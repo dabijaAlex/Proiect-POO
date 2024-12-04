@@ -3,9 +3,11 @@ package org.poo.app;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.commands.Command;
 import org.poo.fileio.UserInput;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @Getter @Setter
 public class User {
@@ -16,6 +18,8 @@ public class User {
     private String email;
     private ArrayList<Account> accounts;
     @JsonIgnore
+    private ArrayList<Command> transactions;
+    @JsonIgnore
     private int index = 0;
 
     public User(UserInput user) {
@@ -23,8 +27,12 @@ public class User {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.accounts = new ArrayList<>();
+        this.transactions = new ArrayList<>();
         counter++;
         index = counter;
+    }
+    public void addTransaction(Command transaction) {
+        transactions.add(transaction);
     }
 
     public void addAccount(Account account) {
@@ -35,14 +43,21 @@ public class User {
         this.accounts.remove(account);
     }
 
-    public Account getAccount(String IBAN) {
+    public Account getAccount(String IBANorCard) {
         for (Account account : this.accounts) {
-            if(account.getIBAN().equals(IBAN)) {
+            if(account.getIBAN().equals(IBANorCard)) {
+                return account;
+            }
+        }
+        for (Account account : this.accounts) {
+            if(account.getCard(IBANorCard) != null) {
                 return account;
             }
         }
         return null;
     }
+
+
 
     public User(User other) {
         this.firstName = other.firstName;

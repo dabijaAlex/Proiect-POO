@@ -15,6 +15,7 @@ public class Account {
     private String currency;
     private String type;
     private ArrayList<Card> cards;
+    private double minBalance = 0;
 
     public Account(String IBAN, double balance, String currency, String type) {
         this.IBAN = IBAN;
@@ -35,6 +36,27 @@ public class Account {
         this.cards = new ArrayList<>();
         for (Card card : other.getCards()) {
             this.cards.add(new Card(card));
+        }
+    }
+
+    public void deleteCard(String cardNumber) {
+        this.cards.remove(getCard(cardNumber));
+//            throw new NotFoundException();
+    }
+
+    public Card getCard(String cardNumber) {
+        for (Card card : cards) {
+            if (card.getCardNumber().equals(cardNumber)) {
+                return card;
+            }
+        }
+        return null;
+    }
+
+    public void useCard(String cardNumber) {
+        Card card = getCard(cardNumber);
+        if(card != null) {
+            useCard(cardNumber);
         }
     }
 }

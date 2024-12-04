@@ -1,11 +1,14 @@
 package org.poo.commands;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.util.List;
 
 //@Getter @Setter
 public class Command {
+    @JsonIgnore
     protected String cmdName = null;
     protected int timestamp = 0;
     protected String cardNumber = null;

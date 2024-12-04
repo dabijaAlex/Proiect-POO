@@ -19,8 +19,10 @@ public class Invoker {
 
     public void solve() {
         for (Command command : cmds) {
-            if(command != null)
+            if(command != null) {
+                System.out.println(command.timestamp);
                 command.execute(output);
+            }
         }
     }
 

@@ -10,4 +10,12 @@ public final class ObjectInput {
     private ExchangeInput[] exchangeRates;
     private CommandInput[] commands;
     private CommerciantInput[] commerciants;
+
+    public CommandInput[] getCommands() {
+        return commands;
+    }
+
+    public void setCommands(CommandInput[] commands) {
+        this.commands = commands;
+    }
 }

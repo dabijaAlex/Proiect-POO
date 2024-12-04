@@ -56,6 +56,7 @@ public final class Main {
             File out = new File(filepath);
             boolean isCreated = out.createNewFile();
             if (isCreated) {
+                if(file.getName().equals("test10_errors.json"))
                 action(file.getName(), filepath);
             }
         }
@@ -75,7 +76,6 @@ public final class Main {
         ObjectInput inputData = objectMapper.readValue(file, ObjectInput.class);
 
         ArrayNode output = objectMapper.createArrayNode();
-
 
         AppStart app = new AppStart(inputData, output);
         Utils.resetRandom();

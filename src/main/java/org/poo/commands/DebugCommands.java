@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.Account;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
 
@@ -59,13 +60,33 @@ class PrintUsers extends Command {
 
 @Getter @Setter
 class PrintTransactions extends Command {
-    public PrintTransactions(CommandInput command) {
+    HashMap<String, User> users;
+    public PrintTransactions(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.email = command.getEmail();
+
+        this.users = users;
     }
-    public void execute() {
+    public void execute(ArrayNode output) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("command", cmdName);
+        User user = this.users.get(email);
+
+        ArrayList<Command> transactions = user.getTransactions();
+        ArrayNode outputArray = mapper.createArrayNode();
+
+        for (Command transaction : transactions) {
+            outputArray.addPOJO(transaction);
+        }
+
+        objectNode.set("output", outputArray);
+        objectNode.put("timestamp", timestamp);
+        output.add(objectNode);
+
     }
+
 }
 
 

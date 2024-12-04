@@ -16,6 +16,7 @@ import java.util.HashMap;
 public class AppStart {
     private ArrayList<User> users;
     private HashMap<String, User> userHashMap;
+    private ExchangeRateList exchangeRateList;
 
     public AppStart(ObjectInput input, final ArrayNode output) {
         userHashMap = new HashMap<>();
@@ -25,6 +26,9 @@ public class AppStart {
             users.add(x);
             userHashMap.put(usr.getEmail(), x);
         }
+
+
+        exchangeRateList = new ExchangeRateList(input.getExchangeRates());
 
 
         Invoker invoker = new Invoker(output);
