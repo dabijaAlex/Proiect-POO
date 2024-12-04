@@ -7,6 +7,7 @@ import org.poo.app.AppStart;
 import org.poo.checker.Checker;
 import org.poo.checker.CheckerConstants;
 import org.poo.fileio.ObjectInput;
+import org.poo.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,7 +76,10 @@ public final class Main {
 
         ArrayNode output = objectMapper.createArrayNode();
 
+
         AppStart app = new AppStart(inputData, output);
+        Utils.resetRandom();
+
 
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         objectWriter.writeValue(new File(filePath2), output);

@@ -1,5 +1,7 @@
 package org.poo.commands;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import java.util.List;
 
 //@Getter @Setter
@@ -22,6 +24,9 @@ public class Command {
     protected int startTimestamp = 0;
     protected int endTimestamp = 0;
 
-    void execute(){
+    void execute(ArrayNode output){
+    }
+    void execute() {
+
     }
 }
