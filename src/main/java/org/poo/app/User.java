@@ -1,5 +1,6 @@
 package org.poo.app;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.UserInput;
@@ -8,16 +9,22 @@ import java.util.ArrayList;
 
 @Getter @Setter
 public class User {
+    @JsonIgnore
+    static int counter = 0;
     private String firstName;
     private String lastName;
     private String email;
     private ArrayList<Account> accounts;
+    @JsonIgnore
+    private int index = 0;
 
     public User(UserInput user) {
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.accounts = new ArrayList<>();
+        counter++;
+        index = counter;
     }
 
     public void addAccount(Account account) {

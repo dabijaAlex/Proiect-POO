@@ -123,18 +123,32 @@ class DeleteAccount extends Command {
         if(user == null) {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode objectNode = mapper.createObjectNode();
-            objectNode.put("timestamp", 5);
-            objectNode.put("description", "User not found");
+            objectNode.put("command", cmdName);
 
-            objectNode.set("output", objectNode);
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("timestamp", timestamp);
+            outputNode.put("description", "User not found");
 
+            objectNode.set("output", outputNode);
+            objectNode.put("timestamp", timestamp);
 
+            output.add(objectNode);
             return;
         }
         Account cont = user.getAccount(account);
-        if(cont != null)
+        if(cont != null) {
             user.deleteAccount(cont);
-        else {
+
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectNode objectNode = mapper.createObjectNode();
+            objectNode.put("command", cmdName);
+            ObjectNode outputNode = mapper.createObjectNode();
+            outputNode.put("success", "Account deleted");
+            outputNode.put("timestamp", timestamp);
+            objectNode.set("output", outputNode);
+            objectNode.put("timestamp", timestamp);
+
+            output.add(objectNode);
         }
     }
 }

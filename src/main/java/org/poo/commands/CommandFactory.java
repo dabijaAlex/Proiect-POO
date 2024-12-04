@@ -32,7 +32,7 @@ public class CommandFactory {
             case "deleteCard" -> {
                 return new DeleteCard(command);
             }
-            case "setMinBalance" -> {
+            case "setMinimumBalance" -> {
                 return new SetMinBalance(command);
             }
             case "checkCardStatus" -> {
@@ -56,8 +56,11 @@ public class CommandFactory {
             case "report" -> {
                 return new Report(command);
             }
-            case "spendingReport" -> {
+            case "spendingsReport" -> {
                 return new SpendingReport(command);
+            }
+            case "splitPayment" -> {
+                return new SplitPayment(command);
             }
             default -> {
                 System.out.println(command.getCommand());

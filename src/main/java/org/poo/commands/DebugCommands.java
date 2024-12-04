@@ -10,10 +10,7 @@ import lombok.Setter;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 
 //public void getCardsInHand(final Match match, final ArrayNode output) {
@@ -46,7 +43,10 @@ class PrintUsers extends Command {
 
          Collection<User> usersCollection = this.users.values();
          Set<User> usersSet = new HashSet<>(usersCollection);
-         for(User user : usersSet) {
+         List<User> list = new ArrayList<>(usersSet);
+         list.sort(Comparator.comparingInt(user -> user.getIndex()));
+
+         for(User user : list) {
             usersArray.addPOJO(new User(user));
          }
          objectNode.set("output", usersArray);
