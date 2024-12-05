@@ -124,32 +124,46 @@ class CreateCard extends Command {
         users.put(card, user);
 
 
-        System.out.println("add the card");
+//        System.out.println("add the card");
         user.addTransaction(this);
     }
 }
 
 @Getter @Setter
 class CreateOneTimeCard extends Command {
+    @JsonIgnore
     private HashMap<String, User> users;
+
+    private int timestamp;
+    private String description;
+    private String card;
+    private String cardHolder;
+    private String account;
 
     public CreateOneTimeCard(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
-        this.email = command.getEmail();
+        this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
         this.users = users;
+
+        this.description = "New card created";
     }
     public void execute(final ArrayNode output) {
-        User user = users.get(email);
+        User user = users.get(cardHolder);
         if(user == null)
             return;
         Account cont = user.getAccount(account);
         if(cont != null) {
             cardNumber = Utils.generateCardNumber();
             cont.addCard(new Card(cardNumber, "active"));
+            this.card = cardNumber;
+            users.put(cardNumber, user);
+            user.addTransaction(this);
+
+
         }
-        users.put(cardNumber, user);
+
     }
 
 }
@@ -264,12 +278,13 @@ class CheckCardStatus extends Command {
 
 
     public CheckCardStatus(CommandInput command, HashMap<String, User> users) {
+        this.users = users;
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.cardNumber = command.getCardNumber();
     }
     public void execute(ArrayNode output) {
-        User user = users.get(account);
+        User user = users.get(cardNumber);
         if(user == null) {
             description = "Card not found";
 
@@ -282,24 +297,45 @@ class CheckCardStatus extends Command {
             outputNode.put("description", description);
 
             objectNode.set("output", outputNode);
+            objectNode.put("timestamp", timestamp);
 
             output.add(objectNode);
+            return;
         } else {
+            Account acc = user.getAccount(cardNumber);
+            if(acc.getCard(cardNumber).getStatus().equals("frozen"))
+                return;
 
-
-            user.addTransaction(this);
+            if(acc.getBalance() <= acc.getMinBalance()) {
+                description = "You have reached the minimum amount of funds, the card will be frozen";
+                acc.getCard(cardNumber).setStatus("frozen");
+            }
+            else if (acc.getBalance() <= acc.getMinBalance() + 30) {
+                description = "Warning";
+            }
         }
+        user.addTransaction(this);
     }
 }
 
 
 @Getter @Setter
-class FailedPayOnline extends Command {
+class InsufficientFunds extends Command {
     private int timestamp;
     private String description;
-    public FailedPayOnline(int timestamp) {
+    public InsufficientFunds(int timestamp) {
         this.timestamp = timestamp;
         description = "Insufficient funds";
+    }
+}
+
+@Getter @Setter
+class FrozenCard extends Command {
+    private int timestamp;
+    private String description;
+    public FrozenCard(int timestamp) {
+        this.timestamp = timestamp;
+        description = "The card is frozen";
     }
 }
 
@@ -356,8 +392,9 @@ class PayOnline extends Command {
                 }
 //                System.out.println(currency + cont.getCurrency());
 //                System.out.println(convRate);
+
                 if(cont.getBalance() < amount * convRate) {
-                    user.addTransaction(new FailedPayOnline(timestamp));
+                    user.addTransaction(new InsufficientFunds(timestamp));
                     return;
                 }
                 cont.setBalance(cont.getBalance() - amount * convRate);
@@ -366,6 +403,10 @@ class PayOnline extends Command {
                 amount = amount * convRate;
                 user.addTransaction(this);
 
+            }
+            if(card != null && card.getStatus().equals("frozen")) {
+                user.addTransaction(new FrozenCard(timestamp));
+                return;
             }
 
         }
@@ -380,6 +421,10 @@ class SendMoney extends Command {
     HashMap<String, User> users;
     @JsonIgnore
     private double amountAsDouble;
+    @JsonIgnore
+    private String senderAlias;
+    @JsonIgnore
+    private String receiverAlias;
 
     private String senderIBAN;
     private String amount;
@@ -390,10 +435,14 @@ class SendMoney extends Command {
 
 
     public SendMoney(CommandInput command, HashMap<String, User> users) {
+        this.senderAlias = command.getAccount();
+        this.receiverAlias = command.getReceiver();
+
+
         this.cmdName = command.getCommand();
-        this.senderIBAN = command.getAccount();
+//        this.senderIBAN = command.getAccount();
         this.amountAsDouble = command.getAmount();
-        this.receiverIBAN = command.getReceiver();
+//        this.receiverIBAN = command.getReceiver();
         this.timestamp = command.getTimestamp();
         this.description = command.getDescription();
         this.users = users;
@@ -401,17 +450,20 @@ class SendMoney extends Command {
         transferType = "sent";
     }
     public void execute(ArrayNode output) {
-        User sender = users.get(senderIBAN);
-        User receiverUser = users.get(this.receiverIBAN);
+        User sender = users.get(senderAlias);
+        User receiverUser = users.get(receiverAlias);
         if(sender == null) {
             return;
         }
+        senderIBAN = sender.getAccount(senderAlias).getIBAN();
         Account senderAccount = sender.getAccount(senderIBAN);
         if(receiverUser == null) {
 //            amount = amountAsDouble + " " + senderAccount.getCurrency();
 //            sender.addTransaction(this);
             return;
         }
+        receiverIBAN = receiverUser.getAccount(receiverAlias).getIBAN();
+
 
         Account receiverAccount = receiverUser.getAccount(receiverIBAN);
         if(senderAccount == null || receiverAccount == null)
@@ -423,6 +475,7 @@ class SendMoney extends Command {
         }
 
         if(senderAccount.getBalance() < amountAsDouble) {
+            sender.addTransaction(new InsufficientFunds(timestamp));
             return;
         }
         senderAccount.setBalance(senderAccount.getBalance() - amountAsDouble);
@@ -436,26 +489,69 @@ class SendMoney extends Command {
 
 @Getter @Setter
 class SetAlias extends Command {
-    public SetAlias(CommandInput command) {
+    private HashMap<String, User> users;
+    public SetAlias(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.email = command.getEmail();
         this.alias = command.getAlias();
         this.account = command. getAccount();
+
+        this.users = users;
     }
-    public void execute() {}
+    public void execute(ArrayNode output) {
+        User user = users.get(email);
+        if(user == null) {
+            users.put(this.alias, user);
+        }
+
+    }
 }
 
 
 @Getter @Setter
 class SplitPayment extends Command {
-    public SplitPayment(CommandInput command) {
+    @JsonIgnore
+    HashMap<String, User> users;
+    @JsonIgnore
+    private double total;
+    private int timestamp;
+    private String description;
+    private double amount;
+    private List<String> involvedAccounts;
+    private String currency;
+
+    public SplitPayment(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.accountsForSplit = command.getAccounts();
+        this.involvedAccounts = command.getAccounts();
         this.timestamp = command.getTimestamp();
         this.currency = command.getCurrency();
-        this.amount = command.getAmount();
+        this.total = command.getAmount();
+
+        this.description = "Split payment of " + String.format("%.2f", total) + " " + currency;
+
+        this.users = users;
     }
-    public void execute() {}
+    public void execute(ArrayNode output) {
+        int nrAccounts = involvedAccounts.size();
+        amount = total / nrAccounts;
+        for(String account : involvedAccounts) {
+            User user = users.get(account);
+            if(user == null) {
+                return;
+            }
+            Account acc = user.getAccount(account);
+            if(acc == null) {
+                return;
+            }
+            double convRate = 1;
+            if(currency.equals(acc.getCurrency()) == false) {
+                convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
+            }
+            acc.setBalance(acc.getBalance() - amount * 1 / convRate);
+            user.addTransaction(this);
+        }
+
+    }
 }
 
 

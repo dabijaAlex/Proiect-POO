@@ -36,7 +36,7 @@ public class CommandFactory {
                 return new SetMinBalance(command);
             }
             case "checkCardStatus" -> {
-                return new CheckCardStatus(command);
+                return new CheckCardStatus(command, userHashMap);
             }
             case "payOnline" -> {
                 return new PayOnline(command, userHashMap);
@@ -45,7 +45,7 @@ public class CommandFactory {
                 return new SendMoney(command, userHashMap);
             }
             case "setAlias" -> {
-                return new SetAlias(command);
+                return new SetAlias(command, userHashMap);
             }
             case "addInterest" -> {
                 return new AddInterest(command);
@@ -60,7 +60,7 @@ public class CommandFactory {
                 return new SpendingReport(command);
             }
             case "splitPayment" -> {
-                return new SplitPayment(command);
+                return new SplitPayment(command, userHashMap);
             }
             default -> {
                 System.out.println(command.getCommand());

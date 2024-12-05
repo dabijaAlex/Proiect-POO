@@ -1,6 +1,7 @@
 package org.poo.app;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,10 @@ public class Account {
     private String currency;
     private String type;
     private ArrayList<Card> cards;
+    @JsonIgnore
     private double minBalance = 0;
+    @JsonIgnore
+    private String alias = "a";
 
     public Account(String IBAN, double balance, String currency, String type) {
         this.IBAN = IBAN;

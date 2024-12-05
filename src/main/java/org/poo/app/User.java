@@ -43,14 +43,19 @@ public class User {
         this.accounts.remove(account);
     }
 
-    public Account getAccount(String IBANorCard) {
+    public Account getAccount(String IBANorCardOrAlias) {
         for (Account account : this.accounts) {
-            if(account.getIBAN().equals(IBANorCard)) {
+            if(account.getIBAN().equals(IBANorCardOrAlias)) {
                 return account;
             }
         }
         for (Account account : this.accounts) {
-            if(account.getCard(IBANorCard) != null) {
+            if(account.getCard(IBANorCardOrAlias) != null) {
+                return account;
+            }
+        }
+        for (Account account : this.accounts) {
+            if(account.getAlias().equals(IBANorCardOrAlias)) {
                 return account;
             }
         }
