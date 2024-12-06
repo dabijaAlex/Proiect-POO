@@ -2,6 +2,7 @@ package org.poo.commands;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 //import com.fasterxml.jackson.databind.Object;
@@ -53,6 +54,7 @@ class AddAccount extends Command {
         this.currency = command.getCurrency();
         this.accountType = command.getAccountType();
         this.timestamp = command.getTimestamp();
+        super.timestamp = timestamp;
         this.interestRate = command.getInterestRate();
 
         this.users = users;
@@ -65,6 +67,10 @@ class AddAccount extends Command {
         users.put(IBAN, user);
         user.addAccount(new Account(IBAN, 0, currency, accountType));
         user.addTransaction(this);
+    }
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
     }
 
 }
@@ -108,7 +114,9 @@ class CreateCard extends Command {
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
+        super.timestamp = timestamp;
         this.users = users;
+
 
         this.description = "New card created";
     }
@@ -126,6 +134,13 @@ class CreateCard extends Command {
 
 //        System.out.println("add the card");
         user.addTransaction(this);
+    }
+
+
+
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
     }
 }
 
@@ -145,6 +160,7 @@ class CreateOneTimeCard extends Command {
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
+        super.timestamp = timestamp;
         this.users = users;
 
         this.description = "New card created";
@@ -164,6 +180,10 @@ class CreateOneTimeCard extends Command {
 
         }
 
+    }
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
     }
 
 }
@@ -237,6 +257,7 @@ class DeleteCard extends Command {
     public DeleteCard(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
+        super.timestamp = timestamp;
         this.card = command.getCardNumber();
         this.users = users;
         this.description = "The card has been destroyed";
@@ -256,17 +277,34 @@ class DeleteCard extends Command {
         }
         user.addTransaction(this);
     }
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
+    }
 }
 
 @Getter @Setter
 class SetMinBalance extends Command {
-    public SetMinBalance(CommandInput command) {
+    HashMap<String, User> users;
+
+
+    public SetMinBalance(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
         this.amount = command.getAmount();
         this.timestamp = command.getTimestamp();
+
+        this.users = users;
     }
-    public void execute() {}
+    public void execute(ArrayNode output) {
+        User user = users.get(account);
+        if(user == null) {
+            return;
+        }
+        Account acc = user.getAccount(account);
+        acc.setMinBalance(amount);
+
+    }
 }
 
 @Getter @Setter
@@ -345,6 +383,8 @@ class FrozenCard extends Command {
 class PayOnline extends Command {
     @JsonIgnore
     HashMap<String, User> users;
+    @JsonIgnore
+    private String account;
     private int timestamp;
     private String description;
     private double amount;
@@ -359,6 +399,8 @@ class PayOnline extends Command {
         this.currency = command.getCurrency();
         this.timestamp = command.getTimestamp();
 //        this.description = command.getDescription();
+        super.timestamp = timestamp;
+
         this.description = "Card payment";
         this.commerciant = command.getCommerciant();
         this.email = command.getEmail();
@@ -401,6 +443,7 @@ class PayOnline extends Command {
                 card.useCard();
 
                 amount = amount * convRate;
+                account = cont.getIBAN();
                 user.addTransaction(this);
 
             }
@@ -411,6 +454,10 @@ class PayOnline extends Command {
 
         }
 
+    }
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
     }
 }
 
@@ -444,6 +491,8 @@ class SendMoney extends Command {
         this.amountAsDouble = command.getAmount();
 //        this.receiverIBAN = command.getReceiver();
         this.timestamp = command.getTimestamp();
+        super.timestamp = timestamp;
+
         this.description = command.getDescription();
         this.users = users;
 
@@ -483,6 +532,10 @@ class SendMoney extends Command {
         amount = amountAsDouble + " " + senderAccount.getCurrency();
         sender.addTransaction(this);
 
+    }
+
+    public void addToList(ArrayList<Command> lista) {
+        lista.add(this);
     }
 }
 
@@ -534,6 +587,8 @@ class SplitPayment extends Command {
     public void execute(ArrayNode output) {
         int nrAccounts = involvedAccounts.size();
         amount = total / nrAccounts;
+        ArrayList<Double> paymentForEach = new ArrayList<>();
+        ArrayList<Account> conturi = new ArrayList<>();
         for(String account : involvedAccounts) {
             User user = users.get(account);
             if(user == null) {
@@ -547,7 +602,24 @@ class SplitPayment extends Command {
             if(currency.equals(acc.getCurrency()) == false) {
                 convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
             }
-            acc.setBalance(acc.getBalance() - amount * 1 / convRate);
+//            acc.setBalance(acc.getBalance() - amount * convRate);
+            paymentForEach.add(amount * convRate);
+            conturi.add(acc);
+//            user.addTransaction(this);
+        }
+        //  check they have money;
+        for(int i = 0; i < nrAccounts; i++) {
+            if(conturi.get(i).getBalance() < paymentForEach.get(i)) {
+                return;
+            }
+        }
+
+        for(int i = 0; i < nrAccounts; i++) {
+            conturi.get(i).setBalance(conturi.get(i).getBalance() - paymentForEach.get(i));
+            User user = users.get(conturi.get(i).getIBAN());
+            if(user == null) {
+                return;
+            }
             user.addTransaction(this);
         }
 
@@ -582,13 +654,57 @@ class ChangeInterestRate extends Command {
 
 @Getter @Setter
 class Report extends Command {
-    public Report(CommandInput command) {
+    @JsonIgnore
+    private HashMap<String, User> users;
+    @JsonProperty("IBAN")
+    private String IBAN;
+    private double balance;
+    private String currency;
+    @JsonIgnore
+    private int timestamp;
+
+
+    private ArrayList<Command> transactions;
+
+    public Report(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
         this.startTimestamp = command.getStartTimestamp();
         this.endTimestamp = command.getEndTimestamp();
+        this.transactions = new ArrayList<>();
+        this.timestamp = command.getTimestamp();
+
+        this.users = users;
     }
-    public void execute() {}
+    public void execute(ArrayNode output) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("command", cmdName);
+
+
+
+
+        User user = users.get(account);
+        Account cont = user.getAccount(account);
+        IBAN = this.account;
+        balance = cont.getBalance();
+        currency = cont.getCurrency();
+
+
+        for(Command transaction : user.getTransactions()) {
+            if(transaction.timestamp >= this.startTimestamp && transaction.timestamp <= this.endTimestamp) {
+//                transactions.add(transaction);
+                transaction.addToList(transactions);
+            }
+        }
+
+        objectNode.putPOJO("output", this);
+//        objectNode.putPOJO("output", transactions);
+
+        objectNode.put("timestamp", timestamp);
+        output.add(objectNode);
+
+    }
 }
 
 

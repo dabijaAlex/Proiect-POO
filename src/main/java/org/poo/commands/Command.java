@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 //@Getter @Setter
@@ -32,4 +33,6 @@ public class Command {
     void execute() {
 
     }
+    public void addToList(ArrayList<Command> lista) {}
+
 }

@@ -33,7 +33,7 @@ public class CommandFactory {
                 return new DeleteCard(command, userHashMap);
             }
             case "setMinimumBalance" -> {
-                return new SetMinBalance(command);
+                return new SetMinBalance(command, userHashMap);
             }
             case "checkCardStatus" -> {
                 return new CheckCardStatus(command, userHashMap);
@@ -54,7 +54,7 @@ public class CommandFactory {
                 return new ChangeInterestRate(command);
             }
             case "report" -> {
-                return new Report(command);
+                return new Report(command, userHashMap);
             }
             case "spendingsReport" -> {
                 return new SpendingReport(command);
