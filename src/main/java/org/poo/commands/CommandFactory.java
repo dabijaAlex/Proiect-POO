@@ -48,16 +48,16 @@ public class CommandFactory {
                 return new SetAlias(command, userHashMap);
             }
             case "addInterest" -> {
-                return new AddInterest(command);
+                return new AddInterest(command, userHashMap);
             }
             case "changeInterestRate" -> {
-                return new ChangeInterestRate(command);
+                return new ChangeInterestRate(command, userHashMap);
             }
             case "report" -> {
                 return new Report(command, userHashMap);
             }
             case "spendingsReport" -> {
-                return new SpendingReport(command);
+                return new SpendingReport(command, userHashMap);
             }
             case "splitPayment" -> {
                 return new SplitPayment(command, userHashMap);

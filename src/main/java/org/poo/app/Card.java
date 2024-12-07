@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
+
 @Getter @Setter
 public class Card {
     private String cardNumber;
@@ -22,7 +24,7 @@ public class Card {
         this.status = other.getStatus();
     }
 
-    public boolean useCard() {
+    public boolean useCard(Account cont,HashMap<String, User> users) {
         return oneTime;
     }
 }

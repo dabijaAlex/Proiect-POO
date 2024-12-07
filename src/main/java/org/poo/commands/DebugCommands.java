@@ -60,7 +60,8 @@ class PrintUsers extends Command {
 
 @Getter @Setter
 class PrintTransactions extends Command {
-    HashMap<String, User> users;
+    private HashMap<String, User> users;
+
     public PrintTransactions(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
