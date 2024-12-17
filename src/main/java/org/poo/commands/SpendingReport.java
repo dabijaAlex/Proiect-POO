@@ -128,7 +128,7 @@ public class SpendingReport extends Command {
     }
 
 
-
+//fol clasa de comparator
 
     private void sortCommerciantsAlphabetically() {
         //  https://stackoverflow.com/questions/18895915/how-to-sort-an-array-of-objects-in-java

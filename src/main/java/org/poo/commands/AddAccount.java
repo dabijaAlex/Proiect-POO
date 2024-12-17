@@ -49,7 +49,7 @@ public class AddAccount extends Command {
 
     public void execute(final ArrayNode output) {
         //  get user
-        User user = users.get(email)
+        User user = users.get(email);
 
         //  gen and add IBAN string to HashMap
         IBAN = Utils.generateIBAN();
