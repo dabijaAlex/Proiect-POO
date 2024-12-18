@@ -70,8 +70,4 @@ public class CreateOneTimeCard extends Command {
 
     }
 
-    public void addToList(ArrayList<Command> lista) {
-        lista.add(this);
-    }
-
 }

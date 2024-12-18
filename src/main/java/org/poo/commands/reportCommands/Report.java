@@ -1,4 +1,4 @@
-package org.poo.commands;
+package org.poo.commands.reportCommands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,9 @@ import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,7 +29,7 @@ public class Report extends Command {
     private int timestamp;
 
 
-    private ArrayList<Command> transactions;
+    private ArrayList<Transaction> transactions;
 
     public Report(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
@@ -57,11 +59,10 @@ public class Report extends Command {
         currency = cont.getCurrency();
 
 
-        for(Command transaction : user.getTransactions()) {
-            if(transaction.timestamp >= this.startTimestamp && transaction.timestamp <= this.endTimestamp
-                && cont.getIBAN().equals(transaction.getIBAN())) {
-                transaction.addToList(transactions);
-            }
+
+        for(Transaction transaction : cont.getTransactions()) {
+            if(transaction.getTimestamp() >= this.startTimestamp && transaction.getTimestamp() <= this.endTimestamp)
+                transactions.add(transaction);
         }
 
         objectNode.putPOJO("output", this);

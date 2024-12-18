@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter @Setter
 public class AddAccountTransaction extends Transaction {
     private String description;
-    public AddAccountTransaction(String description, int timestamp) {
-        this.description = description;
+    public AddAccountTransaction(int timestamp) {
+        this.description = "New account created";
         this.timestamp = timestamp;
     }
 }

@@ -1,37 +1,30 @@
-package org.poo.commands;
+package org.poo.commands.TransactionCommands;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.SavingsAccount;
 import org.poo.app.User;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.AddAccountTransaction;
 import org.poo.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter @Setter
 public class AddAccount extends Command {
-    @JsonIgnore
-    private HashMap<String, User> users;
-    @JsonIgnore
     private String email;
-    @JsonIgnore
     private String currency;
-    @JsonIgnore
     private String accountType;
-    @JsonIgnore
     private double interestRate;
-    @JsonIgnore
     private String IBAN;
-
-
     private int timestamp;
     private String description;
+
+    private HashMap<String, User> users;
+
     public AddAccount(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.email = command.getEmail();
@@ -65,13 +58,7 @@ public class AddAccount extends Command {
             user.addAccount(account);
         }
 
-        user.addTransaction(this);
-        account.addTransaction(new AddAccountTransaction("New account created", this.timestamp));
+        account.addTransaction(new AddAccountTransaction(this.timestamp));
 
     }
-
-    public void addToList(ArrayList<Command> lista) {
-        lista.add(this);
-    }
-
 }

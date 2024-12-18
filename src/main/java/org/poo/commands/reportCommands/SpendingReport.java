@@ -1,4 +1,4 @@
-package org.poo.commands;
+package org.poo.commands.reportCommands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,7 +10,9 @@ import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.Transaction;
 
 import java.util.*;
 
@@ -42,7 +44,7 @@ public class SpendingReport extends Command {
     @JsonIgnore
     private int timestamp;
 
-    private ArrayList<Command> transactions;
+    private ArrayList<Transaction> transactions;
     private ArrayList<Commerciant> commerciants;
 
 
@@ -65,8 +67,6 @@ public class SpendingReport extends Command {
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
 
-        if(timestamp == 692)
-            System.out.println("HATZ");
 
 
         ObjectNode outputNode = mapper.createObjectNode();
@@ -98,25 +98,26 @@ public class SpendingReport extends Command {
 
 
         //  get all transactions by timestamp and IBAN that created them
-        for(Command transaction : user.getTransactions()) {
-            if(transaction.timestamp >= this.startTimestamp &&
-                    transaction.timestamp <= this.endTimestamp) {
-                transaction.addSpendingToList(transactions, this.IBAN);
+        for(Transaction transaction : cont.getTransactions()) {
+            if(transaction.getTimestamp() >= this.startTimestamp &&
+                    transaction.getTimestamp() <= this.endTimestamp) {
+//                transaction.addSpendingToList(transactions, this.IBAN);
+                transaction.addSpendingTransactionToList(transactions);
             }
         }
 
         //  group transactions that have the same vendor
-        for(Command transaction : transactions.reversed()) {
+        for(Transaction transaction : transactions.reversed()) {
             int ok = 0;
             for(Commerciant commerciant : commerciants) {
-                if(commerciant.getCommerciant() != null && commerciant.getCommerciant().equals(transaction.commerciant)) {
-                    commerciant.setTotal(commerciant.getTotal() + transaction.getAmountdouble());
+                if(commerciant.getCommerciant() != null && commerciant.getCommerciant().equals(transaction.getCommerciant2())) {
+                    commerciant.setTotal(commerciant.getTotal() + transaction.getAmountDouble());
                     ok = 1;
                     break;
                 }
             }
             if(ok == 0) {
-                commerciants.add(new Commerciant(transaction.getCommerciant2(), transaction.getAmountdouble()));
+                commerciants.add(new Commerciant(transaction.getCommerciant2(), transaction.getAmountDouble()));
             }
         }
         sortCommerciantsAlphabetically();

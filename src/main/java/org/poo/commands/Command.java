@@ -35,29 +35,10 @@ public class Command {
     protected int startTimestamp = 0;
     protected int endTimestamp = 0;
 
-    void execute(ArrayNode output){
+    public void execute(ArrayNode output){
     }
     void execute() {
 
-    }
-    public void addToList(ArrayList<Command> lista) {}
-
-    public void addSpendingToList(ArrayList<Command> lista, String account) {}
-
-
-
-    @JsonIgnore
-   public String getCommerciant2() {
-        return null;
-   }
-
-//   public double getAmount() {
-//        return 0;
-//   }
-
-    @JsonIgnore
-    public double getAmountdouble(){
-        return 0;
     }
 
 

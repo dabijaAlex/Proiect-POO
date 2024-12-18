@@ -1,4 +1,4 @@
-package org.poo.commands;
+package org.poo.commands.TransactionCommands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -8,6 +8,7 @@ import org.poo.app.Account;
 import org.poo.app.Card;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;
@@ -64,7 +65,5 @@ public class CreateCard extends Command {
 
 
 
-    public void addToList(ArrayList<Command> lista) {
-        lista.add(this);
-    }
+
 }

@@ -1,4 +1,4 @@
-package org.poo.commands;
+package org.poo.commands.TransactionCommands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.ExchangeRateList;
 import org.poo.app.User;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.SplitPaymentErrorTransaction;
 import org.poo.transactions.SplitPaymentTransaction;
@@ -14,38 +15,6 @@ import org.poo.transactions.SplitPaymentTransaction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-@Getter @Setter
-class SplitPaymentError extends Command {
-    private int timestamp;
-    private String description;
-    private double amount;
-    private List<String> involvedAccounts;
-    private String currency;
-    private String error;
-
-    @JsonIgnore
-    private String IBAN;
-
-    public SplitPaymentError(int timestamp, String description, double amount,
-                             List<String> involvedAccounts, String currency, String errorAccount, String IBAN) {
-        this.timestamp = timestamp;
-        super.timestamp = timestamp;
-        this.description = description;
-        this.amount = amount;
-        this.involvedAccounts = involvedAccounts;
-        this.currency = currency;
-        this.error = "Account " + errorAccount + " has insufficient funds for a split payment.";
-
-        this.IBAN = IBAN;
-
-    }
-
-    public void addToList(ArrayList<Command> lista) {
-//        if(lista.contains(this) == false)
-            lista.add(this);
-    }
-}
 
 
 @Getter @Setter
@@ -104,27 +73,19 @@ public class SplitPayment extends Command {
             if(currency.equals(acc.getCurrency()) == false) {
                 convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
             }
-//            acc.setBalance(acc.getBalance() - amount * convRate);
             paymentForEach.add(amount * convRate);
             conturi.add(acc);
-//            user.addTransaction(this);
         }
         //  check they have money;
         for(int i = nrAccounts - 1; i >= 0; i--) {
             if(conturi.get(i).getBalance() < paymentForEach.get(i)) {
-//                addTheTransaction(new SplitPaymentError(timestamp, description,amount,
-//                        this.involvedAccounts, currency, conturi.get(i).getIBAN()), conturi, nrAccounts);
                 for(int j = 0; j < nrAccounts; j++) {
-                    SplitPaymentError error = new SplitPaymentError(timestamp, description,amount,
-                            this.involvedAccounts, currency, conturi.get(i).getIBAN(), conturi.get(j).getIBAN());
                     User user = users.get(conturi.get(j).getIBAN());
                     if(user == null) {
                         return;
                     }
-//                    if(user.getTransactions().contains(error) == false)
                     conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp, description,amount,
                             this.involvedAccounts, currency, conturi.get(i).getIBAN()));
-                    user.addTransaction(error);
                 }
                 return;
             }
@@ -141,20 +102,4 @@ public class SplitPayment extends Command {
         }
 
     }
-
-    private void addTheTransaction(SplitPaymentError error, ArrayList<Account> conturi, int nrAccounts) {
-        for(int i = 0; i < nrAccounts; i++) {
-            User user = users.get(conturi.get(i).getIBAN());
-            if(user == null) {
-                return;
-            }
-//            if(user.getTransactions().contains(error) == false)
-                user.addTransaction(error);
-        }
-    }
-
-    public void addToList(ArrayList<Command> lista) {
-        lista.add(this);
-    }
-
 }
