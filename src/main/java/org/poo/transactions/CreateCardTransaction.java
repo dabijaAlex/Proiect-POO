@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter @Setter
 public class CreateCardTransaction extends Transaction {
-    private int timestamp;
     private String description;
     private String card;
     private String cardHolder;

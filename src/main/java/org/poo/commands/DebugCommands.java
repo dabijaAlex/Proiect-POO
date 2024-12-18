@@ -10,7 +10,9 @@ import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.Transaction;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -69,16 +71,53 @@ class PrintTransactions extends Command {
 
         this.users = users;
     }
+//    public void execute(ArrayNode output) {
+//        ObjectMapper mapper = new ObjectMapper();
+//        ObjectNode objectNode = mapper.createObjectNode();
+//        objectNode.put("command", cmdName);
+//        User user = this.users.get(email);
+//
+//        ArrayList<Command> transactions = user.getTransactions();
+//        ArrayNode outputArray = mapper.createArrayNode();
+//
+//        for (Command transaction : transactions) {
+//            outputArray.addPOJO(transaction);
+//        }
+//
+//        objectNode.set("output", outputArray);
+//        objectNode.put("timestamp", timestamp);
+//        output.add(objectNode);
+//
+//    }
+
+
     public void execute(ArrayNode output) {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
         User user = this.users.get(email);
 
-        ArrayList<Command> transactions = user.getTransactions();
-        ArrayNode outputArray = mapper.createArrayNode();
+        for(Account account : user.getAccounts()) {
+            for(Transaction transaction : account.getTransactions()) {
+                transactions.add(transaction);
+            }
+        }
 
-        for (Command transaction : transactions) {
+//        Collections.sort(transactions, )
+        Collections.sort(transactions, new Comparator<Transaction>(){
+
+            public int compare(Transaction o1, Transaction o2)
+            {
+                return o1.getTimestamp() - o2.getTimestamp();
+            }
+        });
+
+//        ArrayList<Command> transactions = user.getTransactions();
+        ArrayNode outputArray = mapper.createArrayNode();
+//
+        for (Transaction transaction : transactions) {
             outputArray.addPOJO(transaction);
         }
 

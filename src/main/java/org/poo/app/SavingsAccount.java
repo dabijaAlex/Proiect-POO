@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.poo.commands.AddInterest;
 import org.poo.commands.ChangeInterestRate;
 import org.poo.commands.Command;
+import org.poo.transactions.ChangeInterestRateTransaction;
 
 @Getter @Setter
 class SuccessChangeInterestRate extends Command {
@@ -35,6 +36,7 @@ public class SavingsAccount extends Account {
     public void setInterestRate(double interestRate, ArrayNode output, User user, ChangeInterestRate command) {
         this.interestRate = interestRate;
 
+        this.addTransaction(new ChangeInterestRateTransaction(command.getTimestamp(), interestRate));
         user.addTransaction(new SuccessChangeInterestRate(command.getTimestamp(), interestRate));
     }
 }

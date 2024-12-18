@@ -7,7 +7,6 @@ import java.util.List;
 
 @Getter @Setter
 public class SplitPaymentTransaction extends Transaction {
-    private int timestamp;
     private String description;
     private double amount;
     private List<String> involvedAccounts;

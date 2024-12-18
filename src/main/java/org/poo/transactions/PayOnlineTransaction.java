@@ -5,7 +5,6 @@ import lombok.Setter;
 
 @Getter @Setter
 public class PayOnlineTransaction extends Transaction {
-    private int timestamp;
     private String description;
     private double amount;
     private String commerciant;

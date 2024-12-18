@@ -282,7 +282,7 @@ class PayOnline extends Command {
             super.account = cont.getIBAN();
 
             if(cont.getBalance() < amount * convRate) {
-                cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
+                cont.addTransaction(new InsufficientFundsTransaction(timestamp));
                 user.addTransaction(new InsufficientFunds(timestamp, cont.getIBAN()));
                 return;
             }
@@ -454,14 +454,14 @@ class SendMoney extends Command {
         receiverAccount.setBalance(receiverAccount.getBalance() + amountAsDouble * convRate);
         amount = amountAsDouble + " " + senderAccount.getCurrency();
         this.IBAN = senderIBAN;
-        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, "sent", transferType, timestamp));
+        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, description, "sent", timestamp));
         sender.addTransaction(this);
 
 
         receiverUser.addTransaction(new SendMoneyReceiver(timestamp, senderIBAN,
                 amountAsDouble * convRate + " " + receiverAccount.getCurrency(), receiverIBAN,
                 description, "received"));
-        receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, "received", transferType, timestamp));
+        receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amountAsDouble * convRate + " " + receiverAccount.getCurrency(), receiverIBAN, description, "received", timestamp));
 
     }
 
