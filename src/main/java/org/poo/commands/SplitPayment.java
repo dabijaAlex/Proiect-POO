@@ -8,6 +8,8 @@ import org.poo.app.Account;
 import org.poo.app.ExchangeRateList;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.SplitPaymentErrorTransaction;
+import org.poo.transactions.SplitPaymentTransaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +58,7 @@ public class SplitPayment extends Command {
     CommandInput commandInput;
     @JsonIgnore
     private String IBAN;
+
     private int timestamp;
     private String description;
     private double amount;
@@ -119,6 +122,8 @@ public class SplitPayment extends Command {
                         return;
                     }
 //                    if(user.getTransactions().contains(error) == false)
+                    conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp, description,amount,
+                            this.involvedAccounts, currency, conturi.get(i).getIBAN()));
                     user.addTransaction(error);
                 }
                 return;
@@ -131,6 +136,7 @@ public class SplitPayment extends Command {
             if(user == null) {
                 return;
             }
+            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description,amount,involvedAccounts, currency));
             user.addTransaction(new SplitPayment(commandInput, users, conturi.get(i).getIBAN(), amount));
         }
 

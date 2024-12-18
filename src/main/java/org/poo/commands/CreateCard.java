@@ -9,6 +9,7 @@ import org.poo.app.Card;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class CreateCard extends Command {
 
 
         this.IBAN = cont.getIBAN();
+        cont.addTransaction(new CreateCardTransaction(timestamp, description, card, cardHolder, account));
         user.addTransaction(this);
     }
 

@@ -8,6 +8,7 @@ import org.poo.app.Account;
 import org.poo.app.SavingsAccount;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.AddAccountTransaction;
 import org.poo.utils.Utils;
 
 import java.util.ArrayList;
@@ -55,13 +56,18 @@ public class AddAccount extends Command {
         IBAN = Utils.generateIBAN();
         users.put(IBAN, user);
 
-        if(accountType.equals("savings"))
-            user.addAccount(new SavingsAccount(IBAN, 0, currency, accountType));
-        else {
-            user.addAccount(new Account(IBAN, 0, currency, accountType));
+        Account account;
+        if(accountType.equals("savings")) {
+            account = new SavingsAccount(IBAN, 0, currency, accountType);
+            user.addAccount(account);
+        } else {
+            account = new Account(IBAN, 0, currency, accountType);
+            user.addAccount(account);
         }
 
         user.addTransaction(this);
+        account.addTransaction(new AddAccountTransaction("New account created", this.timestamp));
+
     }
 
     public void addToList(ArrayList<Command> lista) {

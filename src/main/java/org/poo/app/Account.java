@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.commands.AddInterest;
 import org.poo.commands.ChangeInterestRate;
+import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
 
@@ -21,11 +22,14 @@ public class Account {
     protected String currency;
     protected String type;
     protected ArrayList<Card> cards;
+
     @JsonIgnore
     protected double minBalance = 0;
     @JsonIgnore
     protected String alias = "a";
     @JsonIgnore double interestRate;
+    @JsonIgnore
+    protected ArrayList<Transaction> transactions;
 
     public Account(String IBAN, double balance, String currency, String type) {
         this.IBAN = IBAN;
@@ -33,6 +37,8 @@ public class Account {
         this.currency = currency;
         this.type = type;
         this.cards = new ArrayList<>();
+
+        this.transactions = new ArrayList<>();
     }
     public void addCard(Card card) {
         this.cards.add(card);
@@ -47,6 +53,11 @@ public class Account {
         for (Card card : other.getCards()) {
             this.cards.add(new Card(card));
         }
+    }
+
+
+    public void addTransaction(Transaction transaction) {
+        this.transactions.add(transaction);
     }
 
     public void deleteCard(String cardNumber) {

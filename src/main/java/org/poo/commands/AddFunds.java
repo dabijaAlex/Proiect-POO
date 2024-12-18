@@ -13,6 +13,7 @@ import lombok.Setter;
 
 import org.poo.app.*;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.*;
 import org.poo.utils.Utils;
 
 import java.lang.annotation.Documented;
@@ -105,6 +106,7 @@ class DeleteAccount extends Command {
             objectNode.put("timestamp", timestamp);
             output.add(objectNode);
             super.account = cont.getIBAN();
+            cont.addTransaction(new FailedDeleteAccountTransaction(timestamp));
             user.addTransaction(new FailedDeleteCard("Account couldn't be deleted - there are funds remaining", timestamp));
 
             return;
@@ -174,6 +176,7 @@ class DeleteCard extends Command {
         users.remove(card);
 
         super.account = acc.getIBAN();
+        acc.addTransaction(new DeleteCardTransaction(timestamp, description, card, cardHolder, account));
         user.addTransaction(this);
     }
 
@@ -279,6 +282,7 @@ class PayOnline extends Command {
             super.account = cont.getIBAN();
 
             if(cont.getBalance() < amount * convRate) {
+                cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
                 user.addTransaction(new InsufficientFunds(timestamp, cont.getIBAN()));
                 return;
             }
@@ -287,6 +291,7 @@ class PayOnline extends Command {
                 amount = amount * convRate;
                 account = cont.getIBAN();
                 super.account = account;
+                cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
                 user.addTransaction(this);
 
 
@@ -300,10 +305,12 @@ class PayOnline extends Command {
 
             amount = amount * convRate;
             account = cont.getIBAN();
+            cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
             user.addTransaction(this);
 
         }
         if(card != null && card.getStatus().equals("frozen")) {
+            cont.addTransaction(new FrozenCardTransaction(timestamp));
             user.addTransaction(new FrozenCard(timestamp));
             return;
         }
@@ -438,6 +445,8 @@ class SendMoney extends Command {
 
         //  sender doesn t have the money
         if (senderAccount.getBalance() < amountAsDouble) {
+
+            senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             sender.addTransaction(new InsufficientFunds(timestamp, senderAccount.getIBAN()));
             return;
         }
@@ -445,11 +454,14 @@ class SendMoney extends Command {
         receiverAccount.setBalance(receiverAccount.getBalance() + amountAsDouble * convRate);
         amount = amountAsDouble + " " + senderAccount.getCurrency();
         this.IBAN = senderIBAN;
+        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, "sent", transferType, timestamp));
         sender.addTransaction(this);
+
 
         receiverUser.addTransaction(new SendMoneyReceiver(timestamp, senderIBAN,
                 amountAsDouble * convRate + " " + receiverAccount.getCurrency(), receiverIBAN,
                 description, "received"));
+        receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, "received", transferType, timestamp));
 
     }
 
