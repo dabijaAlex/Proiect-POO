@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 
 @Getter @Setter
-public class ChangeInterestRate extends Command {
+final public class ChangeInterestRate extends Command {
     @JsonIgnore
     private HashMap<String, User> users;
 
@@ -23,7 +23,7 @@ public class ChangeInterestRate extends Command {
     private int timestamp;
     private double interestRate;
 
-    public ChangeInterestRate(CommandInput command, HashMap<String, User> users) {
+    public ChangeInterestRate(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.timestamp = command.getTimestamp();
@@ -31,7 +31,7 @@ public class ChangeInterestRate extends Command {
 
         this.users = users;
     }
-    public void execute(ArrayNode output) throws NotFoundException {
+    public void execute(final ArrayNode output) throws NotFoundException {
         User user = getUserReference(users, IBAN);
         Account acc = getAccountReference(users, IBAN);
 

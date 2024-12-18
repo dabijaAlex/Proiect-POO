@@ -4,9 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class AddAccountTransaction extends Transaction {
+public final class AddAccountTransaction extends Transaction {
     private String description;
-    public AddAccountTransaction(int timestamp) {
+
+    /**
+     * Constructor
+     * @param timestamp
+     */
+    public AddAccountTransaction(final int timestamp) {
         this.description = "New account created";
         this.timestamp = timestamp;
     }

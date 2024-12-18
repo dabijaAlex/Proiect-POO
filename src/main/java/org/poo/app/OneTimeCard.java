@@ -8,28 +8,15 @@ import java.util.HashMap;
 
 
 public class OneTimeCard extends Card {
-    public OneTimeCard(String cardNumber, String status) {
+    public OneTimeCard(final String cardNumber, final String status) {
         super(cardNumber, status);
         oneTime = true;
     }
-    public OneTimeCard(Card other){
+    public OneTimeCard(final Card other){
         super(other);
     }
 
-    public boolean useCard(Account account, HashMap<String, User> users) {
-//        User user = users.get(account.getIBAN());
-//
-//        account.deleteCard(this.getCardNumber());
-//        String cardNumber = Utils.generateCardNumber();
-//
-//
-//        OneTimeCard oneTimeCard = new OneTimeCard(cardNumber, "active");
-//        account.getCards().add(oneTimeCard);
-//
-//        users.remove(this.getCardNumber());
-//        users.put(cardNumber, user);
-
+    public boolean useCard(final Account account, final HashMap<String, User> users) {
         return oneTime;
-
     }
 }

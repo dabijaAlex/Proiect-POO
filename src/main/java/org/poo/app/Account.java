@@ -31,7 +31,7 @@ public class Account {
     @JsonIgnore
     protected ArrayList<Transaction> transactions;
 
-    public Account(String IBAN, double balance, String currency, String type) {
+    public Account(final String IBAN, final double balance, final String currency, final String type) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
@@ -40,11 +40,12 @@ public class Account {
 
         this.transactions = new ArrayList<>();
     }
-    public void addCard(Card card) {
+
+    public void addCard(final Card card) {
         this.cards.add(card);
     }
 
-    public Account(Account other) {
+    public Account(final Account other) {
         this.IBAN = other.IBAN;
         this.balance = other.balance;
         this.currency = other.currency;
@@ -56,16 +57,16 @@ public class Account {
     }
 
 
-    public void addTransaction(Transaction transaction) {
+    public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
     }
 
-    public void deleteCard(String cardNumber) {
+    public void deleteCard(final String cardNumber) {
         this.cards.remove(getCard(cardNumber));
 //            throw new NotFoundException();
     }
 
-    public Card getCard(String cardNumber) {
+    public Card getCard(final String cardNumber) {
         for (Card card : cards) {
             if (card.getCardNumber().equals(cardNumber)) {
                 return card;
@@ -74,14 +75,14 @@ public class Account {
         return null;
     }
 
-    public void useCard(String cardNumber) {
+    public void useCard(final String cardNumber) {
         Card card = getCard(cardNumber);
         if(card != null) {
             useCard(cardNumber);
         }
     }
 
-    public void addInterest(ArrayNode output, AddInterest command) {
+    public void addInterest(final ArrayNode output, final AddInterest command) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", command.getCmdName());
@@ -97,7 +98,7 @@ public class Account {
         output.add(objectNode);
     }
 
-    public void setInterestRate(double interestRate, ArrayNode output, User user, ChangeInterestRate command) {
+    public void setInterestRate(final double interestRate, final ArrayNode output, final User user, final ChangeInterestRate command) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", command.getCmdName());

@@ -9,7 +9,6 @@ import org.poo.commands.CommandFactory;
 import org.poo.commands.Command;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 
@@ -18,7 +17,7 @@ public class AppStart {
     private HashMap<String, User> userHashMap;
     private ExchangeRateList exchangeRateList;
 
-    public AppStart(ObjectInput input, final ArrayNode output) {
+    public AppStart(final ObjectInput input, final ArrayNode output) {
         userHashMap = new HashMap<>();
         users = new ArrayList<>();
         for(UserInput usr : input.getUsers()) {
@@ -40,15 +39,7 @@ public class AppStart {
             commands.add(factory.createCommand(commandInput, userHashMap));
         }
 
-
-
         invoker.setCmds(commands);
         invoker.solve();
-
-
-
     }
-
-
-
 }

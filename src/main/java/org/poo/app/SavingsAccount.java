@@ -1,41 +1,27 @@
 package org.poo.app;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.commands.AddInterest;
 import org.poo.commands.ChangeInterestRate;
-import org.poo.commands.Command;
 import org.poo.transactions.ChangeInterestRateTransaction;
 
-@Getter @Setter
-class SuccessChangeInterestRate extends Command {
-    private String description;
-    private int timestamp;
-    public SuccessChangeInterestRate(int timestamp, double interestRate) {
-        this.description = "Interest rate of the account changed to " + interestRate;
-        this.timestamp = timestamp;
-    }
-}
 
 @Getter
 @Setter
 public class SavingsAccount extends Account {
-    public SavingsAccount(String IBAN, double balance, String currency, String type) {
+    public SavingsAccount(final String IBAN, final double balance, final String currency, final String type) {
         super(IBAN, balance, currency, type);
     }
 
     @Override
-    public void addInterest(ArrayNode output, AddInterest command) {
+    public void addInterest(final ArrayNode output, final AddInterest command) {
         balance += balance * interestRate;
     }
 
-    public void setInterestRate(double interestRate, ArrayNode output, User user, ChangeInterestRate command) {
+    public void setInterestRate(final double interestRate, final ArrayNode output, final User user, final ChangeInterestRate command) {
         this.interestRate = interestRate;
-
         this.addTransaction(new ChangeInterestRateTransaction(command.getTimestamp(), interestRate));
-        user.addTransaction(new SuccessChangeInterestRate(command.getTimestamp(), interestRate));
     }
 }

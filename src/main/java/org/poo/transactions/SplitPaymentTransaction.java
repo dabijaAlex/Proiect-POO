@@ -12,7 +12,17 @@ public class SplitPaymentTransaction extends Transaction {
     private List<String> involvedAccounts;
     private String currency;
 
-    public SplitPaymentTransaction(int timestamp, String description, double amount, List<String> involvedAccounts, String currency) {
+    /**
+     * Constructor
+     * @param timestamp
+     * @param description
+     * @param amount
+     * @param involvedAccounts
+     * @param currency
+     */
+    public SplitPaymentTransaction(final int timestamp, final String description,
+                                   final double amount, final List<String> involvedAccounts,
+                                   final String currency) {
         this.timestamp = timestamp;
         this.description = description;
         this.amount = amount;

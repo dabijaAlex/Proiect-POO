@@ -4,10 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class InsufficientFundsTransaction extends Transaction {
+public final class InsufficientFundsTransaction extends Transaction {
     private String description;
 
-    public InsufficientFundsTransaction(int timestamp) {
+
+    /**
+     * Constructor
+     * @param timestamp
+     */
+    public InsufficientFundsTransaction(final int timestamp) {
         this.timestamp = timestamp;
         this.description = "Insufficient funds";
     }

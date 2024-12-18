@@ -14,7 +14,7 @@ import org.poo.fileio.CommandInput;
 import java.util.HashMap;
 
 @Getter @Setter
-public class AddInterest extends Command {
+final public class AddInterest extends Command {
     @JsonIgnore
     private HashMap<String, User> users;
 
@@ -22,7 +22,7 @@ public class AddInterest extends Command {
     private int timestamp;
 
 
-    public AddInterest(CommandInput command, HashMap<String, User> users) {
+    public AddInterest(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.timestamp = command.getTimestamp();
@@ -30,7 +30,7 @@ public class AddInterest extends Command {
         this.users = users;
     }
 
-    public void execute(ArrayNode output) throws NotFoundException {
+    public void execute(final ArrayNode output) throws NotFoundException {
         Account acc = getAccountReference(users, IBAN);
 
         acc.addInterest(output, this);

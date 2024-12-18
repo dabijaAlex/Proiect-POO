@@ -19,18 +19,18 @@ public class Command {
     @JsonIgnore
     protected String cmdName = null;
 
-    public void execute(ArrayNode output){
+    public void execute(final ArrayNode output){
     }
 
 
-    public User getUserReference(HashMap<String, User> users, String key) throws NotFoundException {
+    public User getUserReference(final HashMap<String, User> users, final String key) throws NotFoundException {
         User user = users.get(key);
         if(user == null)
             throw new NotFoundException();
         return user;
     }
 
-    public Account getAccountReference(HashMap<String, User> users, String key) throws NotFoundException {
+    public Account getAccountReference(final HashMap<String, User> users, final String key) throws NotFoundException {
         User user = users.get(key);
         if(user == null)
             throw new NotFoundException();
@@ -41,7 +41,7 @@ public class Command {
         return cont;
     }
 
-    protected void addNotFoundError(int timestamp, String description, ArrayNode output) {
+    protected void addNotFoundError(final int timestamp, final String description, final ArrayNode output) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);

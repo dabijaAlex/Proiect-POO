@@ -9,8 +9,8 @@ import org.poo.fileio.CommandInput;
 
 import java.util.HashMap;
 
-public class CommandFactory {
-    public Command createCommand(CommandInput command, HashMap<String, User> userHashMap) {
+final public class CommandFactory {
+    public Command createCommand(final CommandInput command, final HashMap<String, User> userHashMap) {
         switch (command.getCommand()) {
             case "printUsers" -> {
                 return new PrintUsers(command, userHashMap);

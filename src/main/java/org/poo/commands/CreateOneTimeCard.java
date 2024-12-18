@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter @Setter
-public class CreateOneTimeCard extends Command {
+final public class CreateOneTimeCard extends Command {
     private HashMap<String, User> users;
 
     private int timestamp;
@@ -22,7 +22,7 @@ public class CreateOneTimeCard extends Command {
     private String cardHolder;
     private String account;
 
-    public CreateOneTimeCard(CommandInput command, HashMap<String, User> users) {
+    public CreateOneTimeCard(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
@@ -35,7 +35,7 @@ public class CreateOneTimeCard extends Command {
     }
 
     //  for when we need to create a new 1-time after another has been used
-    public CreateOneTimeCard(int timestamp, String cardHolder, String account, HashMap<String, User> users) {
+    public CreateOneTimeCard(final int timestamp, final String cardHolder, final String account, final HashMap<String, User> users) {
         this.timestamp = timestamp;
         this.cardHolder = cardHolder;
         this.account = account;

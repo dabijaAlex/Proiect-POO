@@ -11,14 +11,14 @@ import org.poo.fileio.CommandInput;
 import java.util.HashMap;
 
 @Getter @Setter
-public class SetMinBalance extends Command {
+final public class SetMinBalance extends Command {
     HashMap<String, User> users;
     private String IBAN;
     private double amount;
     private int timestamp;
 
 
-    public SetMinBalance(CommandInput command, HashMap<String, User> users) {
+    public SetMinBalance(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.amount = command.getAmount();
@@ -26,7 +26,7 @@ public class SetMinBalance extends Command {
 
         this.users = users;
     }
-    public void execute(ArrayNode output) throws NotFoundException {
+    public void execute(final ArrayNode output) throws NotFoundException {
         Account acc = getAccountReference(users, IBAN);
         acc.setMinBalance(amount);
     }

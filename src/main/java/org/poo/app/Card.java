@@ -13,18 +13,18 @@ public class Card {
     @JsonIgnore
     protected boolean oneTime;
 
-    public Card(String cardNumber, String status) {
+    public Card(final String cardNumber, final String status) {
         this.cardNumber = cardNumber;
         this.status = status;
         this.oneTime = false;
     }
 
-    public Card(Card other){
+    public Card(final Card other){
         this.cardNumber = other.getCardNumber();
         this.status = other.getStatus();
     }
 
-    public boolean useCard(Account cont,HashMap<String, User> users) {
+    public boolean useCard(final Account cont, final HashMap<String, User> users) {
         return oneTime;
     }
 }

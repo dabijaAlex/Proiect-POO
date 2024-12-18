@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.NoSuchElementException;
 
 @Getter @Setter
-public class CheckCardStatus extends Command {
+final public class CheckCardStatus extends Command {
     HashMap<String, User> users;
     private String IBAN;
     private int timestamp;
@@ -24,14 +24,14 @@ public class CheckCardStatus extends Command {
     private String cardNumber;
 
 
-    public CheckCardStatus(CommandInput command, HashMap<String, User> users) {
+    public CheckCardStatus(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.cardNumber = command.getCardNumber();
 
         this.users = users;
     }
-    public void execute(ArrayNode output) {
+    public void execute(final ArrayNode output) {
         Account acc = null;
         try {
             acc = getAccountReference(users, cardNumber);
@@ -52,9 +52,6 @@ public class CheckCardStatus extends Command {
                 output.add(objectNode);
                 return;
         }
-
-        //  associate transaction to IBAN
-        this.IBAN = acc.getIBAN();
 
         if(acc.getCard(cardNumber).getStatus().equals("frozen")) {
             return;

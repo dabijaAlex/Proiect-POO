@@ -4,10 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class FrozenCardTransaction extends Transaction {
+public final class FrozenCardTransaction extends Transaction {
     private String description;
 
-    public FrozenCardTransaction(int timestamp) {
+    /**
+     * Constructor
+     * @param timestamp
+     */
+    public FrozenCardTransaction(final int timestamp) {
         this.timestamp = timestamp;
         this.description = "The card is frozen";
     }

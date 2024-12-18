@@ -11,12 +11,12 @@ import org.poo.fileio.CommandInput;
 import java.util.HashMap;
 
 @Getter @Setter
-public class SetAlias extends Command {
+final public class SetAlias extends Command {
     private HashMap<String, User> users;
     private String alias;
     private String email;
     private String IBAN;
-    public SetAlias(CommandInput command, HashMap<String, User> users) {
+    public SetAlias(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.email = command.getEmail();
         this.alias = command.getAlias();
@@ -24,7 +24,7 @@ public class SetAlias extends Command {
 
         this.users = users;
     }
-    public void execute(ArrayNode output) throws NotFoundException {
+    public void execute(final ArrayNode output) throws NotFoundException {
 
         User user = getUserReference(users, IBAN);
         Account cont = getAccountReference(users, IBAN);

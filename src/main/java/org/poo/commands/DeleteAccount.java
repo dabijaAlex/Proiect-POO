@@ -15,14 +15,14 @@ import org.poo.transactions.FailedDeleteAccountTransaction;
 import java.util.HashMap;
 
 @Getter @Setter
-public class DeleteAccount extends Command {
+final public class DeleteAccount extends Command {
     private HashMap<String, User> users;
     private int timestamp;
     private String IBAN;
     private String email;
     private String cmdName;
 
-    public DeleteAccount(CommandInput command, HashMap<String, User> users) {
+    public DeleteAccount(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.email = command.getEmail();
@@ -78,8 +78,5 @@ public class DeleteAccount extends Command {
         objectNode.put("timestamp", timestamp);
 
         output.add(objectNode);
-
-
     }
-
 }

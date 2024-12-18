@@ -20,10 +20,10 @@ import java.util.*;
 
 
 @Getter @Setter
-class PrintUsers extends Command {
+final class PrintUsers extends Command {
     private int timestamp;
     private HashMap<String, User> users;
-     public PrintUsers(CommandInput command, HashMap<String, User> users) {
+     public PrintUsers(final CommandInput command, final HashMap<String, User> users) {
          this.cmdName = command.getCommand();
          this.timestamp = command.getTimestamp();
          this.users = users;
@@ -53,12 +53,12 @@ class PrintUsers extends Command {
 }
 
 @Getter @Setter
-class PrintTransactions extends Command {
+final class PrintTransactions extends Command {
     private int timestamp;
     private String email;
     private HashMap<String, User> users;
 
-    public PrintTransactions(CommandInput command, HashMap<String, User> users) {
+    public PrintTransactions(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.email = command.getEmail();
@@ -66,7 +66,7 @@ class PrintTransactions extends Command {
         this.users = users;
     }
 
-    public void execute(ArrayNode output) throws NotFoundException {
+    public void execute(final ArrayNode output) throws NotFoundException {
         ArrayList<Transaction> transactions = new ArrayList<>();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -98,9 +98,7 @@ class PrintTransactions extends Command {
         objectNode.set("output", outputArray);
         objectNode.put("timestamp", timestamp);
         output.add(objectNode);
-
     }
-
 }
 
 
