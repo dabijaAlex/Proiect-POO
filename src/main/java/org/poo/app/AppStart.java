@@ -15,7 +15,7 @@ import java.util.HashMap;
 public final class AppStart {
     private ArrayList<User> users;
     private HashMap<String, User> userHashMap;
-    private ExchangeRateList exchangeRateList;
+    private ExchangeRateGraph exchangeRateList;
 
 
     /**
@@ -42,7 +42,7 @@ public final class AppStart {
         }
 
 
-        exchangeRateList = new ExchangeRateList(input.getExchangeRates());
+        exchangeRateList = new ExchangeRateGraph(input.getExchangeRates());
 
 
         Invoker invoker = new Invoker(output);

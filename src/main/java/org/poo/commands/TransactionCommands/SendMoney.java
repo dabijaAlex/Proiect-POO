@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
-import org.poo.app.ExchangeRateList;
+import org.poo.app.ExchangeRateGraph;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.commands.Command;
@@ -72,7 +72,7 @@ public final class SendMoney extends Command {
         //  check if diff currencies
         double convRate = 1;
         if (!senderAccount.getCurrency().equals(receiverAccount.getCurrency())) {
-            convRate = ExchangeRateList.convertRate(senderAccount.getCurrency(),
+            convRate = ExchangeRateGraph.convertRate(senderAccount.getCurrency(),
                     receiverAccount.getCurrency());
         }
 

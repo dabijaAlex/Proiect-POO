@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
-import org.poo.app.ExchangeRateList;
+import org.poo.app.ExchangeRateGraph;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.commands.Command;
@@ -71,7 +71,7 @@ public class SplitPayment extends Command {
 
             double convRate = 1;
             if (!currency.equals(acc.getCurrency())) {
-                convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
+                convRate = ExchangeRateGraph.convertRate(currency, acc.getCurrency());
             }
 
 
