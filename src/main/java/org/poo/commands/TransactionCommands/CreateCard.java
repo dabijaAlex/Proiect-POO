@@ -1,6 +1,5 @@
 package org.poo.commands.TransactionCommands;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +12,10 @@ import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter @Setter
-public class CreateCard extends Command {
+public final class CreateCard extends Command {
     private HashMap<String, User> users;
 
     private int timestamp;
@@ -26,7 +24,12 @@ public class CreateCard extends Command {
     private String cardHolder;
     private String account;
 
-    public CreateCard(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public CreateCard(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
@@ -36,13 +39,23 @@ public class CreateCard extends Command {
 
         this.description = "New card created";
     }
+
+    /**
+     * check if email and Iban are from the same user
+     *
+     * gen card number
+     * add (card number, user) pair to the users hash map
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
 
         User user = getUserReference(users, account);
         User check = getUserReference(users, cardHolder);
         //  check IBAN and email are from same user
-        if(user != check)
+        if (user != check) {
             return;
+        }
         Account cont = getAccountReference(users, account);
 
         card = Utils.generateCardNumber();
@@ -52,7 +65,8 @@ public class CreateCard extends Command {
         users.put(card, user);
 
 
-        cont.addTransaction(new CreateCardTransaction(timestamp, description, card, cardHolder, account));
+        cont.addTransaction(new CreateCardTransaction(timestamp, description, card, cardHolder,
+                account));
     }
 
 

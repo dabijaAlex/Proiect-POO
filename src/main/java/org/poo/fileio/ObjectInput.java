@@ -15,7 +15,7 @@ public final class ObjectInput {
         return commands;
     }
 
-    public void setCommands(CommandInput[] commands) {
+    public void setCommands(final CommandInput[] commands) {
         this.commands = commands;
     }
 }

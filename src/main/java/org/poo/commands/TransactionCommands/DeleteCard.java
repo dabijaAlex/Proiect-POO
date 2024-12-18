@@ -22,7 +22,12 @@ public class DeleteCard extends Command {
 
     private HashMap<String, User> users;
 
-    public DeleteCard(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public DeleteCard(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.card = command.getCardNumber();
@@ -30,8 +35,14 @@ public class DeleteCard extends Command {
         this.description = "The card has been destroyed";
     }
 
-    //  for when we need to delete and recreate a one time use card
-    public DeleteCard(int timestamp, String cardNumber, HashMap<String, User> users) {
+    /**
+     * Constructor for when we need to delete and recreate a one time use card
+     * @param timestamp
+     * @param cardNumber
+     * @param users
+     */
+    public DeleteCard(final int timestamp, final String cardNumber,
+                      final HashMap<String, User> users) {
         this.timestamp = timestamp;
         this.card = cardNumber;
         this.users = users;
@@ -40,8 +51,17 @@ public class DeleteCard extends Command {
     }
 
 
+    /**
+     * get account and user references (if null it throws error)
+     *
+     * delete card from account
+     * delete (cardNumber user) pair from user hashmap
+     *
+     * add this transaction to account
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
-        //  these two can throw NotFoundException
         User user = getUserReference(users, card);
         Account acc = getAccountReference(users, card);
 
@@ -52,6 +72,7 @@ public class DeleteCard extends Command {
         acc.deleteCard(card);
         users.remove(card);
 
-        acc.addTransaction(new DeleteCardTransaction(timestamp, description, card, cardHolder, account));
+        acc.addTransaction(new DeleteCardTransaction(timestamp, description, card,
+                cardHolder, account));
     }
 }

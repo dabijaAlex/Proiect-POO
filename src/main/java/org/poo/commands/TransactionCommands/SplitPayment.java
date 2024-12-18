@@ -1,6 +1,5 @@
 package org.poo.commands.TransactionCommands;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,9 +19,9 @@ import java.util.List;
 
 @Getter @Setter
 public class SplitPayment extends Command {
-    HashMap<String, User> users;
+    private HashMap<String, User> users;
     private double total;
-    CommandInput commandInput;
+    private CommandInput commandInput;
 
     private int timestamp;
     private String description;
@@ -30,7 +29,12 @@ public class SplitPayment extends Command {
     private List<String> involvedAccounts;
     private String currency;
 
-    public SplitPayment(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public SplitPayment(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.involvedAccounts = command.getAccounts();
         this.timestamp = command.getTimestamp();
@@ -44,19 +48,29 @@ public class SplitPayment extends Command {
     }
 
 
-
-    public void execute(ArrayNode output) throws NotFoundException {
+    /**
+     * put in an array how much each account should pay based currency
+     *
+     * check each account has the required amount
+     * if an account didn t have the money add a failed transaction to all accounts and return
+     *
+     * if all accounts had enough money then subtract the amount for each and add transaction
+     *
+     * @param output
+     * @throws NotFoundException
+     */
+    public void execute(final ArrayNode output) throws NotFoundException {
         int nrAccounts = involvedAccounts.size();
         amount = total / nrAccounts;
         ArrayList<Double> paymentForEach = new ArrayList<>();
         ArrayList<Account> conturi = new ArrayList<>();
 
         //  put in an array how much each account should pay based currency
-        for(String account : involvedAccounts) {
+        for (String account : involvedAccounts) {
             Account acc = getAccountReference(users, account);
 
             double convRate = 1;
-            if(!currency.equals(acc.getCurrency())) {
+            if (!currency.equals(acc.getCurrency())) {
                 convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
             }
 
@@ -66,20 +80,22 @@ public class SplitPayment extends Command {
         }
 
         //  check they have money;
-        for(int i = nrAccounts - 1; i >= 0; i--) {
+        for (int i = nrAccounts - 1; i >= 0; i--) {
             //  an account didnt have the money
-            if(conturi.get(i).getBalance() < paymentForEach.get(i)) {
-                for(int j = 0; j < nrAccounts; j++) {   //poate fac o functie aici
-                    conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp, description,amount,
-                            this.involvedAccounts, currency, conturi.get(i).getIBAN()));
+            if (conturi.get(i).getBalance() < paymentForEach.get(i)) {
+                for (int j = 0; j < nrAccounts; j++) {   //poate fac o functie aici
+                    conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp,
+                            description, amount, this.involvedAccounts, currency,
+                            conturi.get(i).getIBAN()));
                 }
                 return;
             }
         }
 
-        for(int i = 0; i < nrAccounts; i++) {
+        for (int i = 0; i < nrAccounts; i++) {
             conturi.get(i).setBalance(conturi.get(i).getBalance() - paymentForEach.get(i));
-            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description, amount, involvedAccounts, currency));
+            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description,
+                    amount, involvedAccounts, currency));
         }
 
     }

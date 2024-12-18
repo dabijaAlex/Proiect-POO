@@ -35,7 +35,12 @@ public class Report extends Command {
 
     private ArrayList<Transaction> transactions;
 
-    public Report(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public Report(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.startTimestamp = command.getStartTimestamp();
@@ -45,28 +50,36 @@ public class Report extends Command {
 
         this.users = users;
     }
-    public void execute(ArrayNode output) {
+
+    /**
+     * try and get account: if not found add error to output else add to output
+     * the transactions that fit in the timestamps (the transactions are fond in each account)
+     * @param output
+     */
+    public void execute(final ArrayNode output) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
 
-        User user = null;
+        Account cont = null;
         try {
-            user = getUserReference(users, IBAN);
+            cont = getAccountReference(users, IBAN);
+
         } catch (NotFoundException e) {
             this.addNotFoundError(timestamp, "Account not found", output);
             return;
         }
 
-        Account cont = user.getAccount(IBAN);
         balance = cont.getBalance();
         currency = cont.getCurrency();
 
 
-
-        for(Transaction transaction : cont.getTransactions()) {
-            if(transaction.getTimestamp() >= this.startTimestamp && transaction.getTimestamp() <= this.endTimestamp)
+        //  add transactions that fit in timestamp
+        for (Transaction transaction : cont.getTransactions()) {
+            if (transaction.getTimestamp() >= this.startTimestamp
+                    && transaction.getTimestamp() <= this.endTimestamp) {
                 transactions.add(transaction);
+            }
         }
 
         objectNode.putPOJO("output", this);

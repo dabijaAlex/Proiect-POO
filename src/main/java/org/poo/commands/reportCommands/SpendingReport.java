@@ -14,14 +14,23 @@ import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.Transaction;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 
 
 @Getter @Setter
-class Commerciant extends Command {
+final class Commerciant extends Command {
     private String commerciant;
     private double total;
-    public Commerciant(String commerciant, double total) {
+
+    /**
+     * Constructor
+     * @param commerciant
+     * @param total
+     */
+    Commerciant(final String commerciant, final double total) {
         this.commerciant = commerciant;
         this.total = total;
     }
@@ -29,7 +38,7 @@ class Commerciant extends Command {
 
 
 @Getter @Setter
-public class SpendingReport extends Command {
+public final class SpendingReport extends Command {
     @JsonIgnore
     private int endTimestamp;
     @JsonIgnore
@@ -48,8 +57,12 @@ public class SpendingReport extends Command {
     private ArrayList<Commerciant> commerciants;
 
 
-
-    public SpendingReport(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public SpendingReport(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.startTimestamp = command.getStartTimestamp();
@@ -62,7 +75,17 @@ public class SpendingReport extends Command {
     }
 
 
-    public void execute(ArrayNode output) {
+    /**
+     * try get account -> if there is no account add error to output
+     * check acc type -> if it is "savings" add error to output
+     *
+     * get all spending transactions
+     * group transactions by commerciants
+     * sort the commerciants list alphabetically
+     *
+     * @param output
+     */
+    public void execute(final ArrayNode output) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
@@ -72,10 +95,8 @@ public class SpendingReport extends Command {
         ObjectNode outputNode = mapper.createObjectNode();
 
 
-        User user = null;
         Account cont = null;
         try {
-            user = getUserReference(users, IBAN);
 
             cont = getAccountReference(users, IBAN);
             balance = cont.getBalance();
@@ -87,8 +108,9 @@ public class SpendingReport extends Command {
 
 
         //  check if it is a savings account
-        if(cont.getType().equals("savings")) {
-            outputNode.put("error", "This kind of report is not supported for a saving account");
+        if (cont.getType().equals("savings")) {
+            outputNode.put("error", "This kind of report is not "
+                    + "supported for a saving account");
             objectNode.set("output", outputNode);
             objectNode.put("timestamp", timestamp);
 
@@ -97,27 +119,28 @@ public class SpendingReport extends Command {
         }
 
 
-        //  get all transactions by timestamp and IBAN that created them
-        for(Transaction transaction : cont.getTransactions()) {
-            if(transaction.getTimestamp() >= this.startTimestamp &&
-                    transaction.getTimestamp() <= this.endTimestamp) {
-//                transaction.addSpendingToList(transactions, this.IBAN);
+        //  get all transactions by timestamp
+        for (Transaction transaction : cont.getTransactions()) {
+            if (transaction.getTimestamp() >= this.startTimestamp
+                    && transaction.getTimestamp() <= this.endTimestamp) {
                 transaction.addSpendingTransactionToList(transactions);
             }
         }
 
         //  group transactions that have the same vendor
-        for(Transaction transaction : transactions.reversed()) {
+        for (Transaction transaction : transactions.reversed()) {
             int ok = 0;
-            for(Commerciant commerciant : commerciants) {
-                if(commerciant.getCommerciant() != null && commerciant.getCommerciant().equals(transaction.getCommerciant2())) {
+            for (Commerciant commerciant : commerciants) {
+                if (commerciant.getCommerciant() != null
+                        && commerciant.getCommerciant().equals(transaction.getCommerciant2())) {
                     commerciant.setTotal(commerciant.getTotal() + transaction.getAmountDouble());
                     ok = 1;
                     break;
                 }
             }
-            if(ok == 0) {
-                commerciants.add(new Commerciant(transaction.getCommerciant2(), transaction.getAmountDouble()));
+            if (ok == 0) {
+                commerciants.add(new Commerciant(transaction.getCommerciant2(),
+                        transaction.getAmountDouble()));
             }
         }
         sortCommerciantsAlphabetically();
@@ -131,13 +154,14 @@ public class SpendingReport extends Command {
 
 //fol clasa de comparator
 
+    /**
+     * sorting function that sorts commerciants alphabetically in the list
+     */
     private void sortCommerciantsAlphabetically() {
-        //  https://stackoverflow.com/questions/18895915/how-to-sort-an-array-of-objects-in-java
-        Collections.sort(commerciants, new Comparator<Commerciant>(){
+        Collections.sort(commerciants, new Comparator<Commerciant>() {
 
-            public int compare(Commerciant o1, Commerciant o2)
-            {
-                return o1.getCommerciant().compareTo(o2.getCommerciant());
+            public int compare(final Commerciant c1, final Commerciant c2) {
+                return c1.getCommerciant().compareTo(c2.getCommerciant());
             }
         });
     }

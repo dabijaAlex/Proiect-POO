@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
+import org.poo.app.NotFoundException;
 import org.poo.app.SavingsAccount;
 import org.poo.app.User;
 import org.poo.commands.Command;
@@ -14,18 +15,23 @@ import org.poo.utils.Utils;
 import java.util.HashMap;
 
 @Getter @Setter
-public class AddAccount extends Command {
+public final class AddAccount extends Command {
     private String email;
     private String currency;
     private String accountType;
     private double interestRate;
-    private String IBAN;
+    private String iban;
     private int timestamp;
     private String description;
 
     private HashMap<String, User> users;
 
-    public AddAccount(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public AddAccount(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.email = command.getEmail();
         this.currency = command.getCurrency();
@@ -39,25 +45,31 @@ public class AddAccount extends Command {
     }
 
 
-
-    public void execute(final ArrayNode output) {
+    /**
+     * get user (if it doesn t exist this will throw
+     *
+     * check what acc type we want and build one accordingly
+     * add this transaction to account
+     * @param output
+     * @throws NotFoundException
+     */
+    public void execute(final ArrayNode output) throws NotFoundException {
         //  get user
-        User user = users.get(email);
+        User user = getUserReference(users, email);
 
         //  gen and add IBAN string to HashMap
-        IBAN = Utils.generateIBAN();
-        users.put(IBAN, user);
+        iban = Utils.generateIBAN();
+        users.put(iban, user);
 
         Account account;
-        if(accountType.equals("savings")) {
-            account = new SavingsAccount(IBAN, 0, currency, accountType);
+        if (accountType.equals("savings")) {
+            account = new SavingsAccount(iban, 0, currency, accountType);
             user.addAccount(account);
         } else {
-            account = new Account(IBAN, 0, currency, accountType);
+            account = new Account(iban, 0, currency, accountType);
             user.addAccount(account);
         }
 
         account.addTransaction(new AddAccountTransaction(this.timestamp));
-
     }
 }

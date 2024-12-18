@@ -15,8 +15,8 @@ import org.poo.transactions.SendMoneyTransaction;
 import java.util.HashMap;
 
 @Getter @Setter
-public class SendMoney extends Command {
-    HashMap<String, User> users;
+public final class SendMoney extends Command {
+    private HashMap<String, User> users;
     private double amountAsDouble;
     private String senderIdentifier;
     private String receiverIdentifier;
@@ -28,7 +28,12 @@ public class SendMoney extends Command {
     private int timestamp;
 
 
-    public SendMoney(CommandInput command, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    public SendMoney(final CommandInput command, final HashMap<String, User> users) {
         this.senderIdentifier = command.getAccount();
         this.receiverIdentifier = command.getReceiver();
         this.cmdName = command.getCommand();
@@ -39,7 +44,20 @@ public class SendMoney extends Command {
         this.users = users;
     }
 
-    public void execute(ArrayNode output) throws NotFoundException {
+    /**
+     * get sender and receiver accounts references (if fails it will throw)
+     *
+     * check identifier for sender is not an alias
+     *
+     * get the currency conversion
+     *
+     * if sender doesn t have the money add failed transaction to sender and return else
+     * make the transfer and add transaction to oth accounts
+     *
+     * @param output
+     * @throws NotFoundException
+     */
+    public void execute(final ArrayNode output) throws NotFoundException {
         Account senderAccount = getAccountReference(users, senderIdentifier);
         Account receiverAccount = getAccountReference(users, receiverIdentifier);
 
@@ -54,7 +72,8 @@ public class SendMoney extends Command {
         //  check if diff currencies
         double convRate = 1;
         if (!senderAccount.getCurrency().equals(receiverAccount.getCurrency())) {
-            convRate = ExchangeRateList.convertRate(senderAccount.getCurrency(), receiverAccount.getCurrency());
+            convRate = ExchangeRateList.convertRate(senderAccount.getCurrency(),
+                    receiverAccount.getCurrency());
         }
 
         //  sender doesn t have the money
@@ -68,8 +87,12 @@ public class SendMoney extends Command {
         amount = amountAsDouble + " " + senderAccount.getCurrency();
 
         //  add transactions for both accounts
-        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, description, "sent", timestamp));
-        receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amountAsDouble * convRate + " " + receiverAccount.getCurrency(), receiverIBAN, description, "received", timestamp));
+        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount,
+                receiverIBAN, description, "sent", timestamp));
+
+        receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN,
+                amountAsDouble * convRate + " " + receiverAccount.getCurrency(),
+                receiverIBAN, description, "received", timestamp));
 
     }
 }
