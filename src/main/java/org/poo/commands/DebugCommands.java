@@ -13,9 +13,14 @@ import org.poo.app.User;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.Transaction;
 
-import java.lang.reflect.Array;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Comparator;
 
 
 
@@ -23,12 +28,23 @@ import java.util.*;
 final class PrintUsers extends Command {
     private int timestamp;
     private HashMap<String, User> users;
-     public PrintUsers(final CommandInput command, final HashMap<String, User> users) {
+
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+     PrintUsers(final CommandInput command, final HashMap<String, User> users) {
          this.cmdName = command.getCommand();
          this.timestamp = command.getTimestamp();
          this.users = users;
      }
 
+    /**
+     * take all values from hashmap and place them in a set
+     * make the set a list and then sort the users by their index (when they were created)
+     * @param output
+     */
      public void execute(final ArrayNode output) {
          ObjectMapper mapper = new ObjectMapper();
          ObjectNode objectNode = mapper.createObjectNode();
@@ -38,10 +54,15 @@ final class PrintUsers extends Command {
 
          Collection<User> usersCollection = this.users.values();
          Set<User> usersSet = new HashSet<>(usersCollection);
-         List<User> list = new ArrayList<>(usersSet);
-         list.sort(Comparator.comparingInt(user -> user.getIndex()));
+         List<User> userList = new ArrayList<>(usersSet);
+         Collections.sort(userList, new Comparator<User>() {
 
-         for(User user : list) {
+             public int compare(final User u1, final User u2) {
+                 return u1.getIndex() - u2.getIndex();
+             }
+         });
+
+         for (User user : userList) {
             usersArray.addPOJO(new User(user));
          }
          objectNode.set("output", usersArray);
@@ -58,7 +79,12 @@ final class PrintTransactions extends Command {
     private String email;
     private HashMap<String, User> users;
 
-    public PrintTransactions(final CommandInput command, final HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
+    PrintTransactions(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
         this.email = command.getEmail();
@@ -66,6 +92,12 @@ final class PrintTransactions extends Command {
         this.users = users;
     }
 
+    /**
+     * take the transactions from each account of an user, put them together and then sort them
+     * by their timestamp
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
         ArrayList<Transaction> transactions = new ArrayList<>();
 
@@ -75,16 +107,15 @@ final class PrintTransactions extends Command {
 
 
         User user = getUserReference(users, email);
-        for(Account account : user.getAccounts()) {
-            for(Transaction transaction : account.getTransactions()) {
+        for (Account account : user.getAccounts()) {
+            for (Transaction transaction : account.getTransactions()) {
                 transactions.add(transaction);
             }
         }
 
-        Collections.sort(transactions, new Comparator<Transaction>(){
+        Collections.sort(transactions, new Comparator<Transaction>() {
 
-            public int compare(Transaction t1, Transaction t2)
-            {
+            public int compare(final Transaction t1, final Transaction t2) {
                 return t1.getTimestamp() - t2.getTimestamp();
             }
         });

@@ -12,15 +12,30 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class AppStart {
+public final class AppStart {
     private ArrayList<User> users;
     private HashMap<String, User> userHashMap;
     private ExchangeRateList exchangeRateList;
 
+
+    /**
+     * This constructor runs the application
+     *
+     * firstly we need to define the users hashmap where we will store all the
+     * (identifier, user) pairs
+     *
+     * build the exchange rate graph
+     *
+     * extract commands and init them with factory
+     *
+     * add commands list to invoker and call solve
+     * @param input
+     * @param output
+     */
     public AppStart(final ObjectInput input, final ArrayNode output) {
         userHashMap = new HashMap<>();
         users = new ArrayList<>();
-        for(UserInput usr : input.getUsers()) {
+        for (UserInput usr : input.getUsers()) {
             User x = new User(usr);
             users.add(x);
             userHashMap.put(usr.getEmail(), x);
@@ -35,7 +50,7 @@ public class AppStart {
         CommandFactory factory = new CommandFactory();
 
         //  extract commands and init them with factory
-        for(CommandInput commandInput: input.getCommands()) {
+        for (CommandInput commandInput: input.getCommands()) {
             commands.add(factory.createCommand(commandInput, userHashMap));
         }
 

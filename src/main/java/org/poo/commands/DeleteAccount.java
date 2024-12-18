@@ -15,21 +15,36 @@ import org.poo.transactions.FailedDeleteAccountTransaction;
 import java.util.HashMap;
 
 @Getter @Setter
-final public class DeleteAccount extends Command {
+public final class DeleteAccount extends Command {
     private HashMap<String, User> users;
     private int timestamp;
-    private String IBAN;
+    private String iban;
     private String email;
     private String cmdName;
 
+
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
     public DeleteAccount(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.IBAN = command.getAccount();
+        this.iban = command.getAccount();
         this.email = command.getEmail();
         this.timestamp = command.getTimestamp();
 
         this.users = users;
     }
+
+    /**
+     * try and get account refference. if it doesn t exits add error to output
+     *
+     * check if account still has money. if it does add error to output
+     *
+     * delete account and its associated cards
+     * @param output
+     */
     public void execute(final ArrayNode output) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
@@ -39,8 +54,8 @@ final public class DeleteAccount extends Command {
         Account cont = null;
 
         try {
-            user = getUserReference(users, IBAN);
-            cont = getAccountReference(users, IBAN);
+            user = getUserReference(users, iban);
+            cont = getAccountReference(users, iban);
         } catch (NotFoundException e) {
 
                 outputNode.put("timestamp", timestamp);
@@ -54,8 +69,9 @@ final public class DeleteAccount extends Command {
         }
 
 
-        if(cont.getBalance() > 0) {
-            outputNode.put("error", "Account couldn't be deleted - see org.poo.transactions for details");
+        if (cont.getBalance() > 0) {
+            outputNode.put("error", "Account couldn't be deleted - "
+                    + "see org.poo.transactions for details");
             outputNode.put("timestamp", timestamp);
             objectNode.set("output", outputNode);
             objectNode.put("timestamp", timestamp);
@@ -67,10 +83,10 @@ final public class DeleteAccount extends Command {
 
         user.deleteAccount(cont);
         //  clear cards
-        for(Card card : cont.getCards()) {
+        for (Card card : cont.getCards()) {
             users.remove(card.getCardNumber());
         }
-        users.remove(IBAN);
+        users.remove(iban);
 
         outputNode.put("success", "Account deleted");
         outputNode.put("timestamp", timestamp);

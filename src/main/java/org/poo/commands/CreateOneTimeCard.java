@@ -1,19 +1,20 @@
 package org.poo.commands;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.*;
+import org.poo.app.NotFoundException;
+import org.poo.app.OneTimeCard;
+import org.poo.app.User;
+import org.poo.app.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 @Getter @Setter
-final public class CreateOneTimeCard extends Command {
+public final class CreateOneTimeCard extends Command {
     private HashMap<String, User> users;
 
     private int timestamp;
@@ -22,6 +23,11 @@ final public class CreateOneTimeCard extends Command {
     private String cardHolder;
     private String account;
 
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
     public CreateOneTimeCard(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.account = command.getAccount();
@@ -34,8 +40,16 @@ final public class CreateOneTimeCard extends Command {
         this.description = "New card created";
     }
 
-    //  for when we need to create a new 1-time after another has been used
-    public CreateOneTimeCard(final int timestamp, final String cardHolder, final String account, final HashMap<String, User> users) {
+
+    /**
+     * for when we need to create a new 1-time after another has been used
+     * @param timestamp
+     * @param cardHolder
+     * @param account
+     * @param users
+     */
+    public CreateOneTimeCard(final int timestamp, final String cardHolder,
+                             final String account, final HashMap<String, User> users) {
         this.timestamp = timestamp;
         this.cardHolder = cardHolder;
         this.account = account;
@@ -45,6 +59,14 @@ final public class CreateOneTimeCard extends Command {
     }
 
 
+    /**
+     * check if email and Iban are from the same user
+     *
+     * gen card number
+     * add (card number, user) pair to the users hash map
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
         User user = getUserReference(users, account);
         Account cont = getAccountReference(users, account);
@@ -54,7 +76,8 @@ final public class CreateOneTimeCard extends Command {
         users.put(cardNumber, user);
 
 
-        cont.addTransaction(new CreateCardTransaction(timestamp, description, cardNumber, cardHolder, account));
+        cont.addTransaction(new CreateCardTransaction(timestamp, description, cardNumber,
+                cardHolder, account));
     }
 
 }

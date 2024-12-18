@@ -11,11 +11,9 @@ import org.poo.app.NotFoundException;
 import org.poo.app.Card;
 import org.poo.app.ExchangeRateList;
 import org.poo.commands.Command;
-import org.poo.commands.CreateOneTimeCard;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.FrozenCardTransaction;
 import org.poo.transactions.InsufficientFundsTransaction;
-import org.poo.transactions.PayOnlineTransaction;
 
 import java.util.HashMap;
 
@@ -32,6 +30,7 @@ public final class PayOnline extends Command {
     private String cardNumber;
     private String currency;
     private String email;
+    private double convRate;
 
 
     /**
@@ -64,7 +63,8 @@ public final class PayOnline extends Command {
      *
      * if the card is a one time then use it, delete it and generate a new one and
      *          add transaction
-     * else just use the card and add transaction
+     * else just use the card and add transaction (these things are done in the use card
+     * method that are specific to each type)
      *
      * @param output
      */
@@ -100,7 +100,7 @@ public final class PayOnline extends Command {
         //  card is active
 
         //  get conv rate
-        double convRate = 1;
+        convRate = 1;
         if (!currency.equals(cont.getCurrency())) {
             convRate = ExchangeRateList.convertRate(currency, cont.getCurrency());
         }
@@ -112,26 +112,7 @@ public final class PayOnline extends Command {
         }
 
         cont.setBalance(cont.getBalance() - amount * convRate);
-        if (card.useCard(cont, users)) {
-            amount = amount * convRate;
-            account = cont.getIBAN();
-            cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount,
-                    commerciant));
 
-
-            DeleteCard del = new DeleteCard(timestamp, cardNumber, users);
-            del.execute(output);
-            CreateOneTimeCard cr = new CreateOneTimeCard(timestamp, user.getEmail(),
-                    cont.getIBAN(), users);
-            cr.execute(output);
-
-            return;
-        }
-
-        amount = amount * convRate;
-        account = cont.getIBAN();
-        cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
-
-
+        card.useCard(cont, users, this, output);
     }
 }

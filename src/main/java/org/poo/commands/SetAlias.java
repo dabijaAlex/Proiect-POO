@@ -11,23 +11,36 @@ import org.poo.fileio.CommandInput;
 import java.util.HashMap;
 
 @Getter @Setter
-final public class SetAlias extends Command {
+public final class SetAlias extends Command {
     private HashMap<String, User> users;
     private String alias;
     private String email;
-    private String IBAN;
+    private String iban;
+
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
     public SetAlias(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.email = command.getEmail();
         this.alias = command.getAlias();
-        this.IBAN = command. getAccount();
+        this.iban = command.getAccount();
 
         this.users = users;
     }
+
+    /**
+     * set alias to account (if it exists) and then put in the users hashmap the (alias, user) pair
+     * so it can later be identified
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
 
-        User user = getUserReference(users, IBAN);
-        Account cont = getAccountReference(users, IBAN);
+        User user = getUserReference(users, iban);
+        Account cont = getAccountReference(users, iban);
 
         cont.setAlias(alias);
         users.put(alias, user);

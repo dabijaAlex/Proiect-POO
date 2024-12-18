@@ -1,22 +1,58 @@
 package org.poo.app;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.commands.CreateOneTimeCard;
-import org.poo.utils.Utils;
+import org.poo.commands.TransactionCommands.DeleteCard;
+import org.poo.commands.TransactionCommands.PayOnline;
+import org.poo.transactions.PayOnlineTransaction;
 
 import java.util.HashMap;
 
 
 
 public class OneTimeCard extends Card {
+    /**
+     * Constructor that calls cons of superclass
+     * @param cardNumber
+     * @param status
+     */
     public OneTimeCard(final String cardNumber, final String status) {
         super(cardNumber, status);
         oneTime = true;
     }
-    public OneTimeCard(final Card other){
+
+    /**
+     * copy card for another arrayoutput reference
+     * @param other
+     */
+    public OneTimeCard(final Card other) {
         super(other);
     }
 
-    public boolean useCard(final Account account, final HashMap<String, User> users) {
-        return oneTime;
+    /**
+     * card is one time so we need to delete it and generate another one
+     * we also need to add the transaction
+     * @param account
+     * @param users
+     * @param command
+     * @param output
+     */
+    public void useCard(final Account account, final HashMap<String, User> users,
+                           final PayOnline command, final ArrayNode output) {
+        double amount = command.getAmount();
+
+        User user = command.getUserReference(users, account.getIBAN());
+
+        amount = amount * command.getConvRate();
+        account.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
+                command.getDescription(), amount, command.getCommerciant()));
+
+
+        DeleteCard del = new DeleteCard(command.getTimestamp(), command.getCardNumber(),
+                users);
+        del.execute(output);
+        CreateOneTimeCard cr = new CreateOneTimeCard(command.getTimestamp(), user.getEmail(),
+                account.getIBAN(), users);
+        cr.execute(output);
     }
 }

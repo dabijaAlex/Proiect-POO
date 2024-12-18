@@ -27,11 +27,21 @@ public class Account {
     protected double minBalance = 0;
     @JsonIgnore
     protected String alias = "a";
-    @JsonIgnore double interestRate;
+    @JsonIgnore
+    protected double interestRate;
     @JsonIgnore
     protected ArrayList<Transaction> transactions;
 
-    public Account(final String IBAN, final double balance, final String currency, final String type) {
+
+    /**
+     * Constructor
+     * @param IBAN
+     * @param balance
+     * @param currency
+     * @param type
+     */
+    public Account(final String IBAN, final double balance, final String currency,
+                   final String type) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
@@ -41,10 +51,18 @@ public class Account {
         this.transactions = new ArrayList<>();
     }
 
+    /**
+     * Add card to account
+     * @param card
+     */
     public void addCard(final Card card) {
         this.cards.add(card);
     }
 
+    /**
+     * copy account so the reference from output is different
+     * @param other
+     */
     public Account(final Account other) {
         this.IBAN = other.IBAN;
         this.balance = other.balance;
@@ -57,15 +75,27 @@ public class Account {
     }
 
 
+    /**
+     * Add transaction to account
+     * @param transaction
+     */
     public void addTransaction(final Transaction transaction) {
         this.transactions.add(transaction);
     }
 
+    /**
+     * delete card from account
+     * @param cardNumber
+     */
     public void deleteCard(final String cardNumber) {
         this.cards.remove(getCard(cardNumber));
-//            throw new NotFoundException();
     }
 
+    /**
+     * get card by card number
+     * @param cardNumber
+     * @return
+     */
     public Card getCard(final String cardNumber) {
         for (Card card : cards) {
             if (card.getCardNumber().equals(cardNumber)) {
@@ -75,44 +105,52 @@ public class Account {
         return null;
     }
 
-    public void useCard(final String cardNumber) {
-        Card card = getCard(cardNumber);
-        if(card != null) {
-            useCard(cardNumber);
-        }
-    }
 
+    /**
+     * this is a normal account so add interest will add error to output
+     * @param output
+     * @param command
+     */
     public void addInterest(final ArrayNode output, final AddInterest command) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("command", command.getCmdName());
+        this.interestError("This is not a savings account",
+                output, command.getCmdName(), command.getTimestamp());
 
-
-        ObjectNode outputNode = mapper.createObjectNode();
-        outputNode.put("timestamp", command.getTimestamp());
-        outputNode.put("description", "This is not a savings account");
-
-        objectNode.set("output", outputNode);
-        objectNode.put("timestamp", command.getTimestamp());
-
-        output.add(objectNode);
-    }
-
-    public void setInterestRate(final double interestRate, final ArrayNode output, final User user, final ChangeInterestRate command) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("command", command.getCmdName());
-
-
-        ObjectNode outputNode = mapper.createObjectNode();
-        outputNode.put("timestamp", command.getTimestamp());
-        outputNode.put("description", "This is not a savings account");
-
-        objectNode.set("output", outputNode);
-        objectNode.put("timestamp", command.getTimestamp());
-
-        output.add(objectNode);
     }
 
 
+    /**
+     * this is a normal account so add interest will add error to output
+     * @param interestRate
+     * @param output
+     * @param command
+     */
+    public void setInterestRate(final double interestRate, final ArrayNode output,
+                                final ChangeInterestRate command) {
+        this.interestError("This is not a savings account",
+                output, command.getCmdName(), command.getTimestamp());
+    }
+
+    /**
+     * this method is called by both earlier methods
+     * @param description
+     * @param output
+     * @param cmdName
+     * @param timestamp
+     */
+    private void interestError(final String description, final ArrayNode output,
+                               final String cmdName, final int timestamp) {
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode objectNode = mapper.createObjectNode();
+        objectNode.put("command", cmdName);
+
+
+        ObjectNode outputNode = mapper.createObjectNode();
+        outputNode.put("timestamp", timestamp);
+        outputNode.put("description", description);
+
+        objectNode.set("output", outputNode);
+        objectNode.put("timestamp", timestamp);
+
+        output.add(objectNode);
+    }
 }

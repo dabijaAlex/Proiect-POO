@@ -2,15 +2,27 @@ package org.poo.commands;
 
 
 import org.poo.app.User;
-import org.poo.commands.TransactionCommands.*;
+import org.poo.commands.TransactionCommands.AddAccount;
+import org.poo.commands.TransactionCommands.CreateCard;
+import org.poo.commands.TransactionCommands.DeleteCard;
+import org.poo.commands.TransactionCommands.PayOnline;
+import org.poo.commands.TransactionCommands.SendMoney;
+import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.commands.reportCommands.Report;
 import org.poo.commands.reportCommands.SpendingReport;
 import org.poo.fileio.CommandInput;
 
 import java.util.HashMap;
 
-final public class CommandFactory {
-    public Command createCommand(final CommandInput command, final HashMap<String, User> userHashMap) {
+public final class CommandFactory {
+    /**
+     * factory for commands. Get instances by matching string
+     * @param command
+     * @param userHashMap
+     * @return
+     */
+    public Command createCommand(final CommandInput command,
+                                 final HashMap<String, User> userHashMap) {
         switch (command.getCommand()) {
             case "printUsers" -> {
                 return new PrintUsers(command, userHashMap);

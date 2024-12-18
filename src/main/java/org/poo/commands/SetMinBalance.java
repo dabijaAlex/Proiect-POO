@@ -11,23 +11,34 @@ import org.poo.fileio.CommandInput;
 import java.util.HashMap;
 
 @Getter @Setter
-final public class SetMinBalance extends Command {
-    HashMap<String, User> users;
-    private String IBAN;
+public final class SetMinBalance extends Command {
+    private HashMap<String, User> users;
+    private String iban;
     private double amount;
     private int timestamp;
 
 
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
     public SetMinBalance(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.IBAN = command.getAccount();
+        this.iban = command.getAccount();
         this.amount = command.getAmount();
         this.timestamp = command.getTimestamp();
 
         this.users = users;
     }
+
+    /**
+     * if account doesn t exist throw exception else set a minimum balance
+     * @param output
+     * @throws NotFoundException
+     */
     public void execute(final ArrayNode output) throws NotFoundException {
-        Account acc = getAccountReference(users, IBAN);
+        Account acc = getAccountReference(users, iban);
         acc.setMinBalance(amount);
     }
 }

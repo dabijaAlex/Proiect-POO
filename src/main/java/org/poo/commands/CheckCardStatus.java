@@ -1,6 +1,5 @@
 package org.poo.commands;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -13,17 +12,20 @@ import org.poo.fileio.CommandInput;
 import org.poo.transactions.CardLimitReachedTransaction;
 
 import java.util.HashMap;
-import java.util.NoSuchElementException;
 
 @Getter @Setter
-final public class CheckCardStatus extends Command {
-    HashMap<String, User> users;
-    private String IBAN;
+public final class CheckCardStatus extends Command {
+    private HashMap<String, User> users;
     private int timestamp;
     private String description;
     private String cardNumber;
 
 
+    /**
+     * Constructor
+     * @param command
+     * @param users user hashmap where all users can be identified by card/ iban / alias/ email
+     */
     public CheckCardStatus(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
@@ -31,6 +33,11 @@ final public class CheckCardStatus extends Command {
 
         this.users = users;
     }
+
+    /**
+     *
+     * @param output
+     */
     public void execute(final ArrayNode output) {
         Account acc = null;
         try {
@@ -53,11 +60,11 @@ final public class CheckCardStatus extends Command {
                 return;
         }
 
-        if(acc.getCard(cardNumber).getStatus().equals("frozen")) {
+        if (acc.getCard(cardNumber).getStatus().equals("frozen")) {
             return;
         }
 
-        if(acc.getBalance() <= acc.getMinBalance()) {
+        if (acc.getBalance() <= acc.getMinBalance()) {
             description = "You have reached the minimum amount of funds, the card will be frozen";
             acc.getCard(cardNumber).setStatus("frozen");
 
