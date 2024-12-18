@@ -27,7 +27,6 @@ public class DeleteAccount extends Command {
         this.IBAN = command.getAccount();
         this.email = command.getEmail();
         this.timestamp = command.getTimestamp();
-        this.account = IBAN;
 
         this.users = users;
     }
@@ -61,7 +60,6 @@ public class DeleteAccount extends Command {
             objectNode.set("output", outputNode);
             objectNode.put("timestamp", timestamp);
             output.add(objectNode);
-            super.account = cont.getIBAN();
             cont.addTransaction(new FailedDeleteAccountTransaction(timestamp));
 
             return;

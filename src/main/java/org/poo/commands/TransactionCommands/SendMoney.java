@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.ExchangeRateList;
+import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -17,57 +18,38 @@ import java.util.HashMap;
 public class SendMoney extends Command {
     HashMap<String, User> users;
     private double amountAsDouble;
-    private String senderAlias;
-    private String receiverAlias;
+    private String senderIdentifier;
+    private String receiverIdentifier;
 
     private String senderIBAN;
     private String amount;
     private String receiverIBAN;
     private String description;
-    private String transferType;
     private int timestamp;
 
 
     public SendMoney(CommandInput command, HashMap<String, User> users) {
-        this.senderAlias = command.getAccount();
-        this.receiverAlias = command.getReceiver();
+        this.senderIdentifier = command.getAccount();
+        this.receiverIdentifier = command.getReceiver();
         this.cmdName = command.getCommand();
         this.amountAsDouble = command.getAmount();
         this.timestamp = command.getTimestamp();
-        super.timestamp = timestamp;
         this.description = command.getDescription();
 
         this.users = users;
-
-        transferType = "sent";
     }
 
-    public void execute(ArrayNode output) {
+    public void execute(ArrayNode output) throws NotFoundException {
+        Account senderAccount = getAccountReference(users, senderIdentifier);
+        Account receiverAccount = getAccountReference(users, receiverIdentifier);
 
-        User sender = users.get(senderAlias);
+        senderIBAN = senderAccount.getIBAN();
+        receiverIBAN = receiverAccount.getIBAN();
 
-        User receiverUser = users.get(receiverAlias);
-        if (sender == null) {
+        //  cand primim identifierul verificam ca acesta sa nu fie un alias pt sender
+        if (!senderIBAN.equals(senderIdentifier)) {
             return;
         }
-        senderIBAN = sender.getAccount(senderAlias).getIBAN();
-        super.account = senderIBAN;
-
-        //  senderul nu are voie sa fie alias
-        if (senderIBAN.equals(senderAlias) == false) {
-            return;
-        }
-        Account senderAccount = sender.getAccount(senderIBAN);
-        if (receiverUser == null) {
-            return;
-        }
-        receiverIBAN = receiverUser.getAccount(receiverAlias).getIBAN();
-
-
-        Account receiverAccount = receiverUser.getAccount(receiverIBAN);
-        if (senderAccount == null || receiverAccount == null)
-            return;
-
 
         //  check if diff currencies
         double convRate = 1;
@@ -77,16 +59,16 @@ public class SendMoney extends Command {
 
         //  sender doesn t have the money
         if (senderAccount.getBalance() < amountAsDouble) {
-
             senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
         }
+
         senderAccount.setBalance(senderAccount.getBalance() - amountAsDouble);
         receiverAccount.setBalance(receiverAccount.getBalance() + amountAsDouble * convRate);
         amount = amountAsDouble + " " + senderAccount.getCurrency();
-        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, description, "sent", timestamp));
-        sender.addTransaction(this);
 
+        //  add transactions for both accounts
+        senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount, receiverIBAN, description, "sent", timestamp));
         receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amountAsDouble * convRate + " " + receiverAccount.getCurrency(), receiverIBAN, description, "received", timestamp));
 
     }

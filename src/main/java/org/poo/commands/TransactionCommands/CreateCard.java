@@ -18,10 +18,7 @@ import java.util.HashMap;
 
 @Getter @Setter
 public class CreateCard extends Command {
-    @JsonIgnore
     private HashMap<String, User> users;
-    @JsonIgnore
-    private String IBAN;
 
     private int timestamp;
     private String description;
@@ -34,10 +31,8 @@ public class CreateCard extends Command {
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
-        super.timestamp = timestamp;
 
         this.users = users;
-
 
         this.description = "New card created";
     }
@@ -57,9 +52,7 @@ public class CreateCard extends Command {
         users.put(card, user);
 
 
-        this.IBAN = cont.getIBAN();
         cont.addTransaction(new CreateCardTransaction(timestamp, description, card, cardHolder, account));
-        user.addTransaction(this);
     }
 
 

@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.Account;
-import org.poo.app.Card;
-import org.poo.app.OneTimeCard;
-import org.poo.app.User;
+import org.poo.app.*;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;
@@ -17,12 +14,7 @@ import java.util.HashMap;
 
 @Getter @Setter
 public class CreateOneTimeCard extends Command {
-    @JsonIgnore
     private HashMap<String, User> users;
-    @JsonIgnore
-    private String IBAN;
-//    @JsonIgnore
-//    private String cmdName;
 
     private int timestamp;
     private String description;
@@ -35,7 +27,6 @@ public class CreateOneTimeCard extends Command {
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
-        super.timestamp = timestamp;
 
 
         this.users = users;
@@ -54,20 +45,16 @@ public class CreateOneTimeCard extends Command {
     }
 
 
-    public void execute(final ArrayNode output) {
+    public void execute(final ArrayNode output) throws NotFoundException {
         User user = getUserReference(users, account);
         Account cont = getAccountReference(users, account);
 
-        cardNumber = Utils.generateCardNumber();
+        String cardNumber = Utils.generateCardNumber();
         cont.addCard(new OneTimeCard(cardNumber, "active"));
-        this.card = cardNumber;
         users.put(cardNumber, user);
 
-        this.IBAN = cont.getIBAN();
 
-        cont.addTransaction(new CreateCardTransaction(timestamp, description, card, cardHolder, account));
-        user.addTransaction(this);
-
+        cont.addTransaction(new CreateCardTransaction(timestamp, description, cardNumber, cardHolder, account));
     }
 
 }

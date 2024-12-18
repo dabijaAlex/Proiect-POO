@@ -20,7 +20,6 @@ public class AddInterest extends Command {
 
     private String IBAN;
     private int timestamp;
-//    private String cmdName;
 
 
     public AddInterest(CommandInput command, HashMap<String, User> users) {
@@ -30,6 +29,7 @@ public class AddInterest extends Command {
 
         this.users = users;
     }
+
     public void execute(ArrayNode output) throws NotFoundException {
         Account acc = getAccountReference(users, IBAN);
 

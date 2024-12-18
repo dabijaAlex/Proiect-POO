@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
+import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.fileio.CommandInput;
 
@@ -18,7 +19,6 @@ public class ChangeInterestRate extends Command {
     @JsonIgnore
     private HashMap<String, User> users;
 
-//    private String cmdName;
     private String IBAN;
     private int timestamp;
     private double interestRate;
@@ -31,7 +31,7 @@ public class ChangeInterestRate extends Command {
 
         this.users = users;
     }
-    public void execute(ArrayNode output) {
+    public void execute(ArrayNode output) throws NotFoundException {
         User user = getUserReference(users, IBAN);
         Account acc = getAccountReference(users, IBAN);
 

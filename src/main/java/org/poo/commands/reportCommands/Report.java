@@ -27,6 +27,10 @@ public class Report extends Command {
     private String currency;
     @JsonIgnore
     private int timestamp;
+    @JsonIgnore
+    private int startTimestamp;
+    @JsonIgnore
+    private int endTimestamp;
 
 
     private ArrayList<Transaction> transactions;

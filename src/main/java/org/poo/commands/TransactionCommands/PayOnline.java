@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.Account;
-import org.poo.app.Card;
-import org.poo.app.ExchangeRateList;
-import org.poo.app.User;
+import org.poo.app.*;
 import org.poo.commands.Command;
 import org.poo.commands.CreateOneTimeCard;
 import org.poo.fileio.CommandInput;
@@ -28,7 +25,9 @@ public class PayOnline extends Command {
     private String description;
     private double amount;
     private String commerciant;
-
+    private String cardNumber;
+    private String currency;
+    private String email;
 
 
     public PayOnline(CommandInput command, HashMap<String, User> users) {
@@ -37,18 +36,22 @@ public class PayOnline extends Command {
         this.amount = command.getAmount();
         this.currency = command.getCurrency();
         this.timestamp = command.getTimestamp();
-//        this.description = command.getDescription();
-        super.timestamp = timestamp;
 
         this.description = "Card payment";
         this.commerciant = command.getCommerciant();
         this.email = command.getEmail();
         this.users = users;
     }
-    public void execute(ArrayNode output) {
-        User user = users.get(cardNumber);
 
-        if(user == null) {
+
+    public void execute(ArrayNode output) {
+//        User user = users.get(cardNumber);
+        User user = null;
+        Account cont = null;
+        try {
+            user = getUserReference(users, cardNumber);
+            cont = user.getAccount(cardNumber);
+        } catch (NotFoundException e) {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode objectNode = mapper.createObjectNode();
             objectNode.put("command", cmdName);
@@ -65,49 +68,45 @@ public class PayOnline extends Command {
             return;
         }
 
-        Account cont = user.getAccount(cardNumber);
-        if(cont == null) {
+        Card card = cont.getCard(cardNumber);
+        if(card.getStatus().equals("frozen")) {
+            cont.addTransaction(new FrozenCardTransaction(timestamp));
             return;
         }
 
-        Card card = cont.getCard(cardNumber);
-        if(card != null && card.getStatus().equals("active")) {
-            double convRate = 1;
-            if(currency.equals(cont.getCurrency()) == false) {
-                convRate = ExchangeRateList.convertRate(currency, cont.getCurrency());
-            }
+        //  card is active
 
-            super.account = cont.getIBAN();
+        //  get conv rate
+        double convRate = 1;
+        if(!currency.equals(cont.getCurrency())) {
+            convRate = ExchangeRateList.convertRate(currency, cont.getCurrency());
+        }
 
-            if(cont.getBalance() < amount * convRate) {
-                cont.addTransaction(new InsufficientFundsTransaction(timestamp));
-                return;
-            }
-            cont.setBalance(cont.getBalance() - amount * convRate);
-            if(card.useCard(cont, users) == true) {
-                amount = amount * convRate;
-                account = cont.getIBAN();
-                super.account = account;
-                cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
+        //  check for sufficient funds
+        if(cont.getBalance() < amount * convRate) {
+            cont.addTransaction(new InsufficientFundsTransaction(timestamp));
+            return;
+        }
 
-
-                DeleteCard del = new DeleteCard(timestamp, cardNumber, users);
-                del.execute(output);
-                CreateOneTimeCard cr = new CreateOneTimeCard(timestamp, user.getEmail(), cont.getIBAN(), users);
-                cr.execute(output);
-
-                return;
-            }
-
+        cont.setBalance(cont.getBalance() - amount * convRate);
+        if(card.useCard(cont, users)) {
             amount = amount * convRate;
             account = cont.getIBAN();
             cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
 
-        }
-        if(card != null && card.getStatus().equals("frozen")) {
-            cont.addTransaction(new FrozenCardTransaction(timestamp));
+
+            DeleteCard del = new DeleteCard(timestamp, cardNumber, users);
+            del.execute(output);
+            CreateOneTimeCard cr = new CreateOneTimeCard(timestamp, user.getEmail(), cont.getIBAN(), users);
+            cr.execute(output);
+
             return;
         }
+
+        amount = amount * convRate;
+        account = cont.getIBAN();
+        cont.addTransaction(new PayOnlineTransaction(timestamp, description, amount, commerciant));
+
 
     }
 }

@@ -31,12 +31,11 @@ public class AddAccount extends Command {
         this.currency = command.getCurrency();
         this.accountType = command.getAccountType();
         this.timestamp = command.getTimestamp();
-        super.timestamp = timestamp;
         this.interestRate = command.getInterestRate();
 
         this.users = users;
 
-        description = "New account created";
+        this.description = "New account created";
     }
 
 

@@ -25,7 +25,6 @@ public class DeleteCard extends Command {
     public DeleteCard(CommandInput command, HashMap<String, User> users) {
         this.cmdName = command.getCommand();
         this.timestamp = command.getTimestamp();
-        super.timestamp = timestamp;
         this.card = command.getCardNumber();
         this.users = users;
         this.description = "The card has been destroyed";
@@ -34,7 +33,6 @@ public class DeleteCard extends Command {
     //  for when we need to delete and recreate a one time use card
     public DeleteCard(int timestamp, String cardNumber, HashMap<String, User> users) {
         this.timestamp = timestamp;
-        super.timestamp = timestamp;
         this.card = cardNumber;
         this.users = users;
         this.description = "The card has been destroyed";
@@ -43,6 +41,7 @@ public class DeleteCard extends Command {
 
 
     public void execute(final ArrayNode output) throws NotFoundException {
+        //  these two can throw NotFoundException
         User user = getUserReference(users, card);
         Account acc = getAccountReference(users, card);
 
@@ -53,7 +52,6 @@ public class DeleteCard extends Command {
         acc.deleteCard(card);
         users.remove(card);
 
-        super.account = acc.getIBAN();
         acc.addTransaction(new DeleteCardTransaction(timestamp, description, card, cardHolder, account));
     }
 }

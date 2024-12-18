@@ -17,14 +17,11 @@ import java.util.NoSuchElementException;
 
 @Getter @Setter
 public class CheckCardStatus extends Command {
-    @JsonIgnore
     HashMap<String, User> users;
-//    @JsonIgnore
-//    private String cmdName;
-    @JsonIgnore
     private String IBAN;
     private int timestamp;
     private String description;
+    private String cardNumber;
 
 
     public CheckCardStatus(CommandInput command, HashMap<String, User> users) {
@@ -35,11 +32,8 @@ public class CheckCardStatus extends Command {
         this.users = users;
     }
     public void execute(ArrayNode output) {
-//        User user = users.get(cardNumber);
-        User user = null;
         Account acc = null;
         try {
-            user = getUserReference(users, cardNumber);
             acc = getAccountReference(users, cardNumber);
         } catch (NotFoundException e) {
                 description = "Card not found";
@@ -71,12 +65,6 @@ public class CheckCardStatus extends Command {
             acc.getCard(cardNumber).setStatus("frozen");
 
             acc.addTransaction(new CardLimitReachedTransaction(timestamp));
-            user.addTransaction(this);
-
-        }
-        else if (acc.getBalance() <= acc.getMinBalance() + 30) {
-            description = "Warning";
-            user.addTransaction(this);
 
         }
     }

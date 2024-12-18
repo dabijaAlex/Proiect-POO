@@ -17,7 +17,6 @@ class SuccessChangeInterestRate extends Command {
     public SuccessChangeInterestRate(int timestamp, double interestRate) {
         this.description = "Interest rate of the account changed to " + interestRate;
         this.timestamp = timestamp;
-        super.timestamp = timestamp;
     }
 }
 

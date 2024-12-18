@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Account;
 import org.poo.app.ExchangeRateList;
+import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -19,14 +20,9 @@ import java.util.List;
 
 @Getter @Setter
 public class SplitPayment extends Command {
-    @JsonIgnore
     HashMap<String, User> users;
-    @JsonIgnore
     private double total;
-    @JsonIgnore
     CommandInput commandInput;
-    @JsonIgnore
-    private String IBAN;
 
     private int timestamp;
     private String description;
@@ -47,43 +43,33 @@ public class SplitPayment extends Command {
         this.commandInput = command;
     }
 
-    public SplitPayment(CommandInput command, HashMap<String, User> users, String IBAN, double amount) {
-        this(command, users);
-        this.IBAN = IBAN;
-        this.amount = amount;
-    }
 
 
-    public void execute(ArrayNode output) {
+    public void execute(ArrayNode output) throws NotFoundException {
         int nrAccounts = involvedAccounts.size();
         amount = total / nrAccounts;
         ArrayList<Double> paymentForEach = new ArrayList<>();
         ArrayList<Account> conturi = new ArrayList<>();
+
+        //  put in an array how much each account should pay based currency
         for(String account : involvedAccounts) {
-            User user = users.get(account);
-            if(user == null) {
-                return;
-            }
-            Account acc = user.getAccount(account);
-            if(acc == null) {
-                return;
-            }
+            Account acc = getAccountReference(users, account);
 
             double convRate = 1;
-            if(currency.equals(acc.getCurrency()) == false) {
+            if(!currency.equals(acc.getCurrency())) {
                 convRate = ExchangeRateList.convertRate(currency, acc.getCurrency());
             }
+
+
             paymentForEach.add(amount * convRate);
             conturi.add(acc);
         }
+
         //  check they have money;
         for(int i = nrAccounts - 1; i >= 0; i--) {
+            //  an account didnt have the money
             if(conturi.get(i).getBalance() < paymentForEach.get(i)) {
-                for(int j = 0; j < nrAccounts; j++) {
-                    User user = users.get(conturi.get(j).getIBAN());
-                    if(user == null) {
-                        return;
-                    }
+                for(int j = 0; j < nrAccounts; j++) {   //poate fac o functie aici
                     conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp, description,amount,
                             this.involvedAccounts, currency, conturi.get(i).getIBAN()));
                 }
@@ -93,12 +79,7 @@ public class SplitPayment extends Command {
 
         for(int i = 0; i < nrAccounts; i++) {
             conturi.get(i).setBalance(conturi.get(i).getBalance() - paymentForEach.get(i));
-            User user = users.get(conturi.get(i).getIBAN());
-            if(user == null) {
-                return;
-            }
-            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description,amount,involvedAccounts, currency));
-            user.addTransaction(new SplitPayment(commandInput, users, conturi.get(i).getIBAN(), amount));
+            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description, amount, involvedAccounts, currency));
         }
 
     }
