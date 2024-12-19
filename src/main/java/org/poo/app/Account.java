@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.commands.AddInterest;
-import org.poo.commands.ChangeInterestRate;
+import org.poo.commands.otherCommands.AddInterest;
+import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;

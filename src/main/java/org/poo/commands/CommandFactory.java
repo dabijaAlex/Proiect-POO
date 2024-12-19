@@ -2,12 +2,10 @@ package org.poo.commands;
 
 
 import org.poo.app.User;
-import org.poo.commands.TransactionCommands.AddAccount;
-import org.poo.commands.TransactionCommands.CreateCard;
-import org.poo.commands.TransactionCommands.DeleteCard;
-import org.poo.commands.TransactionCommands.PayOnline;
-import org.poo.commands.TransactionCommands.SendMoney;
-import org.poo.commands.TransactionCommands.SplitPayment;
+import org.poo.commands.TransactionCommands.*;
+import org.poo.commands.debugCommands.PrintTransactions;
+import org.poo.commands.debugCommands.PrintUsers;
+import org.poo.commands.otherCommands.*;
 import org.poo.commands.reportCommands.Report;
 import org.poo.commands.reportCommands.SpendingReport;
 import org.poo.fileio.CommandInput;

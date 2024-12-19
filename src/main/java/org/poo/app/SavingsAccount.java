@@ -3,8 +3,8 @@ package org.poo.app;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.commands.AddInterest;
-import org.poo.commands.ChangeInterestRate;
+import org.poo.commands.otherCommands.AddInterest;
+import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.ChangeInterestRateTransaction;
 
 

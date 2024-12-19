@@ -1,4 +1,4 @@
-package org.poo.commands;
+package org.poo.commands.TransactionCommands;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
@@ -7,6 +7,7 @@ import org.poo.app.NotFoundException;
 import org.poo.app.OneTimeCard;
 import org.poo.app.User;
 import org.poo.app.Account;
+import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;
 import org.poo.utils.Utils;

@@ -1,0 +1,71 @@
+the most important thing in this assignment is that we use a hashMap that acts
+as a database for our users: this hashmap includes pairs such as (identifier, user).
+An identifier is any string that can be associated to that user: email, Iban,
+cardNumber, alias. I used this mechanism for ease of access to specific users.
+
+
+in this assignment two design patterns were used:
+    Factory pattern:
+        there is a factory class specialized for instantiating commands
+        based on an input string. These commands are then added to a Command list:
+            Command is the superclass for all commands.
+
+        this pattern could have been used for the transaction classes also, but
+        i will do that in the second part
+
+
+    Command pattern:
+        the commands that are instantiated using the factory class are added
+        to a list in the invoker class. This class is responsible to calling
+        the execute method from each class and handling the thrown exceptions
+        from these methods (exception types will later be expanded, since now there
+        is currently only one type)
+
+
+    ExchangeRateGraph:
+        this is a class that takes the input exchange rates and puts them in a
+        directed weighted graph. This is done to then make it easy to convert from
+        any currency to another by finding a path from one node to another
+        (accounting for exchange rates) using the dfs algorithm. In the graph
+        implementation, the convRate is BigDecimal type in order to ensure
+        there is no floating pointer error
+
+    Account:
+        each account holds its associated cards and transactions
+        SavingsAccount is a subclass of account that interacts with interest.
+
+    OneTimeCard:
+        a subclass of card that overwrites the useCard method that deletes the
+        current card and creates a new one (since the one time card can t be used
+        twice). In the Card class this method just makes the payment
+
+    debugCommands:
+        PrintTransactions:
+            we get the user and pull the transactions from every account and then
+            sort them by their timestamp.
+        PrintUsers:
+            we take all the users from the User HashMap, put them in a set and then
+            sort them by the time they were added in the database
+
+    reportCommands:
+        Report:
+            gets all the transactions in a given time period for a specific account
+        SpendingReport:
+            gets all transactions that classify as spending ones (currently just
+            online payments classify as that). Then by each commerciant they are
+            compressed into how much the account has spent at that certain place
+
+    TransactionCommands:
+        commands that classify as transactions and have a matching Transaction class
+
+    transactions package:
+        contains helper classes matching their respective commands. This makes
+        adding transactions easy to the transaction list in the accounts because
+        we could have considered the commands themselves to be the transactions, but
+        that would require a lot of JsonIgnores and would also make the code less
+        flexible and readable.
+
+        If later on we consider another class to be a transaction, doing that would
+        be very easy.
+
+
