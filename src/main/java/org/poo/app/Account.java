@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.Transaction;
@@ -31,6 +32,8 @@ public class Account {
     protected double interestRate;
     @JsonIgnore
     protected ArrayList<Transaction> transactions;
+    @JsonIgnore
+    protected ServicePlan servicePlan;
 
 
     /**
@@ -41,12 +44,13 @@ public class Account {
      * @param type
      */
     public Account(final String IBAN, final double balance, final String currency,
-                   final String type) {
+                   final String type, ServicePlan servicePlan) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
         this.type = type;
         this.cards = new ArrayList<>();
+        this.servicePlan = servicePlan;
 
         this.transactions = new ArrayList<>();
     }
@@ -73,6 +77,9 @@ public class Account {
             this.cards.add(new Card(card));
         }
     }
+
+
+
 
 
     /**

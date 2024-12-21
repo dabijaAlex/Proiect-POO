@@ -17,6 +17,10 @@ public final class User {
     private ArrayList<Account> accounts;
     @JsonIgnore
     private int index = 0;
+    @JsonIgnore
+    private String birthDate;
+    @JsonIgnore
+    private String occupation;
 
     /**
      * constructor
@@ -27,6 +31,8 @@ public final class User {
         this.lastName = user.getLastName();
         this.email = user.getEmail();
         this.accounts = new ArrayList<>();
+        this.birthDate = user.getBirthDate();
+        this.occupation = user.getOccupation();
         counter++;
         index = counter;
     }
