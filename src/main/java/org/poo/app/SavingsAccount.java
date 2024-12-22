@@ -3,6 +3,7 @@ package org.poo.app;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.ChangeInterestRateTransaction;
@@ -19,8 +20,8 @@ public class SavingsAccount extends Account {
      * @param type
      */
     public SavingsAccount(final String IBAN, final double balance, final String currency,
-                          final String type) {
-        super(IBAN, balance, currency, type);
+                          final String type, ServicePlan servicePlan) {
+        super(IBAN, balance, currency, type, servicePlan);
     }
 
     /**

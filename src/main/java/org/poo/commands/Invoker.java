@@ -4,6 +4,7 @@ package org.poo.commands;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotFoundException;
 
 import java.util.ArrayList;
@@ -32,6 +33,8 @@ public final class Invoker {
                 try {
                     command.execute(output);
                 } catch (NotFoundException ignore) {
+                    continue;
+                } catch (InsufficientFundsException ignore) {
                     continue;
                 }
             }

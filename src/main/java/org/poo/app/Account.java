@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.plans.AlreadyHasPlanException;
+import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
@@ -78,6 +80,15 @@ public class Account {
         }
     }
 
+    public void upgradeServicePlanToGold() throws InsufficientFundsException, AlreadyHasPlanException,
+            CannotDowngradePlanException {
+        servicePlan = servicePlan.upgradeToGold(this);
+    }
+
+    public void upgradeServicePlanToSilver() throws InsufficientFundsException, AlreadyHasPlanException,
+            CannotDowngradePlanException {
+        servicePlan = servicePlan.upgradeToSilver(this);
+    }
 
 
 

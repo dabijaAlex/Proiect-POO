@@ -2,6 +2,9 @@ package org.poo.app.plans;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.Account;
+import org.poo.app.ExchangeRateGraph;
+import org.poo.app.InsufficientFundsException;
 
 @Getter @Setter
 public final class Silver extends ServicePlan{
@@ -14,8 +17,17 @@ public final class Silver extends ServicePlan{
         return amount * 0.1 / 100;
     }
 
-    @Override
-    public ServicePlan upgrade() {
+    public ServicePlan upgradeToGold(Account account) throws InsufficientFundsException {
+        double convRate = ExchangeRateGraph.convertRate("RON", account.getCurrency());
+        if(account.getBalance() - 250 * convRate < 0) {
+            throw new InsufficientFundsException();
+        }
+        account.setBalance(account.getBalance() - 250 * convRate);
         return new Gold();
+    }
+
+    public ServicePlan upgradeToSilver(Account account) throws AlreadyHasPlanException {
+        System.out.println("can t upgrade to silver");
+        throw new AlreadyHasPlanException();
     }
 }

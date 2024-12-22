@@ -7,6 +7,9 @@ import org.poo.app.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.SavingsAccount;
 import org.poo.app.User;
+import org.poo.app.plans.ServicePlan;
+import org.poo.app.plans.Standard;
+import org.poo.app.plans.Student;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.AddAccountTransaction;
@@ -60,13 +63,20 @@ public final class AddAccount extends Command {
         //  gen and add IBAN string to HashMap
         iban = Utils.generateIBAN();
         users.put(iban, user);
+        ServicePlan servicePlan;
+
+        if(user.getOccupation().equals("student")) {
+            servicePlan = new Student();
+        } else {
+            servicePlan = new Standard();
+        }
 
         Account account;
         if (accountType.equals("savings")) {
-            account = new SavingsAccount(iban, 0, currency, accountType);
+            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan);
             user.addAccount(account);
         } else {
-            account = new Account(iban, 0, currency, accountType);
+            account = new Account(iban, 0, currency, accountType, servicePlan);
             user.addAccount(account);
         }
 

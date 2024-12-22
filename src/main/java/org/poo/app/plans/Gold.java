@@ -1,5 +1,7 @@
 package org.poo.app.plans;
 
+import org.poo.app.Account;
+
 public final class Gold extends ServicePlan{
     private String name = "Gold";
 
@@ -9,8 +11,14 @@ public final class Gold extends ServicePlan{
     }
 
     @Override
-    public ServicePlan upgrade() {
-        System.out.println("can t upgrade");
-        return null;
+    public ServicePlan upgradeToSilver(Account account) throws CannotDowngradePlanException{
+        System.out.println("can t upgrade to Silver");
+        throw new CannotDowngradePlanException();
+    }
+
+    @Override
+    public ServicePlan upgradeToGold(Account account) throws AlreadyHasPlanException{
+        System.out.println("can t upgrade to Gold");
+        throw new AlreadyHasPlanException();
     }
 }
