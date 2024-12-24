@@ -13,4 +13,8 @@ public abstract class ServicePlan {
 
     public abstract ServicePlan upgradeToGold(Account account);
     public abstract ServicePlan upgradeToSilver(Account account);
+    public void addPayment(final int amount) {
+
+    }
+
 }

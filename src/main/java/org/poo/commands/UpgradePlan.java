@@ -8,6 +8,7 @@ import org.poo.app.User;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.UpgradePlanTransaction;
 
 import java.util.HashMap;
 
@@ -16,6 +17,7 @@ public class UpgradePlan extends Command {
     private HashMap<String, User> users;
     private String newPlanType;
     private String iban;
+    private int timestamp;
 
     /**
      * Constructor
@@ -26,7 +28,7 @@ public class UpgradePlan extends Command {
         this.iban = command.getAccount();
         this.newPlanType = command.getNewPlanType();
         this.users = users;
-
+        this.timestamp = command.getTimestamp();
     }
 
     /**
@@ -44,10 +46,13 @@ public class UpgradePlan extends Command {
             if (newPlanType.equals("gold")) {
                 cont.upgradeServicePlanToGold();
             }
+            cont.addTransaction(new UpgradePlanTransaction(iban, newPlanType, timestamp));
         } catch (AlreadyHasPlanException e) {
             // handle error
+            System.out.println("already has a plan");
         } catch (CannotDowngradePlanException e) {
             // handle error
+            System.out.println("cannot downgrade a plan");
         }
 
     }

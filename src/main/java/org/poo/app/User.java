@@ -37,6 +37,15 @@ public final class User {
         index = counter;
     }
 
+    public Account getFirstClassicAccount(String currency) {
+        for(Account account : accounts) {
+            if(account.getClassicAccount(currency) != null) {
+                return account;
+            }
+        }
+        return null;
+    }
+
     /**
      * copy the user into another reference for arrayOutput
      * @param other

@@ -24,6 +24,24 @@ public class SavingsAccount extends Account {
         super(IBAN, balance, currency, type, servicePlan);
     }
 
+
+    @Override
+    public Account getClassicAccount(String currency) {
+        return null;
+    }
+
+    @Override
+    public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException{
+        double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(), this.getCurrency());
+        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(convRate * amount);
+        if(amountToTakeFromAccount > this.getBalance()){
+            throw new InsufficientFundsException();
+        }
+        this.balance -= amountToTakeFromAccount;
+        targetAccount.setBalance(targetAccount.getBalance() + convRate * amount);
+    }
+
+
     /**
      * add the interest to the account since it is a savings ine
      * @param output

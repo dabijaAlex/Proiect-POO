@@ -9,6 +9,7 @@ import org.poo.app.InsufficientFundsException;
 @Getter @Setter
 public final class Silver extends ServicePlan{
     private String name = "Silver";
+    private int nrPaymentsOver300 = 0;
 
     @Override
     public double getCommissionAmount(final double amount) {
@@ -29,5 +30,16 @@ public final class Silver extends ServicePlan{
     public ServicePlan upgradeToSilver(Account account) throws AlreadyHasPlanException {
         System.out.println("can t upgrade to silver");
         throw new AlreadyHasPlanException();
+    }
+
+
+    public void addPayment(final int amount, String currency, Account account) {
+        double convRate = ExchangeRateGraph.convertRate(currency, "RON");
+        if(amount * convRate > 300) {
+            nrPaymentsOver300 += 1;
+        }
+        if(nrPaymentsOver300 >= 5) {
+            account.setServicePlan(new Gold());
+        }
     }
 }

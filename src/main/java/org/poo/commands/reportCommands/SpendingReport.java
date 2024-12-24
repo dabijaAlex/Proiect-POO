@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 
 @Getter @Setter
-final class Commerciant extends Command {
+final class Commerciant2 extends Command {
     private String commerciant;
     private double total;
 
@@ -30,7 +30,7 @@ final class Commerciant extends Command {
      * @param commerciant
      * @param total
      */
-    Commerciant(final String commerciant, final double total) {
+    Commerciant2(final String commerciant, final double total) {
         this.commerciant = commerciant;
         this.total = total;
     }
@@ -54,7 +54,7 @@ public final class SpendingReport extends Command {
     private int timestamp;
 
     private ArrayList<Transaction> transactions;
-    private ArrayList<Commerciant> commerciants;
+    private ArrayList<Commerciant2> commerciants;
 
 
     /**
@@ -130,7 +130,7 @@ public final class SpendingReport extends Command {
         //  group transactions that have the same vendor
         for (Transaction transaction : transactions.reversed()) {
             int ok = 0;
-            for (Commerciant commerciant : commerciants) {
+            for (Commerciant2 commerciant : commerciants) {
                 if (commerciant.getCommerciant() != null
                         && commerciant.getCommerciant().equals(transaction.getCommerciant2())) {
                     commerciant.setTotal(commerciant.getTotal() + transaction.getAmountDouble());
@@ -139,7 +139,7 @@ public final class SpendingReport extends Command {
                 }
             }
             if (ok == 0) {
-                commerciants.add(new Commerciant(transaction.getCommerciant2(),
+                commerciants.add(new Commerciant2(transaction.getCommerciant2(),
                         transaction.getAmountDouble()));
             }
         }
@@ -158,9 +158,9 @@ public final class SpendingReport extends Command {
      * sorting function that sorts commerciants alphabetically in the list
      */
     private void sortCommerciantsAlphabetically() {
-        Collections.sort(commerciants, new Comparator<Commerciant>() {
+        Collections.sort(commerciants, new Comparator<Commerciant2>() {
 
-            public int compare(final Commerciant c1, final Commerciant c2) {
+            public int compare(final Commerciant2 c1, final Commerciant2 c2) {
                 return c1.getCommerciant().compareTo(c2.getCommerciant());
             }
         });

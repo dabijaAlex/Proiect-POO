@@ -90,6 +90,18 @@ public class Account {
         servicePlan = servicePlan.upgradeToSilver(this);
     }
 
+    public Account getClassicAccount(String currency) {
+        if(this.currency.equals(currency)) {
+            return this;
+        }
+        return null;
+    }
+
+
+    public void makeWithdrawal(Account targetAccount, double amount) throws NotASavingsAccount{
+        throw new NotASavingsAccount();
+    }
+
 
 
 
