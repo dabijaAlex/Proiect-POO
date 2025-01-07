@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.poo.app.Account;
+import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
 
@@ -13,6 +13,8 @@ import java.util.HashMap;
 public class Command {
     @JsonIgnore
     protected String cmdName = null;
+    @JsonIgnore
+    protected int timestampTheSecond;
 
     /**
      * this method is overwritten in every class that extends command
@@ -31,6 +33,8 @@ public class Command {
      */
     public User getUserReference(final HashMap<String, User> users,
                                  final String key) throws NotFoundException {
+        if(key == null)
+            throw new NotFoundException();
         User user = users.get(key);
         if (user == null) {
             throw new NotFoundException();
@@ -47,6 +51,8 @@ public class Command {
      */
     public Account getAccountReference(final HashMap<String, User> users,
                                        final String key) throws NotFoundException {
+        if(key == null)
+            throw new NotFoundException();
         User user = users.get(key);
         if (user == null) {
             throw new NotFoundException();

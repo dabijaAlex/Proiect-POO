@@ -6,7 +6,7 @@ import lombok.Setter;
 import org.poo.app.NotFoundException;
 import org.poo.app.OneTimeCard;
 import org.poo.app.User;
-import org.poo.app.Account;
+import org.poo.app.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CreateCardTransaction;

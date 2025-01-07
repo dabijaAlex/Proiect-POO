@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
+import org.poo.app.accounts.Account;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.TooYoungCashWithdrawalTransaction;
 
 import java.util.HashMap;
 
@@ -38,20 +40,6 @@ public class WithdrawSavings extends Command {
 
         User user = getUserReference(users, iban);
         int birthYear = Integer.parseInt(user.getBirthDate().substring(0,4));
-        if(2024 - birthYear < 21) {
-            // wrong age output
-
-
-            outputNode.put("timestamp", timestamp);
-            outputNode.put("description", "Too young");
-
-            objectNode.set("output", outputNode);
-            objectNode.put("timestamp", timestamp);
-
-            output.add(objectNode);
-            return;
-
-        }
 
         Account targetAccount = user.getFirstClassicAccount(currency);
         if(targetAccount == null) {
@@ -64,6 +52,23 @@ public class WithdrawSavings extends Command {
 
             output.add(objectNode);
             return;
+        }
+
+
+        if(2024 - birthYear < 21) {
+            // wrong age output
+
+
+//            outputNode.put("timestamp", timestamp);
+//            outputNode.put("description", "Too young");
+//
+//            objectNode.set("output", outputNode);
+//            objectNode.put("timestamp", timestamp);
+//
+//            output.add(objectNode);
+            targetAccount.addTransaction(new TooYoungCashWithdrawalTransaction(timestamp));
+            return;
+
         }
 
 

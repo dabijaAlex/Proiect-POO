@@ -3,10 +3,9 @@ package org.poo.commands.TransactionCommands;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.Account;
-import org.poo.app.ExchangeRateGraph;
-import org.poo.app.NotFoundException;
-import org.poo.app.User;
+import org.poo.app.*;
+import org.poo.app.accounts.Account;
+import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.InsufficientFundsTransaction;
@@ -42,6 +41,7 @@ public final class SendMoney extends Command {
         this.description = command.getDescription();
 
         this.users = users;
+        timestampTheSecond = timestamp;
     }
 
     /**
@@ -57,10 +57,18 @@ public final class SendMoney extends Command {
      * @param output
      * @throws NotFoundException
      */
-    public void execute(final ArrayNode output) throws NotFoundException {
-        Account senderAccount = getAccountReference(users, senderIdentifier);
-        Account receiverAccount = getAccountReference(users, receiverIdentifier);
+    public void execute(final ArrayNode output) throws NotFoundException, UserNotFound {
+        Commerciant commerciant = CommerciantMap.getCommerciantsMap().get(receiverIBAN);
 
+
+        Account senderAccount = null;
+        Account receiverAccount = null;
+        try {
+            senderAccount = getAccountReference(users, senderIdentifier);
+            receiverAccount = getAccountReference(users, receiverIdentifier);
+        } catch (NotFoundException e) {
+            throw new UserNotFound();
+        }
         senderIBAN = senderAccount.getIBAN();
         receiverIBAN = receiverAccount.getIBAN();
 
@@ -77,22 +85,37 @@ public final class SendMoney extends Command {
         }
 
         //  sender doesn t have the money
-        if (senderAccount.getBalance() < amountAsDouble) {
+        if (senderAccount.getBalance() < amountAsDouble + senderAccount.getServicePlan().getCommissionAmount(amountAsDouble)) {
             senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
         }
+        if(senderAccount.getIBAN().equals("RO37POOB7013767509830666"))
+            System.out.println("2");
 
-        senderAccount.setBalance(senderAccount.getBalance() - amountAsDouble);
-        receiverAccount.setBalance(receiverAccount.getBalance() + amountAsDouble * convRate);
+        double amountInRon = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(), "RON", amountAsDouble);
+        double commission = senderAccount.getServicePlan().getCommissionAmount(amountInRon);
+        commission = ExchangeRateGraph.makeConversion("RON", senderAccount.getCurrency(), commission);
+
+        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - commission) * 100.0) / 100.0);
         amount = amountAsDouble + " " + senderAccount.getCurrency();
 
         //  add transactions for both accounts
         senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount,
                 receiverIBAN, description, "sent", timestamp));
 
+        //  receiver account was a commerciant
+//        if(commerciant != null) {
+//            //  add cashback
+//            commerciant.PaymentHappened(amountAsDouble, senderAccount);
+//            senderAccount.setBalance(senderAccount.getBalance() + commerciant.getCashback(amountAsDouble, senderAccount));
+//            return;
+//        }
+
+
+        receiverAccount.setBalance(receiverAccount.getBalance() + Math.round(amountAsDouble * convRate * 100.0) / 100.0);
+
         receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN,
                 amountAsDouble * convRate + " " + receiverAccount.getCurrency(),
                 receiverIBAN, description, "received", timestamp));
-
     }
 }

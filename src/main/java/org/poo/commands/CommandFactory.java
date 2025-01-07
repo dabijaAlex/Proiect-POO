@@ -82,8 +82,11 @@ public final class CommandFactory {
             case "upgradePlan" -> {
                 return new UpgradePlan(command, userHashMap);
             }
+            case "cashWithdrawal" -> {
+                return new CashWithdrawal(command, userHashMap);
+            }
             default -> {
-//                System.out.println(command.getCommand());
+                System.out.println(command.getCommand());
             }
         }
         return null;

@@ -1,6 +1,6 @@
 package org.poo.app.plans;
 
-import org.poo.app.Account;
+import org.poo.app.accounts.Account;
 
 public final class Gold extends ServicePlan{
     private String name = "Gold";
@@ -20,5 +20,16 @@ public final class Gold extends ServicePlan{
     public ServicePlan upgradeToGold(Account account) throws AlreadyHasPlanException{
         System.out.println("can t upgrade to Gold");
         throw new AlreadyHasPlanException();
+    }
+
+
+    public double getLowCashback(double amount) {
+        return Math.round(0.5 / 100 * amount * 100.0) / 100.0;
+    }
+    public double getMedianCashback(double amount) {
+        return Math.round(0.55 / 100 * amount * 100.0) / 100.0;
+    }
+    public double getHighCashback(double amount) {
+        return Math.round(0.7 / 100 * amount * 100.0) / 100.0;
     }
 }

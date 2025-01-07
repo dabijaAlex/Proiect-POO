@@ -1,7 +1,12 @@
 package org.poo.app;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.app.commerciants.ClothesCommerciant;
+import org.poo.app.commerciants.Commerciant;
+import org.poo.app.commerciants.FoodCommerciant;
+import org.poo.app.commerciants.TechCommerciant;
 import org.poo.commands.Invoker;
 import org.poo.fileio.CommandInput;
+import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ObjectInput;
 import  org.poo.fileio.UserInput;
 
@@ -52,6 +57,22 @@ public final class AppStart {
         //  extract commands and init them with factory
         for (CommandInput commandInput: input.getCommands()) {
             commands.add(factory.createCommand(commandInput, userHashMap));
+        }
+
+
+        HashMap<String, Commerciant> commerciants = new HashMap<>();
+        CommerciantMap.setCommerciantsMap(commerciants);
+        for (CommerciantInput commerciantInput: input.getCommerciants()) {
+            String commerciantIban = commerciantInput.getAccount();
+            if(commerciantInput.getType().equals("Food"))
+                commerciants.put(commerciantIban, new FoodCommerciant(commerciantInput));
+            if(commerciantInput.getType().equals("Clothes"))
+                commerciants.put(commerciantIban, new ClothesCommerciant(commerciantInput));
+            if(commerciantInput.getType().equals("Tech"))
+                commerciants.put(commerciantIban, new TechCommerciant(commerciantInput));
+
+            //  put the name of the commerciant also
+            commerciants.put(commerciantInput.getCommerciant(), commerciants.get(commerciantIban));
         }
 
         invoker.setCmds(commands);

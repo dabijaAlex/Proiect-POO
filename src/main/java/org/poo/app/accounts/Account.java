@@ -1,4 +1,4 @@
-package org.poo.app;
+package org.poo.app.accounts;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.Card;
+import org.poo.app.InsufficientFundsException;
+import org.poo.app.NotASavingsAccount;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
@@ -98,7 +101,7 @@ public class Account {
     }
 
 
-    public void makeWithdrawal(Account targetAccount, double amount) throws NotASavingsAccount{
+    public void makeWithdrawal(Account targetAccount, double amount) throws NotASavingsAccount {
         throw new NotASavingsAccount();
     }
 

@@ -1,7 +1,7 @@
 package org.poo.commands;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.poo.app.Account;
+import org.poo.app.accounts.Account;
 import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
@@ -39,6 +39,8 @@ public class UpgradePlan extends Command {
     public void execute(final ArrayNode output) throws NotFoundException ,
             InsufficientFundsException {
         Account cont = getAccountReference(users, iban);
+        if(cont.getIBAN().equals("RO37POOB7013767509830666"))
+            System.out.println("2");
         try {
             if (newPlanType.equals("silver")) {
                 cont.upgradeServicePlanToSilver();

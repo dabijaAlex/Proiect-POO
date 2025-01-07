@@ -3,7 +3,7 @@ package org.poo.commands.otherCommands;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.Account;
+import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.commands.Command;

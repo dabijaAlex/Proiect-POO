@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.poo.fileio.ExchangeInput;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -18,14 +19,14 @@ class DirectedWeightedGraph {
 
     class Edge {
         private String to;
-        private BigDecimal rate;
+        private double rate;
 
         /**
          * constructor for an edge that has an already existing start
          * @param to
          * @param rate
          */
-        public Edge(String to, BigDecimal rate) {
+        public Edge(String to, double rate) {
             this.to = to;
             this.rate = rate;
         }
@@ -44,7 +45,7 @@ class DirectedWeightedGraph {
      * @param to
      * @param rate
      */
-    public void addEdge(final String from, final String to, final BigDecimal rate) {
+    public void addEdge(final String from, final String to, final double rate) {
         if (!this.adjacencyList.containsKey(from)) {
             this.adjacencyList.put(from, new ArrayList<>());
         }
@@ -67,9 +68,9 @@ class DirectedWeightedGraph {
      * @param cost
      * @return
      */
-    public BigDecimal dfs(final DirectedWeightedGraph graph, final String source,
+    public double dfs(final DirectedWeightedGraph graph, final String source,
                           final String target, final ArrayList<String> visited,
-                          final BigDecimal cost) {
+                          final double cost) {
         visited.add(source);
         if (source.equals(target)) {
             return cost;
@@ -77,14 +78,14 @@ class DirectedWeightedGraph {
         List<Edge> nearNodes = graph.getAdjacencyList().get(source);
         for (Edge edge : nearNodes) {
             if (!visited.contains(edge.to)) {
-                BigDecimal rez = dfs(graph, edge.to, target, visited,
-                        edge.rate.multiply(cost));
-                if (rez.doubleValue() != 0) {
+                double rez = dfs(graph, edge.to, target, visited,
+                        edge.rate * cost);
+                if (rez != 0) {
                     return rez;
                 }
             }
         }
-        return new BigDecimal("0");
+        return 0;
     }
 }
 
@@ -104,9 +105,9 @@ public class ExchangeRateGraph {
 
         for (ExchangeInput exchangeInput : input) {
             graph.addEdge(exchangeInput.getFrom(), exchangeInput.getTo(),
-                    BigDecimal.valueOf(exchangeInput.getRate()));
+                    exchangeInput.getRate());
             graph.addEdge(exchangeInput.getTo(), exchangeInput.getFrom(),
-                    BigDecimal.valueOf(1 / exchangeInput.getRate()));
+                    1 / exchangeInput.getRate());
         }
     }
 
@@ -119,8 +120,16 @@ public class ExchangeRateGraph {
      */
     public static double convertRate(final String from, final String to) {
         ArrayList<String> visited = new ArrayList<>();
-        BigDecimal z = graph.dfs(graph, from, to, visited, BigDecimal.valueOf(1));
-        return z.doubleValue();
+        double z = graph.dfs(graph, from, to, visited, 1);
+        return z;
+
     }
+
+    public static double makeConversion(final String from, final String to, final double amount) {
+        double convRate = 1;
+        convRate = convertRate(from, to);
+        return Math.round(amount * convRate * 100.0) / 100.0;
+    }
+
 
 }

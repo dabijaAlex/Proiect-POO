@@ -1,6 +1,7 @@
 package org.poo.app;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.poo.app.accounts.Account;
 import org.poo.commands.TransactionCommands.CreateOneTimeCard;
 import org.poo.commands.TransactionCommands.DeleteCard;
 import org.poo.commands.TransactionCommands.PayOnline;
@@ -38,7 +39,7 @@ public class OneTimeCard extends Card {
      * @param output
      */
     public void useCard(final Account account, final HashMap<String, User> users,
-                           final PayOnline command, final ArrayNode output) {
+                        final PayOnline command, final ArrayNode output) {
         double amount = command.getAmount();
 
         User user = command.getUserReference(users, account.getIBAN());

@@ -3,6 +3,7 @@ package org.poo.app;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.accounts.Account;
 import org.poo.fileio.UserInput;
 
 import java.util.ArrayList;

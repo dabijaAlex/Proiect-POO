@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.accounts.Account;
 import org.poo.commands.TransactionCommands.PayOnline;
 import org.poo.transactions.PayOnlineTransaction;
 
@@ -34,12 +35,12 @@ public class Card {
      * @return
      */
     public void useCard(final Account cont, final HashMap<String, User> users,
-                           final PayOnline command, final ArrayNode output) {
+                        final PayOnline command, final ArrayNode output) {
         double amount = command.getAmount();
         double convRate = command.getConvRate();
 
 
-        amount = amount * convRate;
+        amount = Math.round(amount * convRate * 100.0) / 100.0;
         cont.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
                 command.getDescription(), amount, command.getCommerciant()));
     }

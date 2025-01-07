@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.ExchangeRateGraph;
+import org.poo.app.accounts.Account;
+import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.FrozenCardTransaction;
@@ -66,6 +68,12 @@ public final class PayOnline extends Command {
      * @param output
      */
     public void execute(final ArrayNode output) {
+
+
+
+        if (amount == 0)
+            return;
+        Commerciant commerciant = CommerciantMap.getCommerciantsMap().get(this.commerciant);
         User user = null;
         Account cont = null;
         try {
@@ -87,6 +95,8 @@ public final class PayOnline extends Command {
             output.add(objectNode);
             return;
         }
+        if(cont.getIBAN().equals("RO37POOB7013767509830666"))
+            System.out.println("2");
 
         Card card = cont.getCard(cardNumber);
         if (card.getStatus().equals("frozen")) {
@@ -103,13 +113,22 @@ public final class PayOnline extends Command {
         }
 
         //  check for sufficient funds
-        if (cont.getBalance() < amount * convRate) {
+        if (cont.getBalance() < amount * convRate + cont.getServicePlan().getCommissionAmount(amount * convRate)) {
             cont.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
         }
 
-        cont.setBalance(cont.getBalance() - amount * convRate);
+        double amountInRon = ExchangeRateGraph.makeConversion(cont.getCurrency(), "RON", amount);
+        double commission = cont.getServicePlan().getCommissionAmount(amountInRon);
+        commission = ExchangeRateGraph.makeConversion("RON", cont.getCurrency(), commission);
+
+        cont.setBalance(cont.getBalance() - Math.round(amount * convRate * 100.0) / 100.0 - commission);
 
         card.useCard(cont, users, this, output);
+
+        //  add cashback
+        commerciant.PaymentHappened(amount, cont, this.currency);
+        double amountInaccountCurrency = ExchangeRateGraph.makeConversion(this.currency, cont.getCurrency(), amount);
+        cont.setBalance(cont.getBalance() + commerciant.getCashback(amountInaccountCurrency, cont));
     }
 }

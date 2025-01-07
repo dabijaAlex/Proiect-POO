@@ -1,8 +1,10 @@
-package org.poo.app;
+package org.poo.app.accounts;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.ExchangeRateGraph;
+import org.poo.app.InsufficientFundsException;
 import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
@@ -31,7 +33,7 @@ public class SavingsAccount extends Account {
     }
 
     @Override
-    public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException{
+    public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(), this.getCurrency());
         double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(convRate * amount);
         if(amountToTakeFromAccount > this.getBalance()){
