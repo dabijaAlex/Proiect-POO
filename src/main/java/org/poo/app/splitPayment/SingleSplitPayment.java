@@ -3,10 +3,13 @@ package org.poo.app.splitPayment;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.ExchangeRateGraph;
+import org.poo.app.User;
 import org.poo.app.accounts.Account;
+import org.poo.commands.Command;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 @Getter @Setter
 class Pair {
@@ -61,6 +64,14 @@ public class SingleSplitPayment {
             }
         }
         return null;
+    }
+
+    public void remove() {
+        for(Account account : remainingAccounts){
+            User user = account.getUserRef();
+            Queue<Account> q = user.getAccountsForSplitPayment();
+            q.remove(account);
+        }
     }
 
 

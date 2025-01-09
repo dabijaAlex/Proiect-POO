@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.InsufficientFundsException;
+import org.poo.app.User;
 import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
@@ -23,8 +24,8 @@ public class SavingsAccount extends Account {
      * @param type
      */
     public SavingsAccount(final String IBAN, final double balance, final String currency,
-                          final String type, ServicePlan servicePlan, final double interestRate) {
-        super(IBAN, balance, currency, type, servicePlan, interestRate);
+                          final String type, ServicePlan servicePlan, final double interestRate, final User user) {
+        super(IBAN, balance, currency, type, servicePlan, interestRate, user);
     }
 
 

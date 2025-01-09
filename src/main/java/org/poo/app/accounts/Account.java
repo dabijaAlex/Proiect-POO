@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.poo.app.Card;
 import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotASavingsAccount;
+import org.poo.app.User;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
@@ -44,6 +45,8 @@ public class Account {
     protected ArrayList<Transaction> transactions;
     @JsonIgnore
     protected ServicePlan servicePlan;
+    @JsonIgnore
+    protected User userRef;
 
 
 
@@ -55,7 +58,7 @@ public class Account {
      * @param type
      */
     public Account(final String IBAN, final double balance, final String currency,
-                   final String type, ServicePlan servicePlan, final double interestRate) {
+                   final String type, ServicePlan servicePlan, final double interestRate, final User user) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
@@ -63,6 +66,7 @@ public class Account {
         this.cards = new ArrayList<>();
         this.servicePlan = servicePlan;
         this.interestRate = interestRate;
+        this.userRef = user;
 
         this.transactions = new ArrayList<>();
     }

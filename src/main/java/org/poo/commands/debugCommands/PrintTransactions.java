@@ -66,8 +66,18 @@ public final class PrintTransactions extends Command {
 
         ArrayNode outputArray = mapper.createArrayNode();
 
+        Transaction previousTransaction = null;
         for (Transaction transaction : transactions) {
-            outputArray.addPOJO(transaction);
+            if (previousTransaction == null) {
+                previousTransaction = transaction;
+                outputArray.addPOJO(transaction);
+                continue;
+            }
+            if(previousTransaction.getTimestamp() != transaction.getTimestamp()) {
+                outputArray.addPOJO(transaction);
+                previousTransaction = transaction;
+            }
+
         }
 
         objectNode.set("output", outputArray);

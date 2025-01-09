@@ -73,10 +73,10 @@ public final class AddAccount extends Command {
 
         Account account;
         if (accountType.equals("savings")) {
-            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate);
+            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate, user);
             user.addAccount(account);
         } else {
-            account = new Account(iban, 0, currency, accountType, servicePlan, interestRate);
+            account = new Account(iban, 0, currency, accountType, servicePlan, interestRate, user);
             user.addAccount(account);
         }
 
