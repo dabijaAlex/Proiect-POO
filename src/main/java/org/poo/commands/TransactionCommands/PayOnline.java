@@ -106,29 +106,25 @@ public final class PayOnline extends Command {
 
         //  card is active
 
-        //  get conv rate
-        convRate = 1;
-        if (!currency.equals(cont.getCurrency())) {
-            convRate = ExchangeRateGraph.convertRate(currency, cont.getCurrency());
-        }
+        double amountInAccountCurrency = ExchangeRateGraph.makeConversion(currency, cont.getCurrency(), amount);
+        double commission = cont.getServicePlan().getCommissionAmount(amountInAccountCurrency, cont.getCurrency());
 
         //  check for sufficient funds
-        if (cont.getBalance() < amount * convRate + cont.getServicePlan().getCommissionAmount(amount * convRate)) {
+        if (cont.getBalance() < amountInAccountCurrency + commission) {
             cont.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
         }
 
-        double amountInRon = ExchangeRateGraph.makeConversion(cont.getCurrency(), "RON", amount);
-        double commission = cont.getServicePlan().getCommissionAmount(amountInRon);
-        commission = ExchangeRateGraph.makeConversion("RON", cont.getCurrency(), commission);
 
-        cont.setBalance(cont.getBalance() - Math.round(amount * convRate * 100.0) / 100.0 - commission);
+        cont.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user);
 
-        card.useCard(cont, users, this, output);
+        cont.setBalance(Math.round((cont.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
+
+        card.useCard(cont, users, amountInAccountCurrency, output, this);
 
         //  add cashback
-        commerciant.PaymentHappened(amount, cont, this.currency);
-        double amountInaccountCurrency = ExchangeRateGraph.makeConversion(this.currency, cont.getCurrency(), amount);
-        cont.setBalance(cont.getBalance() + commerciant.getCashback(amountInaccountCurrency, cont));
+
+        commerciant.PaymentHappened(amountInAccountCurrency, cont, cont.getCurrency());
+        cont.setBalance(Math.round((cont.getBalance() + commerciant.getCashback(amountInAccountCurrency, cont)) * 100.0) / 100.0);
     }
 }

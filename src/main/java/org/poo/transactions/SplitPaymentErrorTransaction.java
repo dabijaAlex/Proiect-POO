@@ -13,15 +13,14 @@ public final class SplitPaymentErrorTransaction extends SplitPaymentTransaction 
      * Constructor that calls superclass constructor
      * @param timestamp
      * @param description
-     * @param amount
      * @param involvedAccounts
      * @param currency
      * @param error
      */
     public SplitPaymentErrorTransaction(final int timestamp, final String description,
-                                        final double amount, final List<String> involvedAccounts,
-                                        final String currency, final String error) {
-        super(timestamp, description, amount, involvedAccounts, currency);
+                                        final List<String> involvedAccounts,
+                                        final String currency, final String error, final String type, final List<Double> amountEach) {
+        super(timestamp, description, involvedAccounts, currency, type, amountEach);
         this.error = "Account " + error + " has insufficient funds for a split payment.";
     }
 }

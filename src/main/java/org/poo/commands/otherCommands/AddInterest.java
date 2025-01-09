@@ -30,6 +30,7 @@ public final class AddInterest extends Command {
         this.cmdName = command.getCommand();
         this.IBAN = command.getAccount();
         this.timestamp = command.getTimestamp();
+        this.timestampTheSecond = timestamp;
 
         this.users = users;
     }

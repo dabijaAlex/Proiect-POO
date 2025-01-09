@@ -39,12 +39,10 @@ public class OneTimeCard extends Card {
      * @param output
      */
     public void useCard(final Account account, final HashMap<String, User> users,
-                        final PayOnline command, final ArrayNode output) {
-        double amount = command.getAmount();
+                        final double amount, final ArrayNode output, final PayOnline command) {
 
         User user = command.getUserReference(users, account.getIBAN());
 
-        amount = amount * command.getConvRate();
         account.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
                 command.getDescription(), amount, command.getCommerciant()));
 

@@ -4,9 +4,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
+import org.poo.app.plans.AlreadyHasPlanException;
+import org.poo.app.plans.CannotDowngradePlanException;
+import org.poo.app.plans.Gold;
+import org.poo.app.plans.Silver;
+import org.poo.app.splitPayment.SingleSplitPayment;
+import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.fileio.UserInput;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 @Getter @Setter
 public final class User {
@@ -22,6 +30,13 @@ public final class User {
     private String birthDate;
     @JsonIgnore
     private String occupation;
+    @JsonIgnore
+    private Queue<Account> accountsForSplitPayment = new LinkedList<>();
+
+
+    public void addToAccountToQueue(Account account) {
+        accountsForSplitPayment.add(account);
+    }
 
     /**
      * constructor
@@ -68,6 +83,9 @@ public final class User {
      */
     public void addAccount(final Account account) {
         this.accounts.add(account);
+        if(accounts.size() > 1) {
+            account.setServicePlan(accounts.get(0).getServicePlan());
+        }
     }
 
     /**
@@ -102,5 +120,21 @@ public final class User {
             }
         }
         return null;
+    }
+
+    public void upgradeServicePlanToGold(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
+            CannotDowngradePlanException {
+        cont.getServicePlan().upgradeToGold(cont);
+        for (Account account : this.accounts) {
+            account.setServicePlan(new Gold());
+        }
+    }
+
+    public void upgradeServicePlanToSilver(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
+            CannotDowngradePlanException {
+        cont.getServicePlan().upgradeToSilver(cont);
+        for (Account account : this.accounts) {
+            account.setServicePlan(new Silver());
+        }
     }
 }

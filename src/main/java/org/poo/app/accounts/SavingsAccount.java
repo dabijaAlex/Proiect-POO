@@ -8,6 +8,7 @@ import org.poo.app.InsufficientFundsException;
 import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
+import org.poo.transactions.AddInterestTransaction;
 import org.poo.transactions.ChangeInterestRateTransaction;
 
 
@@ -22,8 +23,8 @@ public class SavingsAccount extends Account {
      * @param type
      */
     public SavingsAccount(final String IBAN, final double balance, final String currency,
-                          final String type, ServicePlan servicePlan) {
-        super(IBAN, balance, currency, type, servicePlan);
+                          final String type, ServicePlan servicePlan, final double interestRate) {
+        super(IBAN, balance, currency, type, servicePlan, interestRate);
     }
 
 
@@ -35,7 +36,7 @@ public class SavingsAccount extends Account {
     @Override
     public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(), this.getCurrency());
-        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(convRate * amount);
+        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(amount, currency);
         if(amountToTakeFromAccount > this.getBalance()){
             throw new InsufficientFundsException();
         }
@@ -51,7 +52,9 @@ public class SavingsAccount extends Account {
      */
     @Override
     public void addInterest(final ArrayNode output, final AddInterest command) {
-        balance += balance * interestRate;
+        double interest = balance * interestRate;
+        balance += interest;
+        this.addTransaction(new AddInterestTransaction(command.getTimestampTheSecond(), interest, this.currency));
     }
 
     /**

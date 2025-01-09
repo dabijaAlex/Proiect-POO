@@ -11,7 +11,7 @@ public class BusinessAccount extends Account {
     public BusinessAccount(final String ownerName, final String ownerEmail, final String IBAN,
                            final double balance, final String currency,
                            final String type, final ServicePlan servicePlan) {
-        super(IBAN, balance, currency, type, servicePlan);
+        super(IBAN, balance, currency, type, servicePlan, 0);
         this.ownerName = ownerName;
         this.ownerEmail = ownerEmail;
     }

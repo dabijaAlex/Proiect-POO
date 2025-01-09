@@ -93,4 +93,7 @@ public class Command {
     public String getCmdName() {
         return cmdName;
     }
+    public int getTimestampTheSecond() {
+        return timestampTheSecond;
+    }
 }

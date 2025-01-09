@@ -2,6 +2,7 @@ package org.poo.app.plans;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.User;
 import org.poo.app.accounts.Account;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.InsufficientFundsException;
@@ -12,36 +13,43 @@ public final class Silver extends ServicePlan{
     private int nrPaymentsOver300 = 0;
 
     @Override
-    public double getCommissionAmount(final double amount) {
+    public double getCommissionAmount(final double amount, final String currency) {
 
-        if(amount <= 500)
+        if(ExchangeRateGraph.makeConversion(currency, "RON", amount) <= 500)
             return 0;
-        return Math.round(amount * 0.1 / 100 * 100) / 100.0;
+        return Math.round(amount * 0.1 / 100.0 * 100.0) / 100.0;
     }
 
-    public ServicePlan upgradeToGold(Account account) throws InsufficientFundsException {
+    public void upgradeToGold(Account account) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate("RON", account.getCurrency());
         if(account.getBalance() - Math.round(250 * convRate * 100.0) / 100.0 < 0) {
             throw new InsufficientFundsException();
         }
-        account.setBalance(account.getBalance() - Math.round(250 * convRate * 100.0) / 100.0);
-        return new Gold();
+        account.setBalance(Math.round((account.getBalance() - 250 * convRate) * 100.0) / 100.0);
+//        return new Gold();
     }
 
-    public ServicePlan upgradeToSilver(Account account) throws AlreadyHasPlanException {
+    public void upgradeToSilver(Account account) throws AlreadyHasPlanException {
         System.out.println("can t upgrade to silver");
         throw new AlreadyHasPlanException();
     }
 
 
-    public void addPayment(final int amount, String currency, Account account) {
+    public void addPayment(final double amount, String currency, Account account, User user) {
         double convRate = ExchangeRateGraph.convertRate(currency, "RON");
         if(amount * convRate > 300) {
             nrPaymentsOver300 += 1;
         }
         if(nrPaymentsOver300 >= 5) {
-            account.setServicePlan(new Gold());
+            for(Account acc: user.getAccounts()) {
+                acc.setServicePlan(new Gold());
+            }
+//            account.setServicePlan(new Gold());
         }
+    }
+
+    public Silver getThisPlan() {
+        return this;
     }
 
 

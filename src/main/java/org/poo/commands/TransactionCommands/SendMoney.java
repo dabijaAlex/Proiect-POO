@@ -63,9 +63,11 @@ public final class SendMoney extends Command {
 
         Account senderAccount = null;
         Account receiverAccount = null;
+        User senderUser = null;
         try {
             senderAccount = getAccountReference(users, senderIdentifier);
             receiverAccount = getAccountReference(users, receiverIdentifier);
+            senderUser = getUserReference(users, senderIdentifier);
         } catch (NotFoundException e) {
             throw new UserNotFound();
         }
@@ -78,25 +80,25 @@ public final class SendMoney extends Command {
         }
 
         //  check if diff currencies
-        double convRate = 1;
-        if (!senderAccount.getCurrency().equals(receiverAccount.getCurrency())) {
-            convRate = ExchangeRateGraph.convertRate(senderAccount.getCurrency(),
-                    receiverAccount.getCurrency());
-        }
+//        double convRate = 1;
+//        if (!senderAccount.getCurrency().equals(receiverAccount.getCurrency())) {
+//            convRate = ExchangeRateGraph.convertRate(senderAccount.getCurrency(),
+//                    receiverAccount.getCurrency());
+//        }
+        double amountInReceiverCurrency = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(),
+                receiverAccount.getCurrency(), amountAsDouble);
 
         //  sender doesn t have the money
-        if (senderAccount.getBalance() < amountAsDouble + senderAccount.getServicePlan().getCommissionAmount(amountAsDouble)) {
+        double senderCommission = senderAccount.getServicePlan().getCommissionAmount(amountAsDouble, senderAccount.getCurrency());
+        if (senderAccount.getBalance() < amountAsDouble + senderCommission) {
             senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
         }
-        if(senderAccount.getIBAN().equals("RO37POOB7013767509830666"))
-            System.out.println("2");
 
-        double amountInRon = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(), "RON", amountAsDouble);
-        double commission = senderAccount.getServicePlan().getCommissionAmount(amountInRon);
-        commission = ExchangeRateGraph.makeConversion("RON", senderAccount.getCurrency(), commission);
 
-        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - commission) * 100.0) / 100.0);
+        senderAccount.getServicePlan().addPayment(amountAsDouble, senderAccount.getCurrency(), senderAccount, senderUser);
+
+        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
         amount = amountAsDouble + " " + senderAccount.getCurrency();
 
         //  add transactions for both accounts
@@ -112,10 +114,10 @@ public final class SendMoney extends Command {
 //        }
 
 
-        receiverAccount.setBalance(receiverAccount.getBalance() + Math.round(amountAsDouble * convRate * 100.0) / 100.0);
+        receiverAccount.setBalance(receiverAccount.getBalance() + Math.round(amountInReceiverCurrency * 100.0) / 100.0);
 
         receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN,
-                amountAsDouble * convRate + " " + receiverAccount.getCurrency(),
+                amountInReceiverCurrency + " " + receiverAccount.getCurrency(),
                 receiverIBAN, description, "received", timestamp));
     }
 }

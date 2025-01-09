@@ -14,11 +14,13 @@ import org.poo.app.NotASavingsAccount;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
+import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 @Getter @Setter
 public class Account {
@@ -28,6 +30,9 @@ public class Account {
     protected String currency;
     protected String type;
     protected ArrayList<Card> cards;
+
+    @JsonIgnore
+    protected String email;
 
     @JsonIgnore
     protected double minBalance = 0;
@@ -41,6 +46,7 @@ public class Account {
     protected ServicePlan servicePlan;
 
 
+
     /**
      * Constructor
      * @param IBAN
@@ -49,13 +55,14 @@ public class Account {
      * @param type
      */
     public Account(final String IBAN, final double balance, final String currency,
-                   final String type, ServicePlan servicePlan) {
+                   final String type, ServicePlan servicePlan, final double interestRate) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
         this.type = type;
         this.cards = new ArrayList<>();
         this.servicePlan = servicePlan;
+        this.interestRate = interestRate;
 
         this.transactions = new ArrayList<>();
     }
@@ -83,15 +90,7 @@ public class Account {
         }
     }
 
-    public void upgradeServicePlanToGold() throws InsufficientFundsException, AlreadyHasPlanException,
-            CannotDowngradePlanException {
-        servicePlan = servicePlan.upgradeToGold(this);
-    }
 
-    public void upgradeServicePlanToSilver() throws InsufficientFundsException, AlreadyHasPlanException,
-            CannotDowngradePlanException {
-        servicePlan = servicePlan.upgradeToSilver(this);
-    }
 
     public Account getClassicAccount(String currency) {
         if(this.currency.equals(currency)) {

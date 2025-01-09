@@ -6,18 +6,18 @@ public final class Gold extends ServicePlan{
     private String name = "Gold";
 
     @Override
-    public double getCommissionAmount(final double amount) {
+    public double getCommissionAmount(final double amount, String currency) {
         return 0;
     }
 
     @Override
-    public ServicePlan upgradeToSilver(Account account) throws CannotDowngradePlanException{
+    public void upgradeToSilver(Account account) throws CannotDowngradePlanException{
         System.out.println("can t upgrade to Silver");
         throw new CannotDowngradePlanException();
     }
 
     @Override
-    public ServicePlan upgradeToGold(Account account) throws AlreadyHasPlanException{
+    public void upgradeToGold(Account account) throws AlreadyHasPlanException{
         System.out.println("can t upgrade to Gold");
         throw new AlreadyHasPlanException();
     }
@@ -31,5 +31,9 @@ public final class Gold extends ServicePlan{
     }
     public double getHighCashback(double amount) {
         return Math.round(0.7 / 100 * amount * 100.0) / 100.0;
+    }
+
+    public Gold getThisPlan() {
+        return this;
     }
 }

@@ -59,21 +59,17 @@ public class CashWithdrawal extends Command {
             throw new UserNotFound();
         }
 
-
-        if(account.getIBAN().equals("RO37POOB7013767509830666"))
-            System.out.println("2");
-
         double amountInAccountCurrency = ExchangeRateGraph.makeConversion("RON", account.getCurrency(), amount);
 
-        double commission = account.getServicePlan().getCommissionAmount(amount);
-        commission = ExchangeRateGraph.makeConversion("RON", account.getCurrency(), commission);
+        double commission = account.getServicePlan().getCommissionAmount(amountInAccountCurrency, account.getCurrency());
+        account.getServicePlan().addPayment(amount, account.getCurrency(), account, user);
 
         if (account.getBalance() < amountInAccountCurrency + commission) {
             account.addTransaction(new InsufficientFundsTransaction(timestamp));
             throw new InsufficientFundsException();
         }
 
-        account.setBalance((1000 * account.getBalance() - 1000 * amountInAccountCurrency - 1000 * commission) / 1000);
+        account.setBalance(Math.round((account.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
 
         account.addTransaction(new CashWithdrawalTransaction(timestamp, amount));
 

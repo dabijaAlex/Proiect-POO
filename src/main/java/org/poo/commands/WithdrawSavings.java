@@ -8,6 +8,7 @@ import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.accounts.Account;
 import org.poo.fileio.CommandInput;
+import org.poo.transactions.NoClassicAccount;
 import org.poo.transactions.TooYoungCashWithdrawalTransaction;
 
 import java.util.HashMap;
@@ -39,18 +40,20 @@ public class WithdrawSavings extends Command {
 
 
         User user = getUserReference(users, iban);
+        Account account = getAccountReference(users, iban);
         int birthYear = Integer.parseInt(user.getBirthDate().substring(0,4));
 
         Account targetAccount = user.getFirstClassicAccount(currency);
         if(targetAccount == null) {
             //  no classic account
-            outputNode.put("timestamp", timestamp);
-            outputNode.put("description", "No classic account");
-
-            objectNode.set("output", outputNode);
-            objectNode.put("timestamp", timestamp);
-
-            output.add(objectNode);
+//            outputNode.put("timestamp", timestamp);
+//            outputNode.put("description", "No classic account");
+//
+//            objectNode.set("output", outputNode);
+//            objectNode.put("timestamp", timestamp);
+//
+//            output.add(objectNode);
+            account.addTransaction(new NoClassicAccount(timestamp));
             return;
         }
 

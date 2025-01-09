@@ -38,15 +38,15 @@ public class UpgradePlan extends Command {
      */
     public void execute(final ArrayNode output) throws NotFoundException ,
             InsufficientFundsException {
+
+        User user = getUserReference(users, iban);
         Account cont = getAccountReference(users, iban);
-        if(cont.getIBAN().equals("RO37POOB7013767509830666"))
-            System.out.println("2");
         try {
             if (newPlanType.equals("silver")) {
-                cont.upgradeServicePlanToSilver();
+                user.upgradeServicePlanToSilver(cont);
             }
             if (newPlanType.equals("gold")) {
-                cont.upgradeServicePlanToGold();
+                user.upgradeServicePlanToGold(cont);
             }
             cont.addTransaction(new UpgradePlanTransaction(iban, newPlanType, timestamp));
         } catch (AlreadyHasPlanException e) {

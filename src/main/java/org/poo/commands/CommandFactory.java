@@ -85,6 +85,9 @@ public final class CommandFactory {
             case "cashWithdrawal" -> {
                 return new CashWithdrawal(command, userHashMap);
             }
+            case "acceptSplitPayment" -> {
+                return new AcceptSplitPayment(command, userHashMap);
+            }
             default -> {
                 System.out.println(command.getCommand());
             }
