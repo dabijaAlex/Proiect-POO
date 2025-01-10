@@ -1,6 +1,7 @@
 package org.poo.commands.otherCommands;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,9 @@ public final class AddFunds extends Command {
     private HashMap<String, User> users;
     private String iban;
     private double amount;
+    @JsonIgnore
+    private String email;
+    private int timestamp;
 
     /**
      * Constructor
@@ -28,6 +32,8 @@ public final class AddFunds extends Command {
         this.iban = command.getAccount();
         this.amount = command.getAmount();
         this.users = users;
+        this.email = command.getEmail();
+        this.timestamp = command.getTimestamp();
 
     }
 
@@ -38,7 +44,9 @@ public final class AddFunds extends Command {
      */
     public void execute(final ArrayNode output) throws NotFoundException {
         Account cont = getAccountReference(users, iban);
-        cont.setBalance(Math.round((cont.getBalance() + amount ) * 100.0) / 100.0);
+//        cont.setBalance(Math.round((cont.getBalance() + amount ) * 100.0) / 100.0);
+//        cont.addFunds(Math.round((cont.getBalance() + amount ) * 100.0) / 100.0, email, timestamp);
+        cont.addFunds(amount, email, timestamp);
     }
 }
 

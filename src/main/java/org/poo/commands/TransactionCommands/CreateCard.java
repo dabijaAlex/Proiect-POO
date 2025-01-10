@@ -1,5 +1,6 @@
 package org.poo.commands.TransactionCommands;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,9 @@ public final class CreateCard extends Command {
     private String cardHolder;
     private String account;
 
+    @JsonIgnore
+    private String email;
+
     /**
      * Constructor
      * @param command
@@ -34,6 +38,7 @@ public final class CreateCard extends Command {
         this.account = command.getAccount();
         this.cardHolder = command.getEmail();
         this.timestamp = command.getTimestamp();
+        this.email = command.getEmail();
 
         this.users = users;
 
@@ -58,8 +63,8 @@ public final class CreateCard extends Command {
         }
         Account cont = getAccountReference(users, account);
 
-        card = Utils.generateCardNumber();
-        cont.addCard(new Card(card, "active"));
+
+        card = cont.createCard(email);
 
         //  add card number to hashMap
         users.put(card, user);

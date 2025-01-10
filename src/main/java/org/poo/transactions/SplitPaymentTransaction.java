@@ -25,6 +25,8 @@ public class SplitPaymentTransaction extends Transaction {
     public SplitPaymentTransaction(final int timestamp, final String description,
                                    final List<String> involvedAccounts,
                                    final String currency, final String type, final List<Double> amountForUsers) {
+        super(true);
+
         this.timestamp = timestamp;
         this.description = description;
         this.involvedAccounts = involvedAccounts;

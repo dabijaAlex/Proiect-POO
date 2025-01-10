@@ -21,6 +21,7 @@ public class DeleteCard extends Command {
     private String account;
 
     private HashMap<String, User> users;
+    private String email;
 
     /**
      * Constructor
@@ -33,6 +34,7 @@ public class DeleteCard extends Command {
         this.card = command.getCardNumber();
         this.users = users;
         this.description = "The card has been destroyed";
+        this.email = command.getEmail();
     }
 
     /**
@@ -42,12 +44,13 @@ public class DeleteCard extends Command {
      * @param users
      */
     public DeleteCard(final int timestamp, final String cardNumber,
-                      final HashMap<String, User> users) {
+                      final HashMap<String, User> users, final String email) {
         this.timestamp = timestamp;
         this.card = cardNumber;
         this.users = users;
         this.description = "The card has been destroyed";
         this.cmdName = "deleteCard";
+        this.email = email;
     }
 
 
@@ -69,7 +72,7 @@ public class DeleteCard extends Command {
         account = acc.getIBAN();
 
 
-        acc.deleteCard(card);
+        acc.deleteCard(card, email);
         users.remove(card);
 
         acc.addTransaction(new DeleteCardTransaction(timestamp, description, card,

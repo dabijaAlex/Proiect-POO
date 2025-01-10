@@ -23,6 +23,7 @@ public final class CreateOneTimeCard extends Command {
     private String card;
     private String cardHolder;
     private String account;
+    private String email;
 
     /**
      * Constructor
@@ -39,6 +40,7 @@ public final class CreateOneTimeCard extends Command {
         this.users = users;
 
         this.description = "New card created";
+        this.email = command.getEmail();
     }
 
 
@@ -50,13 +52,14 @@ public final class CreateOneTimeCard extends Command {
      * @param users
      */
     public CreateOneTimeCard(final int timestamp, final String cardHolder,
-                             final String account, final HashMap<String, User> users) {
+                             final String account, final HashMap<String, User> users, final String email) {
         this.timestamp = timestamp;
         this.cardHolder = cardHolder;
         this.account = account;
         this.users = users;
         this.description = "New card created";
         this.cmdName = "CreateOneTimeCard";
+        this.email = email;
     }
 
 
@@ -73,7 +76,7 @@ public final class CreateOneTimeCard extends Command {
         Account cont = getAccountReference(users, account);
 
         String cardNumber = Utils.generateCardNumber();
-        cont.addCard(new OneTimeCard(cardNumber, "active"));
+        cont.addCard(new OneTimeCard(cardNumber, "active", email));
         users.put(cardNumber, user);
 
 

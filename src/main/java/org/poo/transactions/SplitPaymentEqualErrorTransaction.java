@@ -27,6 +27,7 @@ public final class SplitPaymentEqualErrorTransaction extends Transaction {
     public SplitPaymentEqualErrorTransaction(final int timestamp, final String description,
                                         final List<String> involvedAccounts,
                                         final String currency, final String error, final String type, final List<Double> amountEach, final double amount) {
+        super(true);
         this.amount = amount;
         this.timestamp = timestamp;
         this.description = description;

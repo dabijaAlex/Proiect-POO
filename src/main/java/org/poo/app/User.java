@@ -17,7 +17,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 @Getter @Setter
-public final class User {
+public class User {
     @JsonIgnore
     private static int counter = 0;
     private String firstName;

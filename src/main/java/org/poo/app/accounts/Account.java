@@ -12,15 +12,19 @@ import org.poo.app.Card;
 import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotASavingsAccount;
 import org.poo.app.User;
+import org.poo.app.accounts.userTypes.BAccUser;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
 import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
+import org.poo.transactions.CreateCardTransaction;
 import org.poo.transactions.Transaction;
+import org.poo.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Queue;
 
 @Getter @Setter
@@ -58,7 +62,7 @@ public class Account {
      * @param type
      */
     public Account(final String IBAN, final double balance, final String currency,
-                   final String type, ServicePlan servicePlan, final double interestRate, final User user) {
+                   final String type, ServicePlan servicePlan, final double interestRate, final User user, final String email) {
         this.IBAN = IBAN;
         this.balance = balance;
         this.currency = currency;
@@ -67,6 +71,7 @@ public class Account {
         this.servicePlan = servicePlan;
         this.interestRate = interestRate;
         this.userRef = user;
+        this.email = email;
 
         this.transactions = new ArrayList<>();
     }
@@ -79,6 +84,35 @@ public class Account {
         this.cards.add(card);
     }
 
+    public String createCard(String emailCreator) {
+        String card = Utils.generateCardNumber();
+        this.addCard(new Card(card, "active", emailCreator));
+        return card;
+    }
+
+
+    public void makePayment(final double amount, final double commission, String email, final int timestamp) {
+        balance = Math.round((balance - amount - commission) * 100.0) / 100.0;
+    }
+
+    public void addFunds(final double amount, final String email, final int timestamp) {
+        balance = Math.round((balance + amount) * 100.0) / 100.0;
+    }
+
+    /**
+     * delete card from account
+     * @param cardNumber
+     */
+    public void deleteCard(final String cardNumber, final String email) {
+        this.cards.remove(getCard(cardNumber));
+    }
+    public void setAliasCommand(final String alias, String email) {
+        this.alias = alias;
+    }
+
+    public void setMinBalanceCommand(double minBalance, String email) {
+        this.minBalance = minBalance;
+    }
     /**
      * copy account so the reference from output is different
      * @param other
@@ -119,13 +153,6 @@ public class Account {
         this.transactions.add(transaction);
     }
 
-    /**
-     * delete card from account
-     * @param cardNumber
-     */
-    public void deleteCard(final String cardNumber) {
-        this.cards.remove(getCard(cardNumber));
-    }
 
     /**
      * get card by card number
@@ -189,4 +216,20 @@ public class Account {
 
         output.add(objectNode);
     }
+
+    public void setSpendingLimit(final double spendingLimit) {}
+    public void setDepositLimit(final double depositLimit) {}
+    @JsonIgnore
+    public double getSpendingLimit() {return 0;}
+    @JsonIgnore
+    public double getDepositLimit() {return 0;}
+    public void addBusinessAssociate(String role, String email, String username){}
+
+    public void changeSpendingLimit(double amount, String email){}
+    public void changeDepositLimit(double amount, String email){}
+    public ArrayList<BAccUser> abc() {return null;}
+
+
+
+
 }

@@ -9,7 +9,13 @@ import java.util.List;
 @Getter @Setter
 public class Transaction {
     protected int timestamp;
+    @JsonIgnore
+    private boolean isSplitPayment = false;
 
+    public Transaction() {}
+    public Transaction(boolean isSplitPayment) {
+        this.isSplitPayment = isSplitPayment;
+    }
 
     /**
      * this method is for transactions that characterize as spending transactions

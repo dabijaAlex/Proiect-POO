@@ -43,7 +43,7 @@ public final class SetAlias extends Command {
         User user = getUserReference(users, iban);
         Account cont = getAccountReference(users, iban);
 
-        cont.setAlias(alias);
+        cont.setAliasCommand(alias, email);
         users.put(alias, user);
     }
 }

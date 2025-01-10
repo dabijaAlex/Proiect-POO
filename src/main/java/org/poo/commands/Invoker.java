@@ -1,6 +1,7 @@
 package org.poo.commands;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -8,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.accounts.Account;
+import org.poo.app.accounts.userTypes.ChangeDepositLimitException;
+import org.poo.app.accounts.userTypes.ChangeSpendingLimitException;
+import org.poo.app.accounts.userTypes.NotAuthorizedException;
 
 import java.util.ArrayList;
 
@@ -46,6 +50,32 @@ public final class Invoker {
                     printNotFoundError(output, command.timestampTheSecond, "Card", command.getCmdName());
                 } catch (AccountNotFound e) {
                     printNotFoundError(output, command.timestampTheSecond, "Account", command.getCmdName());
+                } catch (NotAuthorizedException ignoreForNow) {
+                    continue;
+                } catch (ChangeSpendingLimitException e) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode objectNode = mapper.createObjectNode();
+                    objectNode.put("command", "changeSpendingLimit");
+                    ObjectNode outputNode = mapper.createObjectNode();
+                    outputNode.put("timestamp", command.timestampTheSecond);
+                    outputNode.put("description", "You must be owner in order to change spending limit.");
+
+                    objectNode.set("output", outputNode);
+                    objectNode.put("timestamp", command.timestampTheSecond);
+
+                    output.add(objectNode);
+                } catch (ChangeDepositLimitException e) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode objectNode = mapper.createObjectNode();
+                    objectNode.put("command", "changeSpendingLimit");
+                    ObjectNode outputNode = mapper.createObjectNode();
+                    outputNode.put("timestamp", command.timestampTheSecond);
+                    outputNode.put("description", "You must be owner in order to change deposit limit.");
+
+                    objectNode.set("output", outputNode);
+                    objectNode.put("timestamp", command.timestampTheSecond);
+
+                    output.add(objectNode);
                 }
 
             }

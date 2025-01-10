@@ -73,10 +73,13 @@ public final class PrintTransactions extends Command {
                 outputArray.addPOJO(transaction);
                 continue;
             }
-            if(previousTransaction.getTimestamp() != transaction.getTimestamp()) {
-                outputArray.addPOJO(transaction);
-                previousTransaction = transaction;
+            if(previousTransaction.isSplitPayment() && transaction.isSplitPayment()) {
+                if (previousTransaction.getTimestamp() == transaction.getTimestamp()) {
+                    continue;
+                }
             }
+            outputArray.addPOJO(transaction);
+            previousTransaction = transaction;
 
         }
 

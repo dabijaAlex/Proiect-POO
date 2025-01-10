@@ -1,5 +1,6 @@
 package org.poo.commands.TransactionCommands;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,9 @@ public final class SendMoney extends Command {
     private String description;
     private int timestamp;
 
+    @JsonIgnore
+    private String email;
+
 
     /**
      * Constructor
@@ -40,6 +44,7 @@ public final class SendMoney extends Command {
         this.timestamp = command.getTimestamp();
         this.description = command.getDescription();
 
+        this.email = command.getEmail();
         this.users = users;
         timestampTheSecond = timestamp;
     }
@@ -98,7 +103,10 @@ public final class SendMoney extends Command {
 
         senderAccount.getServicePlan().addPayment(amountAsDouble, senderAccount.getCurrency(), senderAccount, senderUser);
 
-        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
+//        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
+//        senderAccount.makePayment(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
+        senderAccount.makePayment(amountAsDouble, senderCommission, email, timestamp);
+
         amount = amountAsDouble + " " + senderAccount.getCurrency();
 
         //  add transactions for both accounts
@@ -106,12 +114,12 @@ public final class SendMoney extends Command {
                 receiverIBAN, description, "sent", timestamp));
 
         //  receiver account was a commerciant
-//        if(commerciant != null) {
-//            //  add cashback
-//            commerciant.PaymentHappened(amountAsDouble, senderAccount);
-//            senderAccount.setBalance(senderAccount.getBalance() + commerciant.getCashback(amountAsDouble, senderAccount));
-//            return;
-//        }
+        if(commerciant != null) {
+            //  add cashback
+            commerciant.PaymentHappened(amountAsDouble, senderAccount, receiverAccount.getCurrency());
+            senderAccount.setBalance(senderAccount.getBalance() + commerciant.getCashback(amountAsDouble, senderAccount));
+            return;
+        }
 
 
         receiverAccount.setBalance(receiverAccount.getBalance() + Math.round(amountInReceiverCurrency * 100.0) / 100.0);

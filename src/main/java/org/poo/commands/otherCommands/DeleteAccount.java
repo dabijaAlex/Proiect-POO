@@ -9,6 +9,7 @@ import org.poo.app.accounts.Account;
 import org.poo.app.Card;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
+import org.poo.app.accounts.userTypes.NotAuthorizedException;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.FailedDeleteAccountTransaction;
@@ -55,8 +56,12 @@ public final class DeleteAccount extends Command {
         Account cont = null;
 
         try {
-            user = getUserReference(users, iban);
+            user = getUserReference(users, email);
+
             cont = getAccountReference(users, iban);
+            if(user.getEmail().equals(cont.getEmail()) == false) {
+                throw new NotAuthorizedException();
+            }
         } catch (NotFoundException e) {
 
                 outputNode.put("timestamp", timestamp);
@@ -81,6 +86,8 @@ public final class DeleteAccount extends Command {
 
             return;
         }
+
+//        if(user.getEmail().equals(email)) {}
 
         user.deleteAccount(cont);
         //  clear cards

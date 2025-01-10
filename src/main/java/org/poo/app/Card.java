@@ -16,16 +16,20 @@ public class Card {
     protected String status;
     @JsonIgnore
     protected boolean oneTime;
+    @JsonIgnore
+    protected String email;
 
-    public Card(final String cardNumber, final String status) {
+    public Card(final String cardNumber, final String status, final String email) {
         this.cardNumber = cardNumber;
         this.status = status;
         this.oneTime = false;
+        this.email = email;
     }
 
     public Card(final Card other) {
         this.cardNumber = other.getCardNumber();
         this.status = other.getStatus();
+        this.email = other.getEmail();
     }
 
     /**

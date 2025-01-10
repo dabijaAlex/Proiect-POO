@@ -9,28 +9,26 @@ import org.poo.fileio.CommandInput;
 
 import java.util.HashMap;
 
-
 @Getter @Setter
-public class addNewBusinessAssociate extends Command {
+public class ChangeSpendingLimit extends Command {
     private HashMap<String, User> users;
     private String accountIban;
-    private String role;
     private String email;
     private int timestamp;
+    private double amount;
 
-
-    public addNewBusinessAssociate(CommandInput input, HashMap<String, User> users) {
+    public ChangeSpendingLimit(CommandInput input, HashMap<String, User> users) {
         this.cmdName = input.getCommand();
         this.users = users;
         this.accountIban = input.getAccount();
-        this.role = input.getRole();
         this.email = input.getEmail();
         this.timestamp = input.getTimestamp();
+        this.amount = input.getAmount();
+        timestampTheSecond = timestamp;
     }
 
     public void execute(ArrayNode output) {
         Account account = getAccountReference(users, accountIban);
-        User user = getUserReference(users, email);
-        account.addBusinessAssociate(role, email, user.getLastName() + " " +  user.getFirstName());
+        account.changeSpendingLimit(amount, email);
     }
 }

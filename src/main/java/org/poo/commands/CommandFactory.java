@@ -6,6 +6,7 @@ import org.poo.commands.TransactionCommands.*;
 import org.poo.commands.debugCommands.PrintTransactions;
 import org.poo.commands.debugCommands.PrintUsers;
 import org.poo.commands.otherCommands.*;
+import org.poo.commands.reportCommands.BusinessReport;
 import org.poo.commands.reportCommands.Report;
 import org.poo.commands.reportCommands.SpendingReport;
 import org.poo.fileio.CommandInput;
@@ -88,6 +89,19 @@ public final class CommandFactory {
             case "acceptSplitPayment" -> {
                 return new AcceptSplitPayment(command, userHashMap);
             }
+            case "addNewBusinessAssociate" -> {
+                return new addNewBusinessAssociate(command, userHashMap);
+            }
+            case "changeSpendingLimit" -> {
+                return new ChangeSpendingLimit(command, userHashMap);
+            }
+            case "businessReport" -> {
+                return new BusinessReport(command, userHashMap);
+            }
+            case "changeDepositLimit" -> {
+                return new ChangeDepositLimit(command, userHashMap);
+            }
+
             default -> {
                 System.out.println(command.getCommand());
             }

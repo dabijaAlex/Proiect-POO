@@ -17,8 +17,8 @@ public class OneTimeCard extends Card {
      * @param cardNumber
      * @param status
      */
-    public OneTimeCard(final String cardNumber, final String status) {
-        super(cardNumber, status);
+    public OneTimeCard(final String cardNumber, final String status, final String email) {
+        super(cardNumber, status, email);
         oneTime = true;
     }
 
@@ -48,10 +48,10 @@ public class OneTimeCard extends Card {
 
 
         DeleteCard del = new DeleteCard(command.getTimestamp(), command.getCardNumber(),
-                users);
+                users, email);
         del.execute(output);
         CreateOneTimeCard cr = new CreateOneTimeCard(command.getTimestamp(), user.getEmail(),
-                account.getIBAN(), users);
+                account.getIBAN(), users, email);
         cr.execute(output);
     }
 }

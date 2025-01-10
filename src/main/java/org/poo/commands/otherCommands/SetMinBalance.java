@@ -17,6 +17,7 @@ public final class SetMinBalance extends Command {
     private String iban;
     private double amount;
     private int timestamp;
+    private String email;
 
 
     /**
@@ -29,6 +30,7 @@ public final class SetMinBalance extends Command {
         this.iban = command.getAccount();
         this.amount = command.getAmount();
         this.timestamp = command.getTimestamp();
+        this.email = command.getEmail();
 
         this.users = users;
     }
@@ -40,6 +42,6 @@ public final class SetMinBalance extends Command {
      */
     public void execute(final ArrayNode output) throws NotFoundException {
         Account acc = getAccountReference(users, iban);
-        acc.setMinBalance(amount);
+        acc.setMinBalanceCommand(amount, email);
     }
 }

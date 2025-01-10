@@ -118,7 +118,9 @@ public final class PayOnline extends Command {
 
         cont.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user);
 
-        cont.setBalance(Math.round((cont.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
+//        cont.makePayment(Math.round((cont.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
+        cont.makePayment(amountInAccountCurrency, commission, email, timestamp);
+
 
         card.useCard(cont, users, amountInAccountCurrency, output, this);
 

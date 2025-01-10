@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
+import org.poo.app.accounts.BusinessAccount;
 import org.poo.app.accounts.SavingsAccount;
 import org.poo.app.User;
 import org.poo.app.plans.ServicePlan;
@@ -72,11 +73,15 @@ public final class AddAccount extends Command {
         }
 
         Account account;
+        if(accountType.equals("business")) {
+            account = new BusinessAccount(user.getLastName(), user.getEmail(), iban, 0, currency, "business", servicePlan, user);
+            user.addAccount(account);
+        }
         if (accountType.equals("savings")) {
-            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate, user);
+            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate, user, email);
             user.addAccount(account);
         } else {
-            account = new Account(iban, 0, currency, accountType, servicePlan, interestRate, user);
+            account = new Account(iban, 0, currency, accountType, servicePlan, interestRate, user, email);
             user.addAccount(account);
         }
 
