@@ -18,11 +18,11 @@ public final class Student extends ServicePlan{
     @Override
     public void upgradeToSilver(Account account) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate("RON", account.getCurrency());
-        if(account.getBalance() - Math.round(100.0 * convRate * 100.0) / 100.0 < 0) {
+        if(account.getBalance() - 100.0 * convRate < 0) {
             throw new InsufficientFundsException();
         }
 
-        account.setBalance(Math.round((account.getBalance() - 100.0 * convRate) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - 100.0 * convRate);
 
 //        return new Silver();
     }
@@ -30,10 +30,10 @@ public final class Student extends ServicePlan{
     @Override
     public void upgradeToGold(Account account) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate("RON", account.getCurrency());
-        if(account.getBalance() - Math.round(350.0 * convRate * 100.0) / 100.0 < 0) {
+        if(account.getBalance() - 350.0 * convRate < 0) {
             throw new InsufficientFundsException();
         }
-        account.setBalance(Math.round((account.getBalance() - 350.0 * convRate) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - 350.0 * convRate);
 
 
 //        return new Gold();
@@ -41,13 +41,13 @@ public final class Student extends ServicePlan{
 
 
     public double getLowCashback(double amount) {
-        return Math.round(0.1 / 100 * amount * 100.0) / 100.0;
+        return 0.1 / 100 * amount;
     }
     public double getMedianCashback(double amount) {
-        return Math.round(0.2 / 100 * amount * 100.0) / 100.0;
+        return 0.2 / 100 * amount;
     }
     public double getHighCashback(double amount) {
-        return Math.round(0.25 / 100 * amount * 100.0) / 100.0;
+        return 0.25 / 100 * amount;
     }
 
     public Student getThisPlan() {

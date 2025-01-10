@@ -69,7 +69,7 @@ public class CashWithdrawal extends Command {
             throw new InsufficientFundsException();
         }
 
-        account.setBalance(Math.round((account.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - amountInAccountCurrency - commission);
 
         account.addTransaction(new CashWithdrawalTransaction(timestamp, amount));
 

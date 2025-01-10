@@ -72,7 +72,7 @@ public class SplitPayment extends Command {
         } else {
             amountForUsers = new ArrayList<>();
             double nrAccounts = command.getAccounts().size();
-            double amountEach = Math.round(amount / nrAccounts * 100.0) / 100.0;
+            double amountEach = amount / nrAccounts;
             for(int i = 0; i < nrAccounts; i++) {
                 amountForUsers.add(amountEach);
             }

@@ -122,7 +122,7 @@ public final class SendMoney extends Command {
         }
 
 
-        receiverAccount.setBalance(receiverAccount.getBalance() + Math.round(amountInReceiverCurrency * 100.0) / 100.0);
+        receiverAccount.setBalance(receiverAccount.getBalance() + amountInReceiverCurrency);
 
         receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN,
                 amountInReceiverCurrency + " " + receiverAccount.getCurrency(),

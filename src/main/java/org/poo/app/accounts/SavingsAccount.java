@@ -37,7 +37,8 @@ public class SavingsAccount extends Account {
     @Override
     public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(), this.getCurrency());
-        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(amount, currency);
+//        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(amount, currency);
+        double amountToTakeFromAccount = convRate * amount;
         if(amountToTakeFromAccount > this.getBalance()){
             throw new InsufficientFundsException();
         }

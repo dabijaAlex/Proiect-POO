@@ -24,13 +24,13 @@ public final class Gold extends ServicePlan{
 
 
     public double getLowCashback(double amount) {
-        return Math.round(0.5 / 100 * amount * 100.0) / 100.0;
+        return 0.5 / 100 * amount;
     }
     public double getMedianCashback(double amount) {
-        return Math.round(0.55 / 100 * amount * 100.0) / 100.0;
+        return 0.55 / 100 * amount;
     }
     public double getHighCashback(double amount) {
-        return Math.round(0.7 / 100 * amount * 100.0) / 100.0;
+        return 0.7 / 100 * amount;
     }
 
     public Gold getThisPlan() {

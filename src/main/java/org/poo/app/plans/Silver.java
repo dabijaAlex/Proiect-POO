@@ -17,15 +17,15 @@ public final class Silver extends ServicePlan{
 
         if(ExchangeRateGraph.makeConversion(currency, "RON", amount) <= 500)
             return 0;
-        return Math.round(amount * 0.1 / 100.0 * 100.0) / 100.0;
+        return amount * 0.1 / 100.0;
     }
 
     public void upgradeToGold(Account account) throws InsufficientFundsException {
         double convRate = ExchangeRateGraph.convertRate("RON", account.getCurrency());
-        if(account.getBalance() - Math.round(250 * convRate * 100.0) / 100.0 < 0) {
+        if(account.getBalance() - 250 * convRate < 0) {
             throw new InsufficientFundsException();
         }
-        account.setBalance(Math.round((account.getBalance() - 250 * convRate) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - 250 * convRate);
 //        return new Gold();
     }
 
@@ -55,12 +55,12 @@ public final class Silver extends ServicePlan{
 
 
     public double getLowCashback(double amount) {
-        return Math.round(0.3 / 100 * amount * 100.0) / 100.0;
+        return 0.3 / 100 * amount;
     }
     public double getMedianCashback(double amount) {
-        return Math.round(0.4 / 100 * amount * 100.0) / 100.0;
+        return 0.4 / 100 * amount;
     }
     public double getHighCashback(double amount) {
-        return Math.round(0.5 / 100 * amount * 100.0) / 100.0;
+        return 0.5 / 100 * amount;
     }
 }

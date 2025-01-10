@@ -51,7 +51,7 @@ public class SplitPaymentDB {
     }
 
     private static void proceedWithPayment(SingleSplitPayment payment) {
-        for(Pair pair: payment.getEachAccountAndPayment().reversed()) {
+        for(Pair pair: payment.getEachAccountAndPayment()) {
             Account account = pair.getAccount();
             double commission = account.getServicePlan().getCommissionAmount(pair.getAmountToPay(), account.getCurrency());
             if(account.getBalance() < pair.getAmountToPay() + commission) {
@@ -59,7 +59,7 @@ public class SplitPaymentDB {
                     Account accountFailed = pairFailed.getAccount();
                     if(payment.getType().equals("equal")) {
                         accountFailed.addTransaction(new SplitPaymentEqualErrorTransaction(payment.getTimestamp(), payment.getDescription()
-                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal(), Math.round(payment.getAmount() / payment.getNrAccounts() * 100.0) / 100.0));
+                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal(), payment.getAmount() / payment.getNrAccounts()));
                     } else {
                         accountFailed.addTransaction(new SplitPaymentErrorTransaction(payment.getTimestamp(), payment.getDescription()
                                 , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal()));
@@ -74,10 +74,10 @@ public class SplitPaymentDB {
         for(Pair pair: payment.getEachAccountAndPayment()) {
             Account account = pair.getAccount();
             double commission = account.getServicePlan().getCommissionAmount(pair.getAmountToPay(), account.getCurrency());
-            account.setBalance(Math.round((account.getBalance() - pair.getAmountToPay() - commission) * 100.0) / 100.0);
+            account.setBalance(account.getBalance() - pair.getAmountToPay() - commission);
             if(payment.getType().equals("equal")) {
                 account.addTransaction(new SplitPaymentEqualTransaction(payment.getTimestamp(), payment.getDescription(),
-                        payment.getInvolvedAccounts(), payment.getCurrency(), payment.getType(), payment.getAmountEachOriginal(), Math.round(payment.getAmount() / payment.getNrAccounts() * 100.0) / 100.0));
+                        payment.getInvolvedAccounts(), payment.getCurrency(), payment.getType(), payment.getAmountEachOriginal(), payment.getAmount() / payment.getNrAccounts()));
             } else {
                 account.addTransaction(new SplitPaymentTransaction(payment.getTimestamp(), payment.getDescription(),
                         payment.getInvolvedAccounts(), payment.getCurrency(), payment.getType(), payment.getAmountEachOriginal()));

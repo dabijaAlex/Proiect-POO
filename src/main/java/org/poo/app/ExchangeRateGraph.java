@@ -128,7 +128,7 @@ public class ExchangeRateGraph {
     public static double makeConversion(final String from, final String to, final double amount) {
         double convRate = 1;
         convRate = convertRate(from, to);
-        return Math.round(amount * convRate * 100.0) / 100.0;
+        return amount * convRate;
     }
 
 

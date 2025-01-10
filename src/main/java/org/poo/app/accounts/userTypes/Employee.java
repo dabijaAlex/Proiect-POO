@@ -40,14 +40,14 @@ public class Employee extends BAccUser {
             throw new NotAuthorizedException();
         deposited2.add(new Amounts(amount, timestamp));
 
-        account.setBalance(Math.round((account.getBalance() - amount - commision) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - amount - commision);
 
 
     }
     public void addFunds(Account account, double funds, int timestamp) {
         if (account.getDepositLimit() < funds && account.getDepositLimit() != -1)
             throw new NotAuthorizedException();
-        account.setBalance(Math.round((account.getBalance() + funds) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() + funds);
         deposited2.add(new Amounts(funds, timestamp));
 
     }

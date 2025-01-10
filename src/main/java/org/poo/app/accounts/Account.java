@@ -92,11 +92,11 @@ public class Account {
 
 
     public void makePayment(final double amount, final double commission, String email, final int timestamp) {
-        balance = Math.round((balance - amount - commission) * 100.0) / 100.0;
+        balance = balance - amount - commission;
     }
 
     public void addFunds(final double amount, final String email, final int timestamp) {
-        balance = Math.round((balance + amount) * 100.0) / 100.0;
+        balance = balance + amount;
     }
 
     /**

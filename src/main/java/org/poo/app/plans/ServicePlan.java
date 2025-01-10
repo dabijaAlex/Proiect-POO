@@ -9,7 +9,7 @@ import org.poo.app.accounts.Account;
 public abstract class ServicePlan {
 
     public double getCommissionAmount(final double amount, String currency) {
-        return (double) Math.round(amount * 0.2 / 100.0 * 100.0) / 100.0;
+        return amount * 0.2 / 100.0;
     }
 
     public abstract void upgradeToGold(Account account);

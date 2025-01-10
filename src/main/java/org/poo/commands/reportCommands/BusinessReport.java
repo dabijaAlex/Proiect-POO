@@ -65,14 +65,14 @@ public class BusinessReport extends Command {
         double totalSpent = 0;
         double totalDeposited = 0;
         for(BAccUser employee : employees) {
-            totalDeposited = Math.round((totalDeposited + employee.getDepositedInTimestamps(startTimestamp, endTimestamp)) * 100.0 ) / 100.0;
-            totalSpent = Math.round((totalSpent + employee.getSpentInTimestamps(startTimestamp, endTimestamp)) * 100.0 ) / 100.0;
+            totalDeposited = totalDeposited + employee.getDepositedInTimestamps(startTimestamp, endTimestamp);
+            totalSpent = totalSpent + employee.getSpentInTimestamps(startTimestamp, endTimestamp);
 
         }
 
         for(BAccUser manager : managers) {
-            totalDeposited = Math.round((totalDeposited + manager.getDepositedInTimestamps(startTimestamp, endTimestamp)) * 100.0 ) / 100.0;
-            totalSpent = Math.round((totalSpent + manager.getSpentInTimestamps(startTimestamp, endTimestamp)) * 100.0 ) / 100.0;
+            totalDeposited = totalDeposited + manager.getDepositedInTimestamps(startTimestamp, endTimestamp);
+            totalSpent = totalSpent + manager.getSpentInTimestamps(startTimestamp, endTimestamp);
 
         }
 

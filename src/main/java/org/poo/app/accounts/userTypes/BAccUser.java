@@ -52,11 +52,11 @@ public class BAccUser {
     }
     public void makePayment(Account account, double amount, double commision, int timestamp) {
         spent2.add(new Amounts(amount, timestamp));
-        account.setBalance(Math.round((account.getBalance() - amount - commision) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() - amount - commision);
     }
     public void addFunds(Account account, double funds, int timestamp) {
         deposited2.add(new Amounts(funds, timestamp));
-        account.setBalance(Math.round((account.getBalance() + funds) * 100.0) / 100.0);
+        account.setBalance(account.getBalance() + funds);
 
     }
     public void setAlias(Account account, String alias) {
@@ -67,7 +67,7 @@ public class BAccUser {
         double total = 0;
         for(Amounts amount : spent2) {
             if(amount.timestamp >= start && amount.timestamp <= end) {
-                total = Math.round((total + amount.val) * 100.0) / 100.0;
+                total = total + amount.val;
 
             }
         }
@@ -81,7 +81,7 @@ public class BAccUser {
         double total = 0;
         for(Amounts amount : deposited2) {
             if(amount.timestamp >= start && amount.timestamp <= end) {
-                total = Math.round((total + amount.val) * 100.0) / 100.0;
+                total = total + amount.val;
             }
         }
         deposited = total;
