@@ -10,7 +10,9 @@ import org.poo.app.accounts.Account;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.NoClassicAccount;
 import org.poo.transactions.TooYoungCashWithdrawalTransaction;
+import org.poo.transactions.WithdrewSavingsTransaction;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.HashMap;
 
 @Getter @Setter
@@ -33,6 +35,7 @@ public class WithdrawSavings extends Command {
 
     @Override
     public void execute(ArrayNode output) throws NotFoundException {
+
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
@@ -46,13 +49,6 @@ public class WithdrawSavings extends Command {
         Account targetAccount = user.getFirstClassicAccount(currency);
         if(targetAccount == null) {
             //  no classic account
-//            outputNode.put("timestamp", timestamp);
-//            outputNode.put("description", "No classic account");
-//
-//            objectNode.set("output", outputNode);
-//            objectNode.put("timestamp", timestamp);
-//
-//            output.add(objectNode);
             account.addTransaction(new NoClassicAccount(timestamp));
             return;
         }
@@ -60,33 +56,15 @@ public class WithdrawSavings extends Command {
 
         if(2024 - birthYear < 21) {
             // wrong age output
-
-
-//            outputNode.put("timestamp", timestamp);
-//            outputNode.put("description", "Too young");
-//
-//            objectNode.set("output", outputNode);
-//            objectNode.put("timestamp", timestamp);
-//
-//            output.add(objectNode);
             targetAccount.addTransaction(new TooYoungCashWithdrawalTransaction(timestamp));
             return;
 
         }
 
-
+        Account savingsAccount = null;
         try {
-            Account savingsAccount = getAccountReference(users, iban); // throws acc not found
+            savingsAccount = getAccountReference(users, iban); // throws acc not found
             savingsAccount.makeWithdrawal(targetAccount, amount); // throws NotASavingsAccount
-
-        } catch (NotFoundException e) {
-            outputNode.put("timestamp", timestamp);
-            outputNode.put("description", "Account not found");
-
-            objectNode.set("output", outputNode);
-            objectNode.put("timestamp", timestamp);
-
-            output.add(objectNode);
         } catch (NotASavingsAccount e) {
             outputNode.put("timestamp", timestamp);
             outputNode.put("description", "This is not a savings account");
@@ -94,8 +72,10 @@ public class WithdrawSavings extends Command {
             objectNode.set("output", outputNode);
             objectNode.put("timestamp", timestamp);
             output.add(objectNode);
-
+            return;
         }
+        savingsAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIBAN(), savingsAccount.getIBAN(), timestamp));
+        targetAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIBAN(), savingsAccount.getIBAN(), timestamp));
 
 
     }

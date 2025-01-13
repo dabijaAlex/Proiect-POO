@@ -10,32 +10,24 @@ public class SpendingThresholdStrategy implements CashbackStrategy {
 
 
     public void addPaymentToMap(Commerciant commerciant, double amount, Account account, String currency) {
-        HashMap<Account, Double> accountsMap = commerciant.getListAccountsThatPayedHere();
-        Double spentMoneySoFar = accountsMap.get(account);
-
-        if(spentMoneySoFar == null) {
-            accountsMap.put(account, Double.valueOf(ExchangeRateGraph.makeConversion(currency, "RON", amount)));
-        } else {
-            accountsMap.replace(account, spentMoneySoFar + ExchangeRateGraph.makeConversion(currency, "RON", amount));
-        }
+        amount = ExchangeRateGraph.makeConversion(currency, "RON", amount);
+        account.setSpentAtCommerciant(account.getSpentAtCommerciant() + amount);
     }
+
 
     @Override
     public double getCashback(Commerciant commerciant, double amount, Account account) {
-        HashMap<Account, Double> accountsMap = commerciant.getListAccountsThatPayedHere();
-        Double spentMoneySoFar = accountsMap.get(account);
-        if(spentMoneySoFar == null) {
-            return 0;
-        }
+        double spentMoneySoFar = account.getSpentAtCommerciant()
+                + ExchangeRateGraph.makeConversion(account.getCurrency(), "RON", amount);
         if(spentMoneySoFar < 100) {
-            return 0;
+            return commerciant.getCashbackAmount(amount, account);
         }
         if(spentMoneySoFar < 300) {
-            return account.getServicePlan().getLowCashback(amount);
+            return account.getServicePlan().getLowCashback(amount) + commerciant.getCashbackAmount(amount, account);
         }
         if(spentMoneySoFar < 500) {
-            return account.getServicePlan().getMedianCashback(amount);
+            return account.getServicePlan().getMedianCashback(amount) + commerciant.getCashbackAmount(amount, account);
         }
-        return account.getServicePlan().getHighCashback(amount);
+        return account.getServicePlan().getHighCashback(amount) + commerciant.getCashbackAmount(amount, account);
     }
 }

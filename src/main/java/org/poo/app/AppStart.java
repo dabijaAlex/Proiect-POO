@@ -73,6 +73,8 @@ public final class AppStart {
 
             //  put the name of the commerciant also
             commerciants.put(commerciantInput.getCommerciant(), commerciants.get(commerciantIban));
+            Integer idInt = new Integer(commerciantInput.getId());
+            commerciants.put(idInt.toString(), commerciants.get(commerciantIban));
         }
 
         invoker.setCmds(commands);

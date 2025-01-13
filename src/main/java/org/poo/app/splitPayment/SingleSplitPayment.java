@@ -6,6 +6,7 @@ import org.poo.app.ExchangeRateGraph;
 import org.poo.app.User;
 import org.poo.app.accounts.Account;
 import org.poo.commands.Command;
+import org.poo.transactions.RejectedSplitPaymentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,14 +67,27 @@ public class SingleSplitPayment {
         return null;
     }
 
-    public void remove() {
-        for(Account account : remainingAccounts){
-            User user = account.getUserRef();
-            Queue<Account> q = user.getAccountsForSplitPayment();
-            q.remove(account);
+    public void setAcceptedPayment(User user) {
+        for(Pair pair : eachAccountAndPayment){
+            if(pair.getAccount().getUserRef().equals(user)){
+                remainingAccounts.remove(pair.getAccount());
+                pair.setStatus(true);
+            }
         }
     }
 
+    public void rejected() {
+        for(Pair pair : eachAccountAndPayment){
+            Account account = pair.getAccount();
+            account.addTransaction(new RejectedSplitPaymentTransaction(timestamp,
+                    "Split payment of " + String.format("%.2f", amount) + " " + currency,
+                    type, currency, amountEachOriginal, involvedAccounts));
+        }
+        for(Account account : remainingAccounts){
+            account.getUserRef().getSplitPayments().remove(this);
+        }
+
+    }
 
     public boolean checkAllAccepted() {
         for(Pair pair : eachAccountAndPayment) {

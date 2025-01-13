@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.poo.app.AccountNotFound;
+import org.poo.app.UserNotFound;
 import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
@@ -37,6 +39,10 @@ public class Command {
             throw new NotFoundException();
         User user = users.get(key);
         if (user == null) {
+            if(key.contains("@"))
+                throw new UserNotFound();
+            if(key.contains("RO"))
+                throw new AccountNotFound();
             throw new NotFoundException();
         }
         return user;
@@ -53,7 +59,7 @@ public class Command {
                                        final String key) throws NotFoundException {
         if(key == null)
             throw new NotFoundException();
-        User user = users.get(key);
+        User user = getUserReference(users, key);
         if (user == null) {
             throw new NotFoundException();
         }
@@ -62,28 +68,6 @@ public class Command {
             throw new NotFoundException();
         }
         return cont;
-    }
-
-    /**
-     *
-     * @param timestamp
-     * @param description
-     * @param output
-     */
-    protected void addNotFoundError(final int timestamp, final String description,
-                                    final ArrayNode output) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("command", cmdName);
-        ObjectNode outputNode = mapper.createObjectNode();
-
-        outputNode.put("timestamp", timestamp);
-        outputNode.put("description", description);
-
-        objectNode.set("output", outputNode);
-        objectNode.put("timestamp", timestamp);
-
-        output.add(objectNode);
     }
 
     /**

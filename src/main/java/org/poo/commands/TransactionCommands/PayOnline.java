@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.accounts.Account;
+import org.poo.app.accounts.BusinessAccount;
+import org.poo.app.cashbackStrategies.SpendingThresholdStrategy;
 import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -48,6 +50,7 @@ public final class PayOnline extends Command {
         this.commerciant = command.getCommerciant();
         this.email = command.getEmail();
         this.users = users;
+        this.timestampTheSecond = timestamp;
     }
 
 
@@ -68,9 +71,6 @@ public final class PayOnline extends Command {
      * @param output
      */
     public void execute(final ArrayNode output) {
-
-
-
         if (amount == 0)
             return;
         Commerciant commerciant = CommerciantMap.getCommerciantsMap().get(this.commerciant);
@@ -79,24 +79,16 @@ public final class PayOnline extends Command {
         try {
             user = getUserReference(users, cardNumber);
             cont = user.getAccount(cardNumber);
+            if(cont.getCurrentAssociate(email) == null)
+                throw new CardNotFound();
+            if(!(cont instanceof BusinessAccount))
+                if(!user.getEmail().equals(email)) {
+                    throw new CardNotFound();
+                }
         } catch (NotFoundException e) {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectNode objectNode = mapper.createObjectNode();
-            objectNode.put("command", cmdName);
-            ObjectNode outputNode = mapper.createObjectNode();
-
-
-            outputNode.put("timestamp", timestamp);
-            outputNode.put("description", "Card not found");
-
-            objectNode.set("output", outputNode);
-            objectNode.put("timestamp", timestamp);
-
-            output.add(objectNode);
-            return;
+            throw new CardNotFound();
         }
-        if(cont.getIBAN().equals("RO37POOB7013767509830666"))
-            System.out.println("2");
+
 
         Card card = cont.getCard(cardNumber);
         if (card.getStatus().equals("frozen")) {
@@ -104,10 +96,11 @@ public final class PayOnline extends Command {
             return;
         }
 
-        //  card is active
+
 
         double amountInAccountCurrency = ExchangeRateGraph.makeConversion(currency, cont.getCurrency(), amount);
         double commission = cont.getServicePlan().getCommissionAmount(amountInAccountCurrency, cont.getCurrency());
+
 
         //  check for sufficient funds
         if (cont.getBalance() < amountInAccountCurrency + commission) {
@@ -116,17 +109,22 @@ public final class PayOnline extends Command {
         }
 
 
-        cont.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user);
 
-//        cont.makePayment(Math.round((cont.getBalance() - amountInAccountCurrency - commission) * 100.0) / 100.0);
-        cont.makePayment(amountInAccountCurrency, commission, email, timestamp);
+        cont.makePayment(amountInAccountCurrency, commission, email, timestamp, commerciant);
+
 
 
         card.useCard(cont, users, amountInAccountCurrency, output, this);
 
-        //  add cashback
 
-        commerciant.PaymentHappened(amountInAccountCurrency, cont, cont.getCurrency());
-        cont.setBalance(cont.getBalance() + commerciant.getCashback(amountInAccountCurrency, cont));
+        cont.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user, timestamp);
+
+
+        //  add cashback
+        double cashback = commerciant.getCashback(amountInAccountCurrency, cont);
+
+
+        cont.setBalance(cont.getBalance() + cashback);
+        commerciant.PaymentHappened(amount, cont, currency);
     }
 }

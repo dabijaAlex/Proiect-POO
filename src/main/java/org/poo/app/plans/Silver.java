@@ -6,6 +6,7 @@ import org.poo.app.User;
 import org.poo.app.accounts.Account;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.InsufficientFundsException;
+import org.poo.transactions.UpgradePlanTransaction;
 
 @Getter @Setter
 public final class Silver extends ServicePlan{
@@ -26,16 +27,15 @@ public final class Silver extends ServicePlan{
             throw new InsufficientFundsException();
         }
         account.setBalance(account.getBalance() - 250 * convRate);
-//        return new Gold();
+        account.getUserRef().setServicePlan(new Gold());
     }
 
     public void upgradeToSilver(Account account) throws AlreadyHasPlanException {
-        System.out.println("can t upgrade to silver");
         throw new AlreadyHasPlanException();
     }
 
 
-    public void addPayment(final double amount, String currency, Account account, User user) {
+    public void addPayment(final double amount, String currency, Account account, User user, int timestamp) {
         double convRate = ExchangeRateGraph.convertRate(currency, "RON");
         if(amount * convRate > 300) {
             nrPaymentsOver300 += 1;
@@ -43,8 +43,8 @@ public final class Silver extends ServicePlan{
         if(nrPaymentsOver300 >= 5) {
             for(Account acc: user.getAccounts()) {
                 acc.setServicePlan(new Gold());
+                acc.addTransaction(new UpgradePlanTransaction(acc.getIBAN(), "gold", timestamp));
             }
-//            account.setServicePlan(new Gold());
         }
     }
 

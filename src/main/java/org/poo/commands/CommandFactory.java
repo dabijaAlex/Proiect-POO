@@ -2,6 +2,8 @@ package org.poo.commands;
 
 
 import org.poo.app.User;
+import org.poo.app.splitPayment.AcceptSplitPayment;
+import org.poo.app.splitPayment.RejectSplitPayment;
 import org.poo.commands.TransactionCommands.*;
 import org.poo.commands.debugCommands.PrintTransactions;
 import org.poo.commands.debugCommands.PrintUsers;
@@ -101,7 +103,9 @@ public final class CommandFactory {
             case "changeDepositLimit" -> {
                 return new ChangeDepositLimit(command, userHashMap);
             }
-
+            case "rejectSplitPayment" -> {
+                return new RejectSplitPayment(command, userHashMap);
+            }
             default -> {
                 System.out.println(command.getCommand());
             }

@@ -13,15 +13,7 @@ import java.util.HashMap;
 @Getter @Setter
 public final class nrOfTransactionsCashback implements CashbackStrategy {
     public double getCashback(Commerciant commerciant, double amount, Account account) {
-        HashMap<Account, Double> accountsMap = commerciant.getListAccountsThatPayedHere();
-        Double nrTranzactii = accountsMap.get(account);
-        if(nrTranzactii == null || nrTranzactii != commerciant.getCashbackPercent() ) {
-            return 0;
-        }
-
-//        return amount * commerciant.getCashbackPercent() / 100;
-
-        return Math.round(amount * commerciant.getCashbackPercent() / 100 * 100.0) / 100.0;
+        return commerciant.getCashbackAmount(amount, account);
     }
 
 
@@ -29,10 +21,21 @@ public final class nrOfTransactionsCashback implements CashbackStrategy {
         HashMap<Account, Double> accountsMap = commerciant.getListAccountsThatPayedHere();
         Double nrTranzactii = accountsMap.get(account);
         if(nrTranzactii == null) {
-            accountsMap.put(account, Double.valueOf(1));
+            accountsMap.put(account, 1.0);
+            return;
         } else {
-            accountsMap.replace(account, nrTranzactii + 1);
+            nrTranzactii++;
+            accountsMap.replace(account, nrTranzactii);
         }
-    }
+        if(nrTranzactii == 2){
+            account.addFoodDiscount();
+        }
+        if(nrTranzactii == 5){
+            account.addClothesDiscount();
+        }
+        if(nrTranzactii == 10){
+            account.addTechDiscount();
+        }
 
+    }
 }

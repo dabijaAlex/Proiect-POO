@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.accounts.Account;
+import org.poo.app.cashbackStrategies.SpendingThresholdStrategy;
 import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -63,35 +64,33 @@ public final class SendMoney extends Command {
      * @throws NotFoundException
      */
     public void execute(final ArrayNode output) throws NotFoundException, UserNotFound {
-        Commerciant commerciant = CommerciantMap.getCommerciantsMap().get(receiverIBAN);
-
+        HashMap<String, Commerciant> map = CommerciantMap.getCommerciantsMap();
+        Commerciant commerciant = map.get(receiverIdentifier);
 
         Account senderAccount = null;
         Account receiverAccount = null;
         User senderUser = null;
         try {
             senderAccount = getAccountReference(users, senderIdentifier);
-            receiverAccount = getAccountReference(users, receiverIdentifier);
+            if(commerciant == null) {
+                receiverAccount = getAccountReference(users, receiverIdentifier);
+            }
             senderUser = getUserReference(users, senderIdentifier);
         } catch (NotFoundException e) {
             throw new UserNotFound();
         }
         senderIBAN = senderAccount.getIBAN();
-        receiverIBAN = receiverAccount.getIBAN();
+        if(receiverAccount == null) {
+            receiverIBAN = receiverIdentifier;
+        } else {
+            receiverIBAN = receiverAccount.getIBAN();
+        }
 
         //  cand primim identifierul verificam ca acesta sa nu fie un alias pt sender
         if (!senderIBAN.equals(senderIdentifier)) {
             return;
         }
 
-        //  check if diff currencies
-//        double convRate = 1;
-//        if (!senderAccount.getCurrency().equals(receiverAccount.getCurrency())) {
-//            convRate = ExchangeRateGraph.convertRate(senderAccount.getCurrency(),
-//                    receiverAccount.getCurrency());
-//        }
-        double amountInReceiverCurrency = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(),
-                receiverAccount.getCurrency(), amountAsDouble);
 
         //  sender doesn t have the money
         double senderCommission = senderAccount.getServicePlan().getCommissionAmount(amountAsDouble, senderAccount.getCurrency());
@@ -101,11 +100,7 @@ public final class SendMoney extends Command {
         }
 
 
-        senderAccount.getServicePlan().addPayment(amountAsDouble, senderAccount.getCurrency(), senderAccount, senderUser);
-
-//        senderAccount.setBalance(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
-//        senderAccount.makePayment(Math.round((senderAccount.getBalance() - amountAsDouble - senderCommission) * 100.0) / 100.0);
-        senderAccount.makePayment(amountAsDouble, senderCommission, email, timestamp);
+        senderAccount.makePayment(amountAsDouble, senderCommission, email, timestamp, commerciant);
 
         amount = amountAsDouble + " " + senderAccount.getCurrency();
 
@@ -113,16 +108,24 @@ public final class SendMoney extends Command {
         senderAccount.addTransaction(new SendMoneyTransaction(senderIBAN, amount,
                 receiverIBAN, description, "sent", timestamp));
 
+
         //  receiver account was a commerciant
         if(commerciant != null) {
             //  add cashback
-            commerciant.PaymentHappened(amountAsDouble, senderAccount, receiverAccount.getCurrency());
-            senderAccount.setBalance(senderAccount.getBalance() + commerciant.getCashback(amountAsDouble, senderAccount));
+            double cashback = commerciant.getCashback(amountAsDouble, senderAccount);
+            senderAccount.setBalance(senderAccount.getBalance() + cashback);
+            commerciant.PaymentHappened(amountAsDouble, senderAccount, senderAccount.getCurrency());
+
             return;
         }
 
+        double amountInReceiverCurrency = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(),
+                receiverAccount.getCurrency(), amountAsDouble);
+
+
 
         receiverAccount.setBalance(receiverAccount.getBalance() + amountInReceiverCurrency);
+
 
         receiverAccount.addTransaction(new SendMoneyTransaction(senderIBAN,
                 amountInReceiverCurrency + " " + receiverAccount.getCurrency(),

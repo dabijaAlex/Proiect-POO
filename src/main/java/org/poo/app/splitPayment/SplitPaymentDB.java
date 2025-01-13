@@ -25,29 +25,15 @@ public class SplitPaymentDB {
         SplitPaymentsList.remove(payment);
     }
 
-    public static void SetAcceptedPayment(Account account, final String type) {
-        for (SingleSplitPayment payment : SplitPaymentsList) {
-            Pair pair = null;
-            if(payment.getType().equals(type)) {
-                pair = payment.findAccount(account);
 
-                if(pair != null && !pair.isStatus()) {
-                    pair.setStatus(true);
-                    return;
-                }
-            }
-        }
-    }
-
-    public static SingleSplitPayment checkAllAccepted() {
+    public static void checkAllAccepted() {
         for (SingleSplitPayment payment : SplitPaymentsList) {
             if(payment.checkAllAccepted()) {
                 removeSplitPaymentFromList(payment);
                 proceedWithPayment(payment);
-                return payment;
+                return;
             }
         }
-        return null;
     }
 
     private static void proceedWithPayment(SingleSplitPayment payment) {
@@ -65,7 +51,6 @@ public class SplitPaymentDB {
                                 , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal()));
                     }
                 }
-                payment.remove();
                 return;
             }
 
@@ -73,8 +58,7 @@ public class SplitPaymentDB {
 
         for(Pair pair: payment.getEachAccountAndPayment()) {
             Account account = pair.getAccount();
-            double commission = account.getServicePlan().getCommissionAmount(pair.getAmountToPay(), account.getCurrency());
-            account.setBalance(account.getBalance() - pair.getAmountToPay() - commission);
+            account.setBalance(account.getBalance() - pair.getAmountToPay());
             if(payment.getType().equals("equal")) {
                 account.addTransaction(new SplitPaymentEqualTransaction(payment.getTimestamp(), payment.getDescription(),
                         payment.getInvolvedAccounts(), payment.getCurrency(), payment.getType(), payment.getAmountEachOriginal(), payment.getAmount() / payment.getNrAccounts()));

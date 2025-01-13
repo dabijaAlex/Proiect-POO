@@ -6,10 +6,8 @@ import org.poo.app.Card;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
-import org.poo.app.accounts.userTypes.BAccUser;
-import org.poo.app.accounts.userTypes.Employee;
-import org.poo.app.accounts.userTypes.Manager;
-import org.poo.app.accounts.userTypes.Owner;
+import org.poo.app.accounts.userTypes.*;
+import org.poo.app.commerciants.Commerciant;
 import org.poo.app.plans.ServicePlan;
 import org.poo.utils.Utils;
 
@@ -22,6 +20,7 @@ public class BusinessAccount extends Account {
     private double spendingLimit;
     private double depositLimit ;
     private ArrayList<BAccUser> businessAssociate = new ArrayList<>();
+    private ArrayList<CommerciantForBusiness> commerciantsForBusiness = new ArrayList<>();
     public BusinessAccount(final String ownerName, final String ownerEmail, final String IBAN,
                            final double balance, final String currency,
                            final String type, final ServicePlan servicePlan, User user) {
@@ -35,6 +34,11 @@ public class BusinessAccount extends Account {
     }
 
     public void addBusinessAssociate(String role, String email, String username) {
+        for(BAccUser associate : businessAssociate) {
+            if(associate.getEmail().equals(email)) {
+                return;
+            }
+        }
         if(role.equals("owner"))
             businessAssociate.add(new Owner(email, username));
         if(role.equals("manager"))
@@ -48,7 +52,7 @@ public class BusinessAccount extends Account {
         return businessAssociate;
     }
 
-    private BAccUser getCurrentAssociate(String email) {
+    public BAccUser getCurrentAssociate(String email) {
         for(BAccUser user : businessAssociate){
             if(user.getEmail().equals(email))
                 return user;
@@ -57,12 +61,14 @@ public class BusinessAccount extends Account {
     }
 
 
-    public void makePayment(final double amount, final double commission, String email, int timestamp) {
+
+    public void makePayment(final double amount, final double commission, String email,
+                            int timestamp, Commerciant commerciant) {
         BAccUser associate = getCurrentAssociate(email);
         if(associate == null) {
             throw new NotFoundException();
         }
-        associate.makePayment(this, amount, commission, timestamp);
+        associate.makePayment(this, amount, commission, timestamp, commerciant);
     }
 
     public void addFunds(final double amount, String email, int timestamp) {
@@ -115,6 +121,10 @@ public class BusinessAccount extends Account {
             throw new NotFoundException();
         }
         associate.changeDepositLimit(this, depositLimit);
+    }
+
+    public Account getClassicAccount(String currency) {
+        return null;
     }
 
 }

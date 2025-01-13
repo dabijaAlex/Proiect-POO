@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
-import org.poo.app.plans.AlreadyHasPlanException;
-import org.poo.app.plans.CannotDowngradePlanException;
-import org.poo.app.plans.Gold;
-import org.poo.app.plans.Silver;
+import org.poo.app.plans.*;
 import org.poo.app.splitPayment.SingleSplitPayment;
 import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.fileio.UserInput;
@@ -31,11 +28,14 @@ public class User {
     @JsonIgnore
     private String occupation;
     @JsonIgnore
-    private Queue<Account> accountsForSplitPayment = new LinkedList<>();
+    private ArrayList<SingleSplitPayment> splitPayments = new ArrayList<>();
+    @JsonIgnore
+    protected ServicePlan servicePlan;
 
 
-    public void addToAccountToQueue(Account account) {
-        accountsForSplitPayment.add(account);
+
+    public void addSplitPayment(SingleSplitPayment splitPayment) {
+        splitPayments.add(splitPayment);
     }
 
     /**
@@ -51,6 +51,11 @@ public class User {
         this.occupation = user.getOccupation();
         counter++;
         index = counter;
+        if(user.getOccupation().equals("student")) {
+            servicePlan = new Student();
+        } else {
+            servicePlan = new Standard();
+        }
     }
 
     public Account getFirstClassicAccount(String currency) {
@@ -83,9 +88,6 @@ public class User {
      */
     public void addAccount(final Account account) {
         this.accounts.add(account);
-        if(accounts.size() > 1) {
-            account.setServicePlan(accounts.get(0).getServicePlan());
-        }
     }
 
     /**

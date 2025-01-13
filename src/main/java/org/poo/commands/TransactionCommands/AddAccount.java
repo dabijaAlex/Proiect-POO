@@ -64,20 +64,14 @@ public final class AddAccount extends Command {
         //  gen and add IBAN string to HashMap
         iban = Utils.generateIBAN();
         users.put(iban, user);
-        ServicePlan servicePlan;
 
-        if(user.getOccupation().equals("student")) {
-            servicePlan = new Student();
-        } else {
-            servicePlan = new Standard();
-        }
+        ServicePlan servicePlan = user.getServicePlan();
 
         Account account;
         if(accountType.equals("business")) {
-            account = new BusinessAccount(user.getLastName(), user.getEmail(), iban, 0, currency, "business", servicePlan, user);
+            account = new BusinessAccount(user.getLastName(), user.getEmail(), iban, 0, currency, accountType, servicePlan, user);
             user.addAccount(account);
-        }
-        if (accountType.equals("savings")) {
+        } else if (accountType.equals("savings")) {
             account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate, user, email);
             user.addAccount(account);
         } else {

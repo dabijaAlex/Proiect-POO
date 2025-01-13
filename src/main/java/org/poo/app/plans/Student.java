@@ -23,8 +23,7 @@ public final class Student extends ServicePlan{
         }
 
         account.setBalance(account.getBalance() - 100.0 * convRate);
-
-//        return new Silver();
+        account.getUserRef().setServicePlan(new Silver());
     }
 
     @Override
@@ -34,9 +33,7 @@ public final class Student extends ServicePlan{
             throw new InsufficientFundsException();
         }
         account.setBalance(account.getBalance() - 350.0 * convRate);
-
-
-//        return new Gold();
+        account.getUserRef().setServicePlan(new Gold());
     }
 
 

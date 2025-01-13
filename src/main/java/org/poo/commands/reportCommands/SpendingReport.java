@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.AccountNotFound;
 import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
@@ -102,8 +103,7 @@ public final class SpendingReport extends Command {
             balance = cont.getBalance();
             currency = cont.getCurrency();
         } catch (NotFoundException e) {
-            addNotFoundError(timestamp, "Account not found", output);
-            return;
+            throw new AccountNotFound();
         }
 
 

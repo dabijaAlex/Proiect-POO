@@ -18,6 +18,8 @@ public final class Standard extends ServicePlan {
         }
 
         account.setBalance(account.getBalance() - 100.0 * convRate);
+        account.getUserRef().setServicePlan(new Silver());
+
 
 //        return new Silver();
     }
@@ -30,6 +32,7 @@ public final class Standard extends ServicePlan {
             throw new InsufficientFundsException();
         }
         account.setBalance(account.getBalance() - 350.0 * convRate);
+        account.getUserRef().setServicePlan(new Gold());
 
 
 //        return new Gold();

@@ -69,10 +69,30 @@ public class DeleteCard extends Command {
         Account acc = getAccountReference(users, card);
 
         cardHolder = user.getEmail();
+        if(cardHolder.equals(email) == false)
+            return;
+
+
+        account = acc.getIBAN();
+        acc.deleteCard(card, email);
+        users.remove(card);
+
+        acc.addTransaction(new DeleteCardTransaction(timestamp, description, card,
+                cardHolder, account));
+    }
+
+
+    public void execute(final ArrayNode output, int type) throws NotFoundException {
+        User user = getUserReference(users, card);
+        Account acc = getAccountReference(users, card);
+
+        cardHolder = user.getEmail();
+        if(cardHolder.equals(email) == false)
+            return;
         account = acc.getIBAN();
 
 
-        acc.deleteCard(card, email);
+        acc.deleteCardOneTime(card, email);
         users.remove(card);
 
         acc.addTransaction(new DeleteCardTransaction(timestamp, description, card,

@@ -44,8 +44,6 @@ public final class AddFunds extends Command {
      */
     public void execute(final ArrayNode output) throws NotFoundException {
         Account cont = getAccountReference(users, iban);
-//        cont.setBalance(Math.round((cont.getBalance() + amount ) * 100.0) / 100.0);
-//        cont.addFunds(Math.round((cont.getBalance() + amount ) * 100.0) / 100.0, email, timestamp);
         cont.addFunds(amount, email, timestamp);
     }
 }

@@ -36,10 +36,6 @@ public class CashWithdrawal extends Command {
 
     @Override
     public void execute(ArrayNode output) throws InsufficientFundsException, NotFoundException {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("command", cmdName);
-        ObjectNode outputNode = mapper.createObjectNode();
         User user = null;
         Account account = null;
 
@@ -54,15 +50,18 @@ public class CashWithdrawal extends Command {
 
         try {
             user = getUserReference(users, email); // throws not found
-//            account = getAccountReference(users, email); // throws not found
         } catch (NotFoundException e) {
             throw new UserNotFound();
+        }
+        User userByCard = getUserReference(users, cardNumber);
+        if(!userByCard.getEmail().equals(email)) {
+            throw new CardNotFound();
         }
 
         double amountInAccountCurrency = ExchangeRateGraph.makeConversion("RON", account.getCurrency(), amount);
 
         double commission = account.getServicePlan().getCommissionAmount(amountInAccountCurrency, account.getCurrency());
-        account.getServicePlan().addPayment(amount, account.getCurrency(), account, user);
+        account.getServicePlan().addPayment(amount, account.getCurrency(), account, user, timestamp);
 
         if (account.getBalance() < amountInAccountCurrency + commission) {
             account.addTransaction(new InsufficientFundsTransaction(timestamp));

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.UserNotFound;
 import org.poo.app.accounts.Account;
 import org.poo.app.Card;
 import org.poo.app.NotFoundException;
@@ -63,15 +64,7 @@ public final class DeleteAccount extends Command {
                 throw new NotAuthorizedException();
             }
         } catch (NotFoundException e) {
-
-                outputNode.put("timestamp", timestamp);
-                outputNode.put("description", "User not found");
-
-                objectNode.set("output", outputNode);
-                objectNode.put("timestamp", timestamp);
-
-                output.add(objectNode);
-                return;
+            throw new UserNotFound();
         }
 
 
@@ -87,7 +80,6 @@ public final class DeleteAccount extends Command {
             return;
         }
 
-//        if(user.getEmail().equals(email)) {}
 
         user.deleteAccount(cont);
         //  clear cards

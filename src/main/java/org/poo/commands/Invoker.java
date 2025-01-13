@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.accounts.Account;
+import org.poo.app.accounts.NotABusinessAccountException;
 import org.poo.app.accounts.userTypes.ChangeDepositLimitException;
 import org.poo.app.accounts.userTypes.ChangeSpendingLimitException;
 import org.poo.app.accounts.userTypes.NotAuthorizedException;
@@ -67,7 +68,7 @@ public final class Invoker {
                 } catch (ChangeDepositLimitException e) {
                     ObjectMapper mapper = new ObjectMapper();
                     ObjectNode objectNode = mapper.createObjectNode();
-                    objectNode.put("command", "changeSpendingLimit");
+                    objectNode.put("command", "changeDepositLimit");
                     ObjectNode outputNode = mapper.createObjectNode();
                     outputNode.put("timestamp", command.timestampTheSecond);
                     outputNode.put("description", "You must be owner in order to change deposit limit.");
@@ -76,6 +77,18 @@ public final class Invoker {
                     objectNode.put("timestamp", command.timestampTheSecond);
 
                     output.add(objectNode);
+                } catch (NotABusinessAccountException e) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    ObjectNode objectNode = mapper.createObjectNode();
+                    objectNode.put("command", command.getCmdName());
+                    ObjectNode outputNode = mapper.createObjectNode();
+                    outputNode.put("timestamp", command.timestampTheSecond);
+                    outputNode.put("description", "This is not a business account");
+
+                    objectNode.set("output", outputNode);
+                    objectNode.put("timestamp", command.timestampTheSecond);
+                    output.add(objectNode);
+
                 }
 
             }

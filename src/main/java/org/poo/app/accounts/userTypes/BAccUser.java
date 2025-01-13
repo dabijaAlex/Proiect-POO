@@ -6,9 +6,7 @@ import lombok.Setter;
 import org.poo.app.Card;
 import org.poo.app.ExchangeRateGraph;
 import org.poo.app.accounts.Account;
-import org.poo.transactions.PayOnlineTransaction;
-import org.poo.transactions.Transaction;
-
+import org.poo.app.commerciants.Commerciant;
 import java.util.ArrayList;
 
 @Getter @Setter
@@ -50,9 +48,12 @@ public class BAccUser {
     public void setMinBalance(Account account, double minBalance) {
         account.setMinBalance(minBalance);
     }
-    public void makePayment(Account account, double amount, double commision, int timestamp) {
+    public void makePayment(Account account, double amount, double commision, int timestamp, Commerciant commerciant) {
         spent2.add(new Amounts(amount, timestamp));
-        account.setBalance(account.getBalance() - amount - commision);
+        double balance = account.getBalance();
+        balance = balance - commision;
+        balance = balance - amount;
+        account.setBalance(balance);
     }
     public void addFunds(Account account, double funds, int timestamp) {
         deposited2.add(new Amounts(funds, timestamp));
@@ -68,11 +69,9 @@ public class BAccUser {
         for(Amounts amount : spent2) {
             if(amount.timestamp >= start && amount.timestamp <= end) {
                 total = total + amount.val;
-
             }
         }
         spent = total;
-
         return total;
 
     }

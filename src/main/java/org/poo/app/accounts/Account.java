@@ -13,6 +13,8 @@ import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotASavingsAccount;
 import org.poo.app.User;
 import org.poo.app.accounts.userTypes.BAccUser;
+import org.poo.app.accounts.userTypes.CommerciantForBusiness;
+import org.poo.app.commerciants.Commerciant;
 import org.poo.app.plans.AlreadyHasPlanException;
 import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
@@ -51,8 +53,28 @@ public class Account {
     protected ServicePlan servicePlan;
     @JsonIgnore
     protected User userRef;
+    @JsonIgnore
+    protected double spentAtCommerciant = 0;
+    @JsonIgnore
+    protected int FoodDiscounts = 0;
+    @JsonIgnore
+    protected int ClothesDiscounts = 0;
+    @JsonIgnore
+    protected int TechDiscounts = 0;
 
 
+    public void addFoodDiscount() {
+        if(FoodDiscounts == 0)
+            FoodDiscounts++;
+    }
+    public void addClothesDiscount() {
+        if(ClothesDiscounts == 0)
+            ClothesDiscounts++;
+    }
+    public void addTechDiscount() {
+        if(TechDiscounts == 0)
+            TechDiscounts++;
+    }
 
     /**
      * Constructor
@@ -91,8 +113,9 @@ public class Account {
     }
 
 
-    public void makePayment(final double amount, final double commission, String email, final int timestamp) {
-        balance = balance - amount - commission;
+    public void makePayment(final double amount, final double commission, String email,
+                            final int timestamp, Commerciant commerciant) {
+        balance = balance - (commission + amount);
     }
 
     public void addFunds(final double amount, final String email, final int timestamp) {
@@ -104,6 +127,18 @@ public class Account {
      * @param cardNumber
      */
     public void deleteCard(final String cardNumber, final String email) {
+        Card card = getCard(cardNumber);
+        if(card.getStatus().equals("active")) {
+            return;
+        }
+        this.cards.remove(getCard(cardNumber));
+    }
+
+    public void deleteCardOneTime(final String cardNumber, final String email) {
+        Card card = getCard(cardNumber);
+//        if(!card.isOneTime() && card.getStatus().equals("active")) {
+//            return;
+//        }
         this.cards.remove(getCard(cardNumber));
     }
     public void setAliasCommand(final String alias, String email) {
@@ -225,9 +260,24 @@ public class Account {
     public double getDepositLimit() {return 0;}
     public void addBusinessAssociate(String role, String email, String username){}
 
-    public void changeSpendingLimit(double amount, String email){}
-    public void changeDepositLimit(double amount, String email){}
+    public void changeSpendingLimit(double amount, String email){
+        throw new NotABusinessAccountException();
+    }
+    public void changeDepositLimit(double amount, String email){
+        throw new NotABusinessAccountException();
+    }
     public ArrayList<BAccUser> abc() {return null;}
+
+    @JsonIgnore
+    public ArrayList<CommerciantForBusiness> getCommerciantsForBusiness() {
+        return null;
+    }
+
+    @JsonIgnore
+    public BAccUser getCurrentAssociate(String email) {
+        return new BAccUser("", "");
+//        return null;
+    }
 
 
 

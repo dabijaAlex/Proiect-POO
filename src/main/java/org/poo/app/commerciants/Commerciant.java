@@ -40,4 +40,7 @@ public class Commerciant {
         return cashbackStrategy.getCashback(this, amount, account);
     }
 
+    public double getCashbackAmount(double amount, Account account) {
+        return 0;
+    }
 }

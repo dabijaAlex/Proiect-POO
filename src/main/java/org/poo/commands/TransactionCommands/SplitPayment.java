@@ -40,19 +40,6 @@ public class SplitPayment extends Command {
      * @param command
      * @param users user hashmap where all users can be identified by card/ iban / alias/ email
      */
-//    public SplitPayment(final CommandInput command, final HashMap<String, User> users) {
-//        this.cmdName = command.getCommand();
-//        this.involvedAccounts = command.getAccounts();
-//        this.timestamp = command.getTimestamp();
-//        this.currency = command.getCurrency();
-//        this.total = command.getAmount();
-//
-//        this.description = "Split payment of " + String.format("%.2f", total) + " " + currency;
-//
-//        this.users = users;
-//        this.commandInput = command;
-//    }
-
     public SplitPayment(final CommandInput command, final HashMap<String, User> users) {
         this.type = command.getSplitPaymentType();
         this.cmdName = command.getCommand();
@@ -67,7 +54,7 @@ public class SplitPayment extends Command {
         if(type.equals("custom")) {
             this.amountForUsers = command.getAmountForUsers();
             for (Double amountForUser : amountForUsers) {
-                this.amountForUsersOriginal.add(amountForUser.doubleValue());
+                this.amountForUsersOriginal.add(amountForUser);
             }
         } else {
             amountForUsers = new ArrayList<>();
@@ -102,56 +89,19 @@ public class SplitPayment extends Command {
     public void execute(final ArrayNode output) throws NotFoundException {
         for(String accountIban : involvedAccounts) {
             Account acc = getAccountReference(users, accountIban);
-            User user = getUserReference(users, accountIban);
-            user.addToAccountToQueue(acc);
             this.involvedAccountsRef.add(acc);
         }
+
         this.convertForCurrency();
-        SingleSplitPayment payment = new SingleSplitPayment(involvedAccountsRef, amountForUsers, currency, type, timestamp, amount, description, involvedAccounts, amountForUsersOriginal);
+        SingleSplitPayment payment = new SingleSplitPayment(involvedAccountsRef, amountForUsers, currency, type,
+                timestamp, amount, description, involvedAccounts, amountForUsersOriginal);
+        for(String accountIban : involvedAccounts) {
+            User user = getUserReference(users, accountIban);
+            user.addSplitPayment(payment);
+        }
+
+
         SplitPaymentDB.addSplitPaymentToList(payment);
     }
 
-
-
-
-
-//        int nrAccounts = involvedAccounts.size();
-//        amount = total / nrAccounts;
-//        ArrayList<Double> paymentForEach = new ArrayList<>();
-//        ArrayList<Account> conturi = new ArrayList<>();
-//
-//        //  put in an array how much each account should pay based currency
-//        for (String account : involvedAccounts) {
-//            Account acc = getAccountReference(users, account);
-//
-//            double convRate = 1;
-//            if (!currency.equals(acc.getCurrency())) {
-//                convRate = ExchangeRateGraph.convertRate(currency, acc.getCurrency());
-//            }
-//
-//
-//            paymentForEach.add(amount * convRate);
-//            conturi.add(acc);
-//        }
-//
-//        //  check they have money;
-//        for (int i = nrAccounts - 1; i >= 0; i--) {
-//            //  an account didnt have the money
-//            if (conturi.get(i).getBalance() < paymentForEach.get(i)) {
-//                for (int j = 0; j < nrAccounts; j++) {   //poate fac o functie aici
-//                    conturi.get(j).addTransaction(new SplitPaymentErrorTransaction(timestamp,
-//                            description, amount, this.involvedAccounts, currency,
-//                            conturi.get(i).getIBAN()));
-//                }
-//                return;
-//            }
-//        }
-//
-//        for (int i = 0; i < nrAccounts; i++) {
-//            conturi.get(i).setBalance(conturi.get(i).getBalance() - paymentForEach.get(i));
-//            conturi.get(i).addTransaction(new SplitPaymentTransaction(timestamp, description,
-//                    amount, involvedAccounts, currency));
-//        }
-
-//    }
-}
+    }

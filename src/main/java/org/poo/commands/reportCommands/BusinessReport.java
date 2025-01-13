@@ -10,6 +10,7 @@ import org.poo.app.User;
 import org.poo.app.accounts.Account;
 import org.poo.app.accounts.BusinessAccount;
 import org.poo.app.accounts.userTypes.BAccUser;
+import org.poo.app.accounts.userTypes.CommerciantForBusiness;
 import org.poo.app.accounts.userTypes.Employee;
 import org.poo.app.accounts.userTypes.Manager;
 import org.poo.commands.Command;
@@ -17,6 +18,8 @@ import org.poo.fileio.CommandInput;
 import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 
@@ -48,9 +51,51 @@ public class BusinessReport extends Command {
         objectNode.put("command", "businessReport");
 
         Account account = getAccountReference(users, accountIban);
-        ArrayList<BAccUser> businessAssociates = ((BusinessAccount)account).abc();
 
 
+
+        ObjectNode outputNode = mapper.createObjectNode();
+        outputNode.put("IBAN", accountIban);
+        outputNode.put("balance", account.getBalance());
+        outputNode.put("currency", account.getCurrency());
+        outputNode.put("spending limit", account.getSpendingLimit());
+        outputNode.put("deposit limit", account.getDepositLimit());
+        outputNode.put("statistics type", type);
+        if(type.equals("transaction")) {
+            transactionSide(account, outputNode);
+        } else {
+            commerciantSide(account, mapper, outputNode);
+        }
+
+        objectNode.set("output", outputNode);
+        objectNode.put("timestamp", timestamp);
+
+        output.add(objectNode);
+
+    }
+
+    private void commerciantSide(Account account, ObjectMapper mapper, ObjectNode outputNode) {
+        ArrayNode commercaints = mapper.createArrayNode();
+        Collections.sort(account.getCommerciantsForBusiness(), new Comparator<CommerciantForBusiness>() {
+
+            public int compare(final CommerciantForBusiness c1, final CommerciantForBusiness c2) {
+                return c1.getName().compareTo(c2.getName());
+            }
+        });
+        for(CommerciantForBusiness c: account.getCommerciantsForBusiness()) {
+            ObjectNode singleCommerciant = mapper.createObjectNode();
+            singleCommerciant.put("commerciant", c.getName());
+            singleCommerciant.put("total received", c.getTotalReceived());
+            singleCommerciant.putPOJO("managers", c.getManagersCopy());
+            singleCommerciant.putPOJO("employees", c.getEmployeesCopy());
+            commercaints.add(singleCommerciant);
+        }
+        outputNode.set("commerciants", commercaints);
+    }
+
+
+    private void transactionSide(Account account, ObjectNode outputNode) {
+        ArrayList<BAccUser> businessAssociates = account.abc();
 
 
         for(BAccUser businessAssociate : businessAssociates) {
@@ -76,26 +121,9 @@ public class BusinessReport extends Command {
 
         }
 
-
-        ObjectNode outputNode = mapper.createObjectNode();
-        outputNode.put("IBAN", accountIban);
-        outputNode.put("balance", account.getBalance());
-        outputNode.put("currency", account.getCurrency());
-        outputNode.put("spending limit", account.getSpendingLimit());
-        outputNode.put("deposit limit", account.getDepositLimit());
-        outputNode.put("statistics type", type);
-        outputNode.putPOJO("managers", managers);
-        outputNode.putPOJO("employees", employees);
-
         outputNode.put("total spent", totalSpent);
         outputNode.put("total deposited", totalDeposited);
-
-
-
-        objectNode.set("output", outputNode);
-        objectNode.put("timestamp", timestamp);
-
-        output.add(objectNode);
-
+        outputNode.putPOJO("managers", managers);
+        outputNode.putPOJO("employees", employees);
     }
 }

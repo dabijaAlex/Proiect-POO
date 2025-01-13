@@ -14,7 +14,7 @@ public abstract class ServicePlan {
 
     public abstract void upgradeToGold(Account account);
     public abstract void upgradeToSilver(Account account);
-    public void addPayment(final double amount, String currency, Account account, User user) {
+    public void addPayment(final double amount, String currency, Account account, User user, int timestamp) {
 
     }
     public abstract double getLowCashback(double amount);

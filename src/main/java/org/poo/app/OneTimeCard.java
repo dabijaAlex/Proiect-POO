@@ -49,7 +49,7 @@ public class OneTimeCard extends Card {
 
         DeleteCard del = new DeleteCard(command.getTimestamp(), command.getCardNumber(),
                 users, email);
-        del.execute(output);
+        del.execute(output, 2);
         CreateOneTimeCard cr = new CreateOneTimeCard(command.getTimestamp(), user.getEmail(),
                 account.getIBAN(), users, email);
         cr.execute(output);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.CardNotFound;
 import org.poo.app.accounts.Account;
 import org.poo.app.NotFoundException;
 import org.poo.app.User;
@@ -44,21 +45,7 @@ public final class CheckCardStatus extends Command {
         try {
             acc = getAccountReference(users, cardNumber);
         } catch (NotFoundException e) {
-                description = "Card not found";
-
-                ObjectMapper mapper = new ObjectMapper();
-                ObjectNode objectNode = mapper.createObjectNode();
-                objectNode.put("command", cmdName);
-
-                ObjectNode outputNode = mapper.createObjectNode();
-                outputNode.put("timestamp", timestamp);
-                outputNode.put("description", description);
-
-                objectNode.set("output", outputNode);
-                objectNode.put("timestamp", timestamp);
-
-                output.add(objectNode);
-                return;
+                throw new CardNotFound();
         }
 
         if (acc.getCard(cardNumber).getStatus().equals("frozen")) {

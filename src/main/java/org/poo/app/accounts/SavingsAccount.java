@@ -11,6 +11,9 @@ import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.AddInterestTransaction;
 import org.poo.transactions.ChangeInterestRateTransaction;
+import org.poo.transactions.WithdrewSavingsTransaction;
+
+import java.math.BigDecimal;
 
 
 @Getter
@@ -55,7 +58,9 @@ public class SavingsAccount extends Account {
     @Override
     public void addInterest(final ArrayNode output, final AddInterest command) {
         double interest = balance * interestRate;
-        balance += interest;
+        balance = balance + 0.1;
+        balance = balance + interest;
+        balance = balance - 0.1;
         this.addTransaction(new AddInterestTransaction(command.getTimestampTheSecond(), interest, this.currency));
     }
 
