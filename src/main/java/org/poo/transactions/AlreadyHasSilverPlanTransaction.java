@@ -4,9 +4,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class AlreadyHasSilverPlanTransaction extends Transaction {
+public final class AlreadyHasSilverPlanTransaction extends Transaction {
     private String description;
-    public AlreadyHasSilverPlanTransaction(int timestamp, String plan) {
+
+    /**
+     * Constructor
+     * @param timestamp
+     * @param plan
+     */
+    public AlreadyHasSilverPlanTransaction(final int timestamp, final String plan) {
         description = "The user already has the " + plan + " plan.";
         this.timestamp = timestamp;
     }

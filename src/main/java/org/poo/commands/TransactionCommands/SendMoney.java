@@ -79,11 +79,11 @@ public final class SendMoney extends Command {
         } catch (NotFoundException e) {
             throw new UserNotFound();
         }
-        senderIBAN = senderAccount.getIBAN();
+        senderIBAN = senderAccount.getIban();
         if(receiverAccount == null) {
             receiverIBAN = receiverIdentifier;
         } else {
-            receiverIBAN = receiverAccount.getIBAN();
+            receiverIBAN = receiverAccount.getIban();
         }
 
         //  cand primim identifierul verificam ca acesta sa nu fie un alias pt sender
@@ -114,7 +114,7 @@ public final class SendMoney extends Command {
             //  add cashback
             double cashback = commerciant.getCashback(amountAsDouble, senderAccount);
             senderAccount.setBalance(senderAccount.getBalance() + cashback);
-            commerciant.PaymentHappened(amountAsDouble, senderAccount, senderAccount.getCurrency());
+            commerciant.paymentHappened(amountAsDouble, senderAccount, senderAccount.getCurrency());
 
             return;
         }

@@ -12,8 +12,10 @@ public class Transaction {
     @JsonIgnore
     private boolean isSplitPayment = false;
 
-    public Transaction() {}
-    public Transaction(boolean isSplitPayment) {
+    public Transaction() {
+
+    }
+    public Transaction(final boolean isSplitPayment) {
         this.isSplitPayment = isSplitPayment;
     }
 

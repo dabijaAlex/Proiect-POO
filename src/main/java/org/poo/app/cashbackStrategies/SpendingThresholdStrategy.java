@@ -4,19 +4,19 @@ import org.poo.app.ExchangeRateGraph;
 import org.poo.app.accounts.Account;
 import org.poo.app.commerciants.Commerciant;
 
-import java.util.HashMap;
 
-public class SpendingThresholdStrategy implements CashbackStrategy {
+public final class SpendingThresholdStrategy implements CashbackStrategy {
 
 
-    public void addPaymentToMap(Commerciant commerciant, double amount, Account account, String currency) {
-        amount = ExchangeRateGraph.makeConversion(currency, "RON", amount);
-        account.setSpentAtCommerciant(account.getSpentAtCommerciant() + amount);
+    public void addPaymentToMap(final Commerciant commerciant, final double amount,
+                                final Account account, final String currency) {
+        double amountInRon = ExchangeRateGraph.makeConversion(currency, "RON", amount);
+        account.setSpentAtCommerciant(account.getSpentAtCommerciant() + amountInRon);
     }
 
 
     @Override
-    public double getCashback(Commerciant commerciant, double amount, Account account) {
+    public double getCashback(final Commerciant commerciant, final double amount, final Account account) {
         double spentMoneySoFar = account.getSpentAtCommerciant()
                 + ExchangeRateGraph.makeConversion(account.getCurrency(), "RON", amount);
         if(spentMoneySoFar < 100) {

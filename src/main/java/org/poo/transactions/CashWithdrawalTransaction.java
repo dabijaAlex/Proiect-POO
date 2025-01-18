@@ -7,6 +7,12 @@ import lombok.Setter;
 public final class CashWithdrawalTransaction extends Transaction {
     private String description;
     private double amount;
+
+    /**
+     * Constructor
+     * @param timestamp
+     * @param amount
+     */
     public CashWithdrawalTransaction(final int timestamp, final double amount) {
         this.timestamp = timestamp;
         this.amount = amount;

@@ -10,7 +10,14 @@ public final class UpgradePlanTransaction extends Transaction {
     private String newPlanType;
     private int timestamp;
 
-    public UpgradePlanTransaction(final String accountIBAN, final String newPlanType, final int timestamp) {
+    /**
+     * Constructor
+     * @param accountIBAN
+     * @param newPlanType
+     * @param timestamp
+     */
+    public UpgradePlanTransaction(final String accountIBAN, final String newPlanType,
+                                  final int timestamp) {
         this.accountIBAN = accountIBAN;
         this.newPlanType = newPlanType;
         this.timestamp = timestamp;

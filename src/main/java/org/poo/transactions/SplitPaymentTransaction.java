@@ -2,17 +2,14 @@ package org.poo.transactions;
 
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Getter @Setter
-public class SplitPaymentTransaction extends Transaction {
+public final class SplitPaymentTransaction extends Transaction {
     private String description;
     private List<String> involvedAccounts;
     private String currency;
-    private String SplitPaymentType;
+    private String splitPaymentType;
     private List<Double> amountForUsers;
 
     /**
@@ -31,7 +28,7 @@ public class SplitPaymentTransaction extends Transaction {
         this.description = description;
         this.involvedAccounts = involvedAccounts;
         this.currency = currency;
-        this.SplitPaymentType = type;
+        this.splitPaymentType = type;
         this.amountForUsers = amountForUsers;
     }
 

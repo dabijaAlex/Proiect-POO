@@ -11,9 +11,6 @@ import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.AddInterestTransaction;
 import org.poo.transactions.ChangeInterestRateTransaction;
-import org.poo.transactions.WithdrewSavingsTransaction;
-
-import java.math.BigDecimal;
 
 
 @Getter
@@ -21,28 +18,30 @@ import java.math.BigDecimal;
 public class SavingsAccount extends Account {
     /**
      * Constructor
-     * @param IBAN
+     * @param iban
      * @param balance
      * @param currency
      * @param type
      */
-    public SavingsAccount(final String IBAN, final double balance, final String currency,
-                          final String type, ServicePlan servicePlan, final double interestRate, final User user, final String email) {
-        super(IBAN, balance, currency, type, servicePlan, interestRate, user, email);
+    public SavingsAccount(final String iban, final double balance, final String currency,
+                          final String type, final ServicePlan servicePlan,
+                          final double interestRate, final User user, final String email) {
+        super(iban, balance, currency, type, servicePlan, interestRate, user, email);
     }
 
 
     @Override
-    public Account getClassicAccount(String currency) {
+    public Account getClassicAccount(final String currency) {
         return null;
     }
 
     @Override
-    public void makeWithdrawal(Account targetAccount, double amount) throws InsufficientFundsException {
-        double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(), this.getCurrency());
-//        double amountToTakeFromAccount = convRate * amount + servicePlan.getCommissionAmount(amount, currency);
+    public void makeWithdrawal(final Account targetAccount,
+                               final double amount) throws InsufficientFundsException {
+        double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(),
+                this.getCurrency());
         double amountToTakeFromAccount = convRate * amount;
-        if(amountToTakeFromAccount > this.getBalance()){
+        if (amountToTakeFromAccount > this.getBalance()) {
             throw new InsufficientFundsException();
         }
         this.balance -= amountToTakeFromAccount;
@@ -58,10 +57,9 @@ public class SavingsAccount extends Account {
     @Override
     public void addInterest(final ArrayNode output, final AddInterest command) {
         double interest = balance * interestRate;
-        balance = balance + 0.1;
         balance = balance + interest;
-        balance = balance - 0.1;
-        this.addTransaction(new AddInterestTransaction(command.getTimestampTheSecond(), interest, this.currency));
+        this.addTransaction(new AddInterestTransaction(command.getTimestampTheSecond(),
+                interest, this.currency));
     }
 
     /**

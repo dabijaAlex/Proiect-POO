@@ -39,4 +39,3 @@ public final class SplitPaymentErrorTransaction extends Transaction {
     }
 
 }
-//tre sa dau remove la acc din usersasdasd

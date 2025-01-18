@@ -64,12 +64,15 @@ public final class AppStart {
         CommerciantMap.setCommerciantsMap(commerciants);
         for (CommerciantInput commerciantInput: input.getCommerciants()) {
             String commerciantIban = commerciantInput.getAccount();
-            if(commerciantInput.getType().equals("Food"))
+            if (commerciantInput.getType().equals("Food")) {
                 commerciants.put(commerciantIban, new FoodCommerciant(commerciantInput));
-            if(commerciantInput.getType().equals("Clothes"))
+            }
+            if (commerciantInput.getType().equals("Clothes")) {
                 commerciants.put(commerciantIban, new ClothesCommerciant(commerciantInput));
-            if(commerciantInput.getType().equals("Tech"))
+            }
+            if (commerciantInput.getType().equals("Tech")) {
                 commerciants.put(commerciantIban, new TechCommerciant(commerciantInput));
+            }
 
             //  put the name of the commerciant also
             commerciants.put(commerciantInput.getCommerciant(), commerciants.get(commerciantIban));

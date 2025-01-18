@@ -1,9 +1,7 @@
 package org.poo.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.poo.app.AccountNotFound;
 import org.poo.app.UserNotFound;
 import org.poo.app.accounts.Account;
@@ -35,14 +33,17 @@ public class Command {
      */
     public User getUserReference(final HashMap<String, User> users,
                                  final String key) throws NotFoundException {
-        if(key == null)
+        if (key == null) {
             throw new NotFoundException();
+        }
         User user = users.get(key);
         if (user == null) {
-            if(key.contains("@"))
+            if (key.contains("@")) {
                 throw new UserNotFound();
-            if(key.contains("RO"))
+            }
+            if (key.contains("RO")) {
                 throw new AccountNotFound();
+            }
             throw new NotFoundException();
         }
         return user;
@@ -57,8 +58,9 @@ public class Command {
      */
     public Account getAccountReference(final HashMap<String, User> users,
                                        final String key) throws NotFoundException {
-        if(key == null)
+        if (key == null) {
             throw new NotFoundException();
+        }
         User user = getUserReference(users, key);
         if (user == null) {
             throw new NotFoundException();

@@ -41,7 +41,7 @@ public class OneTimeCard extends Card {
     public void useCard(final Account account, final HashMap<String, User> users,
                         final double amount, final ArrayNode output, final PayOnline command) {
 
-        User user = command.getUserReference(users, account.getIBAN());
+        User user = command.getUserReference(users, account.getIban());
 
         account.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
                 command.getDescription(), amount, command.getCommerciant()));
@@ -51,7 +51,7 @@ public class OneTimeCard extends Card {
                 users, email);
         del.execute(output, 2);
         CreateOneTimeCard cr = new CreateOneTimeCard(command.getTimestamp(), user.getEmail(),
-                account.getIBAN(), users, email);
+                account.getIban(), users, email);
         cr.execute(output);
     }
 }

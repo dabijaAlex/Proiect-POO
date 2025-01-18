@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter @Setter
-public class SplitPaymentEqualTransaction extends Transaction {
+public final class SplitPaymentEqualTransaction extends Transaction {
     private double amount;
     private String description;
     private List<String> involvedAccounts;

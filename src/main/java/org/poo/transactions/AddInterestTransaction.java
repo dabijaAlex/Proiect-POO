@@ -4,10 +4,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter @Setter
-public class AddInterestTransaction extends Transaction {
+public final  class AddInterestTransaction extends Transaction {
     private double amount;
     private String currency;
     private String description;
+
+    /**
+     * Constructor
+     * @param timestamp
+     * @param amount
+     * @param currency
+     */
     public AddInterestTransaction(final int timestamp, final double amount, final String currency) {
         this.amount = amount;
         this.currency = currency;

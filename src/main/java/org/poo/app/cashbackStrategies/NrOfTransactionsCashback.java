@@ -3,21 +3,19 @@ package org.poo.app.cashbackStrategies;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
-import org.poo.app.commerciants.ClothesCommerciant;
 import org.poo.app.commerciants.Commerciant;
-import org.poo.app.commerciants.FoodCommerciant;
-import org.poo.app.commerciants.TechCommerciant;
 
 import java.util.HashMap;
 
 @Getter @Setter
-public final class nrOfTransactionsCashback implements CashbackStrategy {
-    public double getCashback(Commerciant commerciant, double amount, Account account) {
+public final class NrOfTransactionsCashback implements CashbackStrategy {
+    public double getCashback(final Commerciant commerciant, final double amount, final Account account) {
         return commerciant.getCashbackAmount(amount, account);
     }
 
 
-    public void addPaymentToMap(Commerciant commerciant, double amount, Account account, String currency) {
+    public void addPaymentToMap(final Commerciant commerciant, final double amount,
+                                final Account account, final String currency) {
         HashMap<Account, Double> accountsMap = commerciant.getListAccountsThatPayedHere();
         Double nrTranzactii = accountsMap.get(account);
         if(nrTranzactii == null) {

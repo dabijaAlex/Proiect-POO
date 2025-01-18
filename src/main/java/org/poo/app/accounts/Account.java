@@ -9,30 +9,22 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Card;
-import org.poo.app.InsufficientFundsException;
 import org.poo.app.NotASavingsAccount;
 import org.poo.app.User;
 import org.poo.app.accounts.userTypes.BAccUser;
 import org.poo.app.accounts.userTypes.CommerciantForBusiness;
 import org.poo.app.commerciants.Commerciant;
-import org.poo.app.plans.AlreadyHasPlanException;
-import org.poo.app.plans.CannotDowngradePlanException;
 import org.poo.app.plans.ServicePlan;
-import org.poo.commands.TransactionCommands.SplitPayment;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
-import org.poo.transactions.CreateCardTransaction;
 import org.poo.transactions.Transaction;
 import org.poo.utils.Utils;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Queue;
 
 @Getter @Setter
 public class Account {
     @JsonProperty("IBAN")
-    protected String IBAN;
+    protected String iban;
     protected double balance;
     protected String currency;
     protected String type;
@@ -56,36 +48,40 @@ public class Account {
     @JsonIgnore
     protected double spentAtCommerciant = 0;
     @JsonIgnore
-    protected int FoodDiscounts = 0;
+    protected int foodDiscounts = 0;
     @JsonIgnore
-    protected int ClothesDiscounts = 0;
+    protected int clothesDiscounts = 0;
     @JsonIgnore
-    protected int TechDiscounts = 0;
+    protected int techDiscounts = 0;
 
 
     public void addFoodDiscount() {
-        if(FoodDiscounts == 0)
-            FoodDiscounts++;
+        if (foodDiscounts == 0) {
+            foodDiscounts++;
+        }
     }
     public void addClothesDiscount() {
-        if(ClothesDiscounts == 0)
-            ClothesDiscounts++;
+        if (clothesDiscounts == 0) {
+            clothesDiscounts++;
+        }
     }
     public void addTechDiscount() {
-        if(TechDiscounts == 0)
-            TechDiscounts++;
+        if (techDiscounts == 0) {
+            techDiscounts++;
+        }
     }
 
     /**
      * Constructor
-     * @param IBAN
+     * @param iban
      * @param balance
      * @param currency
      * @param type
      */
-    public Account(final String IBAN, final double balance, final String currency,
-                   final String type, ServicePlan servicePlan, final double interestRate, final User user, final String email) {
-        this.IBAN = IBAN;
+    public Account(final String iban, final double balance, final String currency,
+                   final String type, final ServicePlan servicePlan, final double interestRate,
+                   final User user, final String email) {
+        this.iban = iban;
         this.balance = balance;
         this.currency = currency;
         this.type = type;
@@ -106,19 +102,21 @@ public class Account {
         this.cards.add(card);
     }
 
-    public String createCard(String emailCreator) {
+    public String createCard(final String emailCreator) {
         String card = Utils.generateCardNumber();
         this.addCard(new Card(card, "active", emailCreator));
         return card;
     }
 
 
-    public void makePayment(final double amount, final double commission, String email,
-                            final int timestamp, Commerciant commerciant) {
+    public void makePayment(final double amount, final double commission,
+                            final String queryingPersonEmail, final int timestamp,
+                            final Commerciant commerciant) {
         balance = balance - (commission + amount);
     }
 
-    public void addFunds(final double amount, final String email, final int timestamp) {
+    public void addFunds(final double amount, final String queryingPersonEmail,
+                         final int timestamp) {
         balance = balance + amount;
     }
 
@@ -126,34 +124,30 @@ public class Account {
      * delete card from account
      * @param cardNumber
      */
-    public void deleteCard(final String cardNumber, final String email) {
+    public void deleteCard(final String cardNumber, final String queryingPersonEmail) {
         Card card = getCard(cardNumber);
-        if(card.getStatus().equals("active")) {
+        if (card.getStatus().equals("active")) {
             return;
         }
         this.cards.remove(getCard(cardNumber));
     }
 
-    public void deleteCardOneTime(final String cardNumber, final String email) {
-        Card card = getCard(cardNumber);
-//        if(!card.isOneTime() && card.getStatus().equals("active")) {
-//            return;
-//        }
+    public void deleteCardOneTime(final String cardNumber, final String queryingPersonEmail) {
         this.cards.remove(getCard(cardNumber));
     }
-    public void setAliasCommand(final String alias, String email) {
-        this.alias = alias;
+    public void setAliasCommand(final String newAlias, final String queryingPersonEmail) {
+        this.alias = newAlias;
     }
 
-    public void setMinBalanceCommand(double minBalance, String email) {
-        this.minBalance = minBalance;
+    public void setMinBalanceCommand(final double newMinBalance, final String queryingPersonEmail) {
+        this.minBalance = newMinBalance;
     }
     /**
      * copy account so the reference from output is different
      * @param other
      */
     public Account(final Account other) {
-        this.IBAN = other.IBAN;
+        this.iban = other.iban;
         this.balance = other.balance;
         this.currency = other.currency;
         this.type = other.type;
@@ -165,15 +159,16 @@ public class Account {
 
 
 
-    public Account getClassicAccount(String currency) {
-        if(this.currency.equals(currency)) {
+    public Account getClassicAccount(final String givenCurrency) {
+        if (this.currency.equals(givenCurrency)) {
             return this;
         }
         return null;
     }
 
 
-    public void makeWithdrawal(Account targetAccount, double amount) throws NotASavingsAccount {
+    public void makeWithdrawal(final Account targetAccount,
+                               final double amount) throws NotASavingsAccount {
         throw new NotASavingsAccount();
     }
 
@@ -218,11 +213,11 @@ public class Account {
 
     /**
      * this is a normal account so add interest will add error to output
-     * @param interestRate
+     * @param newInterestRate
      * @param output
      * @param command
      */
-    public void setInterestRate(final double interestRate, final ArrayNode output,
+    public void setInterestRate(final double newInterestRate, final ArrayNode output,
                                 final ChangeInterestRate command) {
         this.interestError("This is not a savings account",
                 output, command.getCmdName(), command.getTimestamp());
@@ -252,21 +247,44 @@ public class Account {
         output.add(objectNode);
     }
 
-    public void setSpendingLimit(final double spendingLimit) {}
-    public void setDepositLimit(final double depositLimit) {}
-    @JsonIgnore
-    public double getSpendingLimit() {return 0;}
-    @JsonIgnore
-    public double getDepositLimit() {return 0;}
-    public void addBusinessAssociate(String role, String email, String username){}
+    public void setSpendingLimit(final double spendingLimit) {
 
-    public void changeSpendingLimit(double amount, String email){
+    }
+
+    public void setDepositLimit(final double depositLimit) {
+
+    }
+
+    @JsonIgnore
+    public double getSpendingLimit() {
+        return 0;
+    }
+
+    @JsonIgnore
+    public double getDepositLimit() {
+        return 0;
+    }
+
+    public void addBusinessAssociate(final String role, final String queryingPersonEmail,
+                                     final String username) {
+
+    }
+
+    public void changeSpendingLimit(final double amount,
+                                    final String queryingPersonEmail)
+                                    throws NotABusinessAccountException {
         throw new NotABusinessAccountException();
     }
-    public void changeDepositLimit(double amount, String email){
+
+    public void changeDepositLimit(final double amount,
+                                   final String queryingPersonEmail)
+                                    throws NotABusinessAccountException {
         throw new NotABusinessAccountException();
     }
-    public ArrayList<BAccUser> abc() {return null;}
+
+    public ArrayList<BAccUser> abc() {
+        return null;
+    }
 
     @JsonIgnore
     public ArrayList<CommerciantForBusiness> getCommerciantsForBusiness() {
@@ -274,9 +292,8 @@ public class Account {
     }
 
     @JsonIgnore
-    public BAccUser getCurrentAssociate(String email) {
+    public BAccUser getCurrentAssociate(final String queryingPersonEmail) {
         return new BAccUser("", "");
-//        return null;
     }
 
 

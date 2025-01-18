@@ -74,8 +74,8 @@ public class WithdrawSavings extends Command {
             output.add(objectNode);
             return;
         }
-        savingsAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIBAN(), savingsAccount.getIBAN(), timestamp));
-        targetAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIBAN(), savingsAccount.getIBAN(), timestamp));
+        savingsAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIban(), savingsAccount.getIban(), timestamp));
+        targetAccount.addTransaction(new WithdrewSavingsTransaction(amount, targetAccount.getIban(), savingsAccount.getIban(), timestamp));
 
 
     }

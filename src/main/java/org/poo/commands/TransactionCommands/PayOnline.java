@@ -125,6 +125,6 @@ public final class PayOnline extends Command {
 
 
         cont.setBalance(cont.getBalance() + cashback);
-        commerciant.PaymentHappened(amount, cont, currency);
+        commerciant.paymentHappened(amount, cont, currency);
     }
 }

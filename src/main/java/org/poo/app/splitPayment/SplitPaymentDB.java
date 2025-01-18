@@ -45,10 +45,10 @@ public class SplitPaymentDB {
                     Account accountFailed = pairFailed.getAccount();
                     if(payment.getType().equals("equal")) {
                         accountFailed.addTransaction(new SplitPaymentEqualErrorTransaction(payment.getTimestamp(), payment.getDescription()
-                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal(), payment.getAmount() / payment.getNrAccounts()));
+                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIban(), payment.getType(), payment.getAmountEachOriginal(), payment.getAmount() / payment.getNrAccounts()));
                     } else {
                         accountFailed.addTransaction(new SplitPaymentErrorTransaction(payment.getTimestamp(), payment.getDescription()
-                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIBAN(), payment.getType(), payment.getAmountEachOriginal()));
+                                , payment.getInvolvedAccounts(), payment.getCurrency(), account.getIban(), payment.getType(), payment.getAmountEachOriginal()));
                     }
                 }
                 return;

@@ -107,7 +107,7 @@ public class User {
      */
     public Account getAccount(final String ibanOrCardOrAlias) {
         for (Account account : this.accounts) {
-            if (account.getIBAN().equals(ibanOrCardOrAlias)) {
+            if (account.getIban().equals(ibanOrCardOrAlias)) {
                 return account;
             }
         }

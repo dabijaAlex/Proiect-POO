@@ -1,14 +1,12 @@
 package org.poo.commands;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
-import org.poo.app.accounts.Account;
 import org.poo.app.accounts.NotABusinessAccountException;
 import org.poo.app.accounts.userTypes.ChangeDepositLimitException;
 import org.poo.app.accounts.userTypes.ChangeSpendingLimitException;
@@ -35,73 +33,43 @@ public final class Invoker {
      * if it throws exception then handle it
      */
     public void solve() {
-        int timestamp = 0;
         for (Command command : cmds) {
-            timestamp += 1;
             if (command != null) {
                 try {
                     command.execute(output);
-                } catch (NotFoundException ignore) {
-                    continue;
-                } catch (InsufficientFundsException ignore) {
-                    continue;
+                } catch (NotFoundException | InsufficientFundsException
+                         | NotAuthorizedException ignore) {
                 } catch (UserNotFound e) {
-                    printNotFoundError(output, command.timestampTheSecond, "User", command.getCmdName());
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "User not found");
                 } catch (CardNotFound e) {
-                    printNotFoundError(output, command.timestampTheSecond, "Card", command.getCmdName());
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "Card not found");
                 } catch (AccountNotFound e) {
-                    printNotFoundError(output, command.timestampTheSecond, "Account", command.getCmdName());
-                } catch (NotAuthorizedException ignoreForNow) {
-                    continue;
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "Account not found");
                 } catch (ChangeSpendingLimitException e) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    ObjectNode objectNode = mapper.createObjectNode();
-                    objectNode.put("command", "changeSpendingLimit");
-                    ObjectNode outputNode = mapper.createObjectNode();
-                    outputNode.put("timestamp", command.timestampTheSecond);
-                    outputNode.put("description", "You must be owner in order to change spending limit.");
-
-                    objectNode.set("output", outputNode);
-                    objectNode.put("timestamp", command.timestampTheSecond);
-
-                    output.add(objectNode);
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "You must be owner in order to change spending limit.");
                 } catch (ChangeDepositLimitException e) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    ObjectNode objectNode = mapper.createObjectNode();
-                    objectNode.put("command", "changeDepositLimit");
-                    ObjectNode outputNode = mapper.createObjectNode();
-                    outputNode.put("timestamp", command.timestampTheSecond);
-                    outputNode.put("description", "You must be owner in order to change deposit limit.");
-
-                    objectNode.set("output", outputNode);
-                    objectNode.put("timestamp", command.timestampTheSecond);
-
-                    output.add(objectNode);
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "You must be owner in order to change deposit limit.");
                 } catch (NotABusinessAccountException e) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    ObjectNode objectNode = mapper.createObjectNode();
-                    objectNode.put("command", command.getCmdName());
-                    ObjectNode outputNode = mapper.createObjectNode();
-                    outputNode.put("timestamp", command.timestampTheSecond);
-                    outputNode.put("description", "This is not a business account");
-
-                    objectNode.set("output", outputNode);
-                    objectNode.put("timestamp", command.timestampTheSecond);
-                    output.add(objectNode);
-
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "This is not a business account");
                 }
-
             }
         }
     }
 
-    private void printNotFoundError(ArrayNode output, int timestamp, String type, String cmdName) {
+    private void printError(final int timestamp,
+                            final String cmdName, final String description) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", cmdName);
         ObjectNode outputNode = mapper.createObjectNode();
         outputNode.put("timestamp", timestamp);
-        outputNode.put("description", type + " not found");
+        outputNode.put("description", description);
 
         objectNode.set("output", outputNode);
         objectNode.put("timestamp", timestamp);

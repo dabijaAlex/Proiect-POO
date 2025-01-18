@@ -73,7 +73,7 @@ public class DeleteCard extends Command {
             return;
 
 
-        account = acc.getIBAN();
+        account = acc.getIban();
         acc.deleteCard(card, email);
         users.remove(card);
 
@@ -89,7 +89,7 @@ public class DeleteCard extends Command {
         cardHolder = user.getEmail();
         if(cardHolder.equals(email) == false)
             return;
-        account = acc.getIBAN();
+        account = acc.getIban();
 
 
         acc.deleteCardOneTime(card, email);

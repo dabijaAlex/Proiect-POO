@@ -3,15 +3,27 @@ package org.poo.app.commerciants;
 import org.poo.app.accounts.Account;
 import org.poo.fileio.CommerciantInput;
 
-public class FoodCommerciant extends Commerciant {
-    public FoodCommerciant(CommerciantInput input) {
-        super(input, 2);
+public final class FoodCommerciant extends Commerciant {
+    private static final double CASHBACK_PERCENT = 2.0 / 100.0;
+
+    /**
+     * Constructor
+     * @param input
+     */
+    public FoodCommerciant(final CommerciantInput input) {
+        super(input);
     }
 
-    public double getCashbackAmount(double amount, Account account) {
-        if(account.getFoodDiscounts() > 0) {
+    /**
+     * Get coupon discount based on commerciant type
+     * @param amount
+     * @param account
+     * @return
+     */
+    public double getCashbackAmount(final double amount, final Account account) {
+        if (account.getFoodDiscounts() > 0) {
             account.setFoodDiscounts(account.getFoodDiscounts() - 1);
-            return 2.0 / 100.0 * amount;
+            return CASHBACK_PERCENT * amount;
         }
         return 0;
     }
