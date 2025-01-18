@@ -99,7 +99,7 @@ public final class PayOnline extends Command {
 
 
         double amountInAccountCurrency = ExchangeRateGraph.makeConversion(currency, cont.getCurrency(), amount);
-        double commission = cont.getServicePlan().getCommissionAmount(amountInAccountCurrency, cont.getCurrency());
+        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency, cont.getCurrency());
 
 
         //  check for sufficient funds
@@ -117,7 +117,7 @@ public final class PayOnline extends Command {
         card.useCard(cont, users, amountInAccountCurrency, output, this);
 
 
-        cont.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user, timestamp);
+        user.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user, timestamp);
 
 
         //  add cashback

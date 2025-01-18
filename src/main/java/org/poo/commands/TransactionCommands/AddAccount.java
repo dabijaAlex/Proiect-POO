@@ -72,10 +72,10 @@ public final class AddAccount extends Command {
             account = new BusinessAccount(user.getLastName(), user.getEmail(), iban, 0, currency, accountType, servicePlan, user);
             user.addAccount(account);
         } else if (accountType.equals("savings")) {
-            account = new SavingsAccount(iban, 0, currency, accountType, servicePlan, interestRate, user, email);
+            account = new SavingsAccount(iban, 0, currency, accountType, interestRate, user, email);
             user.addAccount(account);
         } else {
-            account = new Account(iban, 0, currency, accountType, servicePlan, interestRate, user, email);
+            account = new Account(iban, 0, currency, accountType, interestRate, user, email);
             user.addAccount(account);
         }
 

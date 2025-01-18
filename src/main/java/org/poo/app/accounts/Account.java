@@ -42,8 +42,6 @@ public class Account {
     @JsonIgnore
     protected ArrayList<Transaction> transactions;
     @JsonIgnore
-    protected ServicePlan servicePlan;
-    @JsonIgnore
     protected User userRef;
     @JsonIgnore
     protected double spentAtCommerciant = 0;
@@ -79,14 +77,13 @@ public class Account {
      * @param type
      */
     public Account(final String iban, final double balance, final String currency,
-                   final String type, final ServicePlan servicePlan, final double interestRate,
+                   final String type, final double interestRate,
                    final User user, final String email) {
         this.iban = iban;
         this.balance = balance;
         this.currency = currency;
         this.type = type;
         this.cards = new ArrayList<>();
-        this.servicePlan = servicePlan;
         this.interestRate = interestRate;
         this.userRef = user;
         this.email = email;

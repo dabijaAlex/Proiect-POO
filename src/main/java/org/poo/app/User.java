@@ -126,17 +126,11 @@ public class User {
 
     public void upgradeServicePlanToGold(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
             CannotDowngradePlanException {
-        cont.getServicePlan().upgradeToGold(cont);
-        for (Account account : this.accounts) {
-            account.setServicePlan(new Gold());
-        }
+        servicePlan.upgradeToGold(cont);
     }
 
     public void upgradeServicePlanToSilver(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
             CannotDowngradePlanException {
-        cont.getServicePlan().upgradeToSilver(cont);
-        for (Account account : this.accounts) {
-            account.setServicePlan(new Silver());
-        }
+        servicePlan.upgradeToSilver(cont);
     }
 }

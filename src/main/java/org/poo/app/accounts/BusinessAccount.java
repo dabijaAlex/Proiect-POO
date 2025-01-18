@@ -23,7 +23,7 @@ public final class BusinessAccount extends Account {
     public BusinessAccount(final String ownerName, final String ownerEmail, final String IBAN,
                            final double balance, final String currency,
                            final String type, final ServicePlan servicePlan, final User user) {
-        super(IBAN, balance, currency, type, servicePlan, 0, user, ownerEmail);
+        super(IBAN, balance, currency, type, 0, user, ownerEmail);
         this.ownerName = ownerName;
         this.ownerEmail = ownerEmail;
         this.addBusinessAssociate("owner", ownerEmail, user.getFirstName()

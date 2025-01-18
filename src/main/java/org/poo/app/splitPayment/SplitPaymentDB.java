@@ -2,6 +2,7 @@ package org.poo.app.splitPayment;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.poo.app.User;
 import org.poo.app.accounts.Account;
 import org.poo.app.commerciants.Commerciant;
 import org.poo.transactions.SplitPaymentEqualErrorTransaction;
@@ -39,7 +40,8 @@ public class SplitPaymentDB {
     private static void proceedWithPayment(SingleSplitPayment payment) {
         for(Pair pair: payment.getEachAccountAndPayment()) {
             Account account = pair.getAccount();
-            double commission = account.getServicePlan().getCommissionAmount(pair.getAmountToPay(), account.getCurrency());
+            User user = account.getUserRef();
+            double commission = user.getServicePlan().getCommissionAmount(pair.getAmountToPay(), account.getCurrency());
             if(account.getBalance() < pair.getAmountToPay() + commission) {
                 for(Pair pairFailed: payment.getEachAccountAndPayment()) {
                     Account accountFailed = pairFailed.getAccount();

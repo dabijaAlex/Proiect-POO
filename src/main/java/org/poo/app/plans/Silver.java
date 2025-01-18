@@ -78,9 +78,9 @@ public final class Silver extends ServicePlan {
         }
         if (nrPaymentsOver300 >= NUMBER_OF_TRANS_FOR_AUTO_UPGRADE) {
             for (Account acc: user.getAccounts()) {
-                acc.setServicePlan(new Gold());
                 acc.addTransaction(new UpgradePlanTransaction(acc.getIban(), "gold", timestamp));
             }
+            user.setServicePlan(new Gold());
         }
     }
 

@@ -24,9 +24,9 @@ public class SavingsAccount extends Account {
      * @param type
      */
     public SavingsAccount(final String iban, final double balance, final String currency,
-                          final String type, final ServicePlan servicePlan,
+                          final String type,
                           final double interestRate, final User user, final String email) {
-        super(iban, balance, currency, type, servicePlan, interestRate, user, email);
+        super(iban, balance, currency, type, interestRate, user, email);
     }
 
 

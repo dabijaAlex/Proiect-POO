@@ -93,7 +93,7 @@ public final class SendMoney extends Command {
 
 
         //  sender doesn t have the money
-        double senderCommission = senderAccount.getServicePlan().getCommissionAmount(amountAsDouble, senderAccount.getCurrency());
+        double senderCommission = senderUser.getServicePlan().getCommissionAmount(amountAsDouble, senderAccount.getCurrency());
         if (senderAccount.getBalance() < amountAsDouble + senderCommission) {
             senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;

@@ -60,8 +60,8 @@ public class CashWithdrawal extends Command {
 
         double amountInAccountCurrency = ExchangeRateGraph.makeConversion("RON", account.getCurrency(), amount);
 
-        double commission = account.getServicePlan().getCommissionAmount(amountInAccountCurrency, account.getCurrency());
-        account.getServicePlan().addPayment(amount, account.getCurrency(), account, user, timestamp);
+        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency, account.getCurrency());
+        user.getServicePlan().addPayment(amount, account.getCurrency(), account, user, timestamp);
 
         if (account.getBalance() < amountInAccountCurrency + commission) {
             account.addTransaction(new InsufficientFundsTransaction(timestamp));

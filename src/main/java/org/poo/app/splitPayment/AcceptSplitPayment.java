@@ -34,8 +34,6 @@ public class AcceptSplitPayment extends Command {
     }
 
     public void execute(ArrayNode output) {
-        if(timestamp == 667)
-            System.out.println(2);
         User user = null;
         try {
             user = getUserReference(users, email);
