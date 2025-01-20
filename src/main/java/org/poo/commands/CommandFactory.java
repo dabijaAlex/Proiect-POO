@@ -2,8 +2,8 @@ package org.poo.commands;
 
 
 import org.poo.app.User;
-import org.poo.app.splitPayment.AcceptSplitPayment;
-import org.poo.app.splitPayment.RejectSplitPayment;
+import org.poo.commands.TransactionCommands.splitPayment.AcceptSplitPayment;
+import org.poo.commands.TransactionCommands.splitPayment.RejectSplitPayment;
 import org.poo.commands.TransactionCommands.*;
 import org.poo.commands.debugCommands.PrintTransactions;
 import org.poo.commands.debugCommands.PrintUsers;

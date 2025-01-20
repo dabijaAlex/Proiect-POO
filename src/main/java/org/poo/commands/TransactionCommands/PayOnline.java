@@ -1,15 +1,16 @@
 package org.poo.commands.TransactionCommands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.*;
+import org.poo.app.CardNotFound;
 import org.poo.app.ExchangeRateGraph;
+import org.poo.app.NotFoundException;
+import org.poo.app.Card;
+import org.poo.app.User;
+import org.poo.app.CommerciantMap;
 import org.poo.app.accounts.Account;
 import org.poo.app.accounts.BusinessAccount;
-import org.poo.app.cashbackStrategies.SpendingThresholdStrategy;
 import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -27,7 +28,7 @@ public final class PayOnline extends Command {
     private int timestamp;
     private String description;
     private double amount;
-    private String commerciant;
+    private String commerciantIdentifier;
     private String cardNumber;
     private String currency;
     private String email;
@@ -47,7 +48,7 @@ public final class PayOnline extends Command {
         this.timestamp = command.getTimestamp();
 
         this.description = "Card payment";
-        this.commerciant = command.getCommerciant();
+        this.commerciantIdentifier = command.getCommerciant();
         this.email = command.getEmail();
         this.users = users;
         this.timestampTheSecond = timestamp;
@@ -71,20 +72,24 @@ public final class PayOnline extends Command {
      * @param output
      */
     public void execute(final ArrayNode output) {
-        if (amount == 0)
+        if (amount == 0) {
             return;
-        Commerciant commerciant = CommerciantMap.getCommerciantsMap().get(this.commerciant);
+        }
+        Commerciant commerciant = CommerciantMap.getCommerciantsMap().
+                get(this.commerciantIdentifier);
         User user = null;
         Account cont = null;
         try {
             user = getUserReference(users, cardNumber);
             cont = user.getAccount(cardNumber);
-            if(cont.getCurrentAssociate(email) == null)
+            if (cont.getCurrentAssociate(email) == null) {
                 throw new CardNotFound();
-            if(!(cont instanceof BusinessAccount))
-                if(!user.getEmail().equals(email)) {
+            }
+            if (!(cont instanceof BusinessAccount)) {
+                if (!user.getEmail().equals(email)) {
                     throw new CardNotFound();
                 }
+            }
         } catch (NotFoundException e) {
             throw new CardNotFound();
         }
@@ -98,8 +103,10 @@ public final class PayOnline extends Command {
 
 
 
-        double amountInAccountCurrency = ExchangeRateGraph.makeConversion(currency, cont.getCurrency(), amount);
-        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency, cont.getCurrency());
+        double amountInAccountCurrency = ExchangeRateGraph.makeConversion(currency,
+                cont.getCurrency(), amount);
+        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency,
+                cont.getCurrency());
 
 
         //  check for sufficient funds
@@ -117,7 +124,8 @@ public final class PayOnline extends Command {
         card.useCard(cont, users, amountInAccountCurrency, output, this);
 
 
-        user.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user, timestamp);
+        user.getServicePlan().addPayment(amountInAccountCurrency, cont.getCurrency(), cont, user,
+                timestamp);
 
 
         //  add cashback

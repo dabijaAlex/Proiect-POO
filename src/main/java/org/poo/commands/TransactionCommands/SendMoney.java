@@ -4,9 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.*;
+import org.poo.app.CommerciantMap;
+import org.poo.app.NotFoundException;
+import org.poo.app.User;
+import org.poo.app.UserNotFound;
+import org.poo.app.ExchangeRateGraph;
 import org.poo.app.accounts.Account;
-import org.poo.app.cashbackStrategies.SpendingThresholdStrategy;
 import org.poo.app.commerciants.Commerciant;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
@@ -72,7 +75,7 @@ public final class SendMoney extends Command {
         User senderUser = null;
         try {
             senderAccount = getAccountReference(users, senderIdentifier);
-            if(commerciant == null) {
+            if (commerciant == null) {
                 receiverAccount = getAccountReference(users, receiverIdentifier);
             }
             senderUser = getUserReference(users, senderIdentifier);
@@ -80,7 +83,7 @@ public final class SendMoney extends Command {
             throw new UserNotFound();
         }
         senderIBAN = senderAccount.getIban();
-        if(receiverAccount == null) {
+        if (receiverAccount == null) {
             receiverIBAN = receiverIdentifier;
         } else {
             receiverIBAN = receiverAccount.getIban();
@@ -93,7 +96,8 @@ public final class SendMoney extends Command {
 
 
         //  sender doesn t have the money
-        double senderCommission = senderUser.getServicePlan().getCommissionAmount(amountAsDouble, senderAccount.getCurrency());
+        double senderCommission = senderUser.getServicePlan().getCommissionAmount(amountAsDouble,
+                senderAccount.getCurrency());
         if (senderAccount.getBalance() < amountAsDouble + senderCommission) {
             senderAccount.addTransaction(new InsufficientFundsTransaction(timestamp));
             return;
@@ -110,17 +114,19 @@ public final class SendMoney extends Command {
 
 
         //  receiver account was a commerciant
-        if(commerciant != null) {
+        if (commerciant != null) {
             //  add cashback
             double cashback = commerciant.getCashback(amountAsDouble, senderAccount);
             senderAccount.setBalance(senderAccount.getBalance() + cashback);
-            commerciant.paymentHappened(amountAsDouble, senderAccount, senderAccount.getCurrency());
+            commerciant.paymentHappened(amountAsDouble, senderAccount,
+                    senderAccount.getCurrency());
 
             return;
         }
 
-        double amountInReceiverCurrency = ExchangeRateGraph.makeConversion(senderAccount.getCurrency(),
-                receiverAccount.getCurrency(), amountAsDouble);
+        double amountInReceiverCurrency = ExchangeRateGraph.
+                makeConversion(senderAccount.getCurrency(),
+                                receiverAccount.getCurrency(), amountAsDouble);
 
 
 

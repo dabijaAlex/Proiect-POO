@@ -57,6 +57,9 @@ public final class Invoker {
                 } catch (NotABusinessAccountException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "This is not a business account");
+                } catch (NotASavingsAccount e) {
+                    printError(command.timestampTheSecond, command.getCmdName(),
+                            "This is not a savings account");
                 }
             }
         }

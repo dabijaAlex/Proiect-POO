@@ -1,12 +1,15 @@
 package org.poo.commands;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.*;
+import org.poo.app.CardNotFound;
+import org.poo.app.InsufficientFundsException;
+import org.poo.app.User;
+import org.poo.app.UserNotFound;
 import org.poo.app.accounts.Account;
+import org.poo.app.NotFoundException;
+import org.poo.app.ExchangeRateGraph;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.CashWithdrawalTransaction;
 import org.poo.transactions.InsufficientFundsTransaction;
@@ -22,7 +25,12 @@ public class CashWithdrawal extends Command {
     private String location;
     private int timestamp;
 
-    public CashWithdrawal(CommandInput input, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param input
+     * @param users
+     */
+    public CashWithdrawal(final CommandInput input, final HashMap<String, User> users) {
         this.cmdName = input.getCommand();
         this.users = users;
         this.cardNumber = input.getCardNumber();
@@ -34,13 +42,17 @@ public class CashWithdrawal extends Command {
         timestampTheSecond = timestamp;
     }
 
+    /**
+     * get account, check if card exists and emails match, make withdrawal if enough money
+     * @param output
+     * @throws InsufficientFundsException
+     * @throws NotFoundException
+     */
     @Override
-    public void execute(ArrayNode output) throws InsufficientFundsException, NotFoundException {
+    public void execute(final ArrayNode output) throws InsufficientFundsException,
+            NotFoundException {
         User user = null;
         Account account = null;
-
-
-
         try {
             user = getUserReference(users, cardNumber); // throws not found
             account = getAccountReference(users, cardNumber); // throws not found
@@ -54,13 +66,15 @@ public class CashWithdrawal extends Command {
             throw new UserNotFound();
         }
         User userByCard = getUserReference(users, cardNumber);
-        if(!userByCard.getEmail().equals(email)) {
+        if (!userByCard.getEmail().equals(email)) {
             throw new CardNotFound();
         }
 
-        double amountInAccountCurrency = ExchangeRateGraph.makeConversion("RON", account.getCurrency(), amount);
+        double amountInAccountCurrency = ExchangeRateGraph.makeConversion("RON",
+                account.getCurrency(), amount);
 
-        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency, account.getCurrency());
+        double commission = user.getServicePlan().getCommissionAmount(amountInAccountCurrency,
+                account.getCurrency());
         user.getServicePlan().addPayment(amount, account.getCurrency(), account, user, timestamp);
 
         if (account.getBalance() < amountInAccountCurrency + commission) {

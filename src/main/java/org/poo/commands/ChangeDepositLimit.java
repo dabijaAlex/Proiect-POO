@@ -17,7 +17,13 @@ public class ChangeDepositLimit extends Command {
     private int timestamp;
     private double amount;
 
-    public ChangeDepositLimit(CommandInput input, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param input
+     * @param users
+     */
+    public ChangeDepositLimit(final CommandInput input,
+                              final HashMap<String, User> users) {
         this.cmdName = input.getCommand();
         this.users = users;
         this.accountIban = input.getAccount();
@@ -27,7 +33,11 @@ public class ChangeDepositLimit extends Command {
         timestampTheSecond = timestamp;
     }
 
-    public void execute(ArrayNode output) {
+    /**
+     *  Method works only for business account. the rest throw exception
+     * @param output
+     */
+    public void execute(final ArrayNode output) {
         Account account = getAccountReference(users, accountIban);
         account.changeDepositLimit(amount, email);
     }

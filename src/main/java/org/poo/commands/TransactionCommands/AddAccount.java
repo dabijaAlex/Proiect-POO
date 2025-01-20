@@ -9,8 +9,6 @@ import org.poo.app.accounts.BusinessAccount;
 import org.poo.app.accounts.SavingsAccount;
 import org.poo.app.User;
 import org.poo.app.plans.ServicePlan;
-import org.poo.app.plans.Standard;
-import org.poo.app.plans.Student;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 import org.poo.transactions.AddAccountTransaction;
@@ -68,14 +66,18 @@ public final class AddAccount extends Command {
         ServicePlan servicePlan = user.getServicePlan();
 
         Account account;
-        if(accountType.equals("business")) {
-            account = new BusinessAccount(user.getLastName(), user.getEmail(), iban, 0, currency, accountType, servicePlan, user);
+        if (accountType.equals("business")) {
+            account = new BusinessAccount(user.getLastName(),
+                    user.getEmail(), iban, 0, currency, accountType,
+                    servicePlan, user);
             user.addAccount(account);
         } else if (accountType.equals("savings")) {
-            account = new SavingsAccount(iban, 0, currency, accountType, interestRate, user, email);
+            account = new SavingsAccount(iban, 0, currency,
+                    accountType, interestRate, user, email);
             user.addAccount(account);
         } else {
-            account = new Account(iban, 0, currency, accountType, interestRate, user, email);
+            account = new Account(iban, 0, currency,
+                    accountType, interestRate, user, email);
             user.addAccount(account);
         }
 

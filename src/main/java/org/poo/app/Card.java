@@ -42,6 +42,6 @@ public class Card {
                         final double amount, final ArrayNode output, final PayOnline command) {
 
         cont.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
-                command.getDescription(), amount, command.getCommerciant()));
+                command.getDescription(), amount, command.getCommerciantIdentifier()));
     }
 }

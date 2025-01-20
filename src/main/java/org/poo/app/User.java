@@ -4,17 +4,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
-import org.poo.app.plans.*;
-import org.poo.app.splitPayment.SingleSplitPayment;
-import org.poo.commands.TransactionCommands.SplitPayment;
+import org.poo.app.plans.AlreadyHasPlanException;
+import org.poo.app.plans.ServicePlan;
+import org.poo.app.plans.Standard;
+import org.poo.app.plans.Student;
+import org.poo.app.plans.CannotDowngradePlanException;
+
+import org.poo.commands.TransactionCommands.splitPayment.SingleSplitPayment;
 import org.poo.fileio.UserInput;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 @Getter @Setter
-public class User {
+public final class User {
     @JsonIgnore
     private static int counter = 0;
     private String firstName;
@@ -33,8 +35,11 @@ public class User {
     protected ServicePlan servicePlan;
 
 
-
-    public void addSplitPayment(SingleSplitPayment splitPayment) {
+    /**
+     * add a split payent to the split payments pending list
+     * @param splitPayment
+     */
+    public void addSplitPayment(final SingleSplitPayment splitPayment) {
         splitPayments.add(splitPayment);
     }
 
@@ -51,16 +56,21 @@ public class User {
         this.occupation = user.getOccupation();
         counter++;
         index = counter;
-        if(user.getOccupation().equals("student")) {
+        if (user.getOccupation().equals("student")) {
             servicePlan = new Student();
         } else {
             servicePlan = new Standard();
         }
     }
 
-    public Account getFirstClassicAccount(String currency) {
-        for(Account account : accounts) {
-            if(account.getClassicAccount(currency) != null) {
+    /**
+     * get the first classic account of user that matches currency
+     * @param currency
+     * @return
+     */
+    public Account getFirstClassicAccount(final String currency) {
+        for (Account account : accounts) {
+            if (account.getClassicAccount(currency) != null) {
                 return account;
             }
         }
@@ -124,12 +134,28 @@ public class User {
         return null;
     }
 
-    public void upgradeServicePlanToGold(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
+    /**
+     * upgrade service plan to gold
+     * @param cont
+     * @throws InsufficientFundsException
+     * @throws AlreadyHasPlanException
+     * @throws CannotDowngradePlanException
+     */
+    public void upgradeServicePlanToGold(final Account cont)
+            throws InsufficientFundsException, AlreadyHasPlanException,
             CannotDowngradePlanException {
         servicePlan.upgradeToGold(cont);
     }
 
-    public void upgradeServicePlanToSilver(Account cont) throws InsufficientFundsException, AlreadyHasPlanException,
+    /**
+     * upgrade service plan to silver
+     * @param cont
+     * @throws InsufficientFundsException
+     * @throws AlreadyHasPlanException
+     * @throws CannotDowngradePlanException
+     */
+    public void upgradeServicePlanToSilver(final Account cont)
+            throws InsufficientFundsException, AlreadyHasPlanException,
             CannotDowngradePlanException {
         servicePlan.upgradeToSilver(cont);
     }

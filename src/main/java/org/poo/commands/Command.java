@@ -73,12 +73,18 @@ public class Command {
     }
 
     /**
-     *
+     * get command name
      * @return
      */
     public String getCmdName() {
         return cmdName;
     }
+
+    /**
+     * get the timestamp of the command
+     * I should have put it from the beginning as a field but it is what it is now
+     * @return
+     */
     public int getTimestampTheSecond() {
         return timestampTheSecond;
     }

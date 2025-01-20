@@ -48,7 +48,7 @@ public final class SpendingReport extends Command {
     private HashMap<String, User> users;
 
     @JsonProperty("IBAN")
-    private String IBAN;
+    private String iban;
     private double balance;
     private String currency;
     @JsonIgnore
@@ -65,7 +65,7 @@ public final class SpendingReport extends Command {
      */
     public SpendingReport(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.IBAN = command.getAccount();
+        this.iban = command.getAccount();
         this.startTimestamp = command.getStartTimestamp();
         this.endTimestamp = command.getEndTimestamp();
         this.timestamp = command.getTimestamp();
@@ -99,7 +99,7 @@ public final class SpendingReport extends Command {
         Account cont = null;
         try {
 
-            cont = getAccountReference(users, IBAN);
+            cont = getAccountReference(users, iban);
             balance = cont.getBalance();
             currency = cont.getCurrency();
         } catch (NotFoundException e) {

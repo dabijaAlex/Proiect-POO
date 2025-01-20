@@ -69,9 +69,9 @@ public class DeleteCard extends Command {
         Account acc = getAccountReference(users, card);
 
         cardHolder = user.getEmail();
-        if(cardHolder.equals(email) == false)
+        if (!cardHolder.equals(email)) {
             return;
-
+        }
 
         account = acc.getIban();
         acc.deleteCard(card, email);
@@ -81,14 +81,20 @@ public class DeleteCard extends Command {
                 cardHolder, account));
     }
 
-
-    public void execute(final ArrayNode output, int type) throws NotFoundException {
+    /**
+     * used for deleting the used one time card
+     * @param output
+     * @param type
+     * @throws NotFoundException
+     */
+    public void execute(final ArrayNode output, final int type) throws NotFoundException {
         User user = getUserReference(users, card);
         Account acc = getAccountReference(users, card);
 
         cardHolder = user.getEmail();
-        if(cardHolder.equals(email) == false)
+        if (!cardHolder.equals(email)) {
             return;
+        }
         account = acc.getIban();
 
 

@@ -1,6 +1,7 @@
 package org.poo.commands.otherCommands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +18,8 @@ public final class AddInterest extends Command {
     @JsonIgnore
     private HashMap<String, User> users;
 
-    private String IBAN;
+    @JsonProperty("IBAN")
+    private String iban;
     private int timestamp;
 
 
@@ -28,7 +30,7 @@ public final class AddInterest extends Command {
      */
     public AddInterest(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.IBAN = command.getAccount();
+        this.iban = command.getAccount();
         this.timestamp = command.getTimestamp();
         this.timestampTheSecond = timestamp;
 
@@ -41,7 +43,7 @@ public final class AddInterest extends Command {
      * @throws NotFoundException
      */
     public void execute(final ArrayNode output) throws NotFoundException {
-        Account acc = getAccountReference(users, IBAN);
+        Account acc = getAccountReference(users, iban);
         acc.addInterest(output, this);
     }
 }

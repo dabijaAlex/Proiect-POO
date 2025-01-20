@@ -23,7 +23,7 @@ public class Report extends Command {
     @JsonIgnore
     private HashMap<String, User> users;
     @JsonProperty("IBAN")
-    private String IBAN;
+    private String iban;
     private double balance;
     private String currency;
     @JsonIgnore
@@ -43,7 +43,7 @@ public class Report extends Command {
      */
     public Report(final CommandInput command, final HashMap<String, User> users) {
         this.cmdName = command.getCommand();
-        this.IBAN = command.getAccount();
+        this.iban = command.getAccount();
         this.startTimestamp = command.getStartTimestamp();
         this.endTimestamp = command.getEndTimestamp();
         this.transactions = new ArrayList<>();
@@ -64,7 +64,7 @@ public class Report extends Command {
 
         Account cont = null;
         try {
-            cont = getAccountReference(users, IBAN);
+            cont = getAccountReference(users, iban);
 
         } catch (NotFoundException e) {
             throw new AccountNotFound();

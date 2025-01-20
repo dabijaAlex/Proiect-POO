@@ -2,11 +2,26 @@ package org.poo.app.cashbackStrategies;
 
 import org.poo.app.accounts.Account;
 import org.poo.app.commerciants.Commerciant;
-import org.poo.app.commerciants.FoodCommerciant;
+
+
 
 public interface CashbackStrategy {
-    public void addPaymentToMap(final Commerciant commerciant, final double amount,
-                                final Account account, final String currency);
-    public double getCashback(final Commerciant commerciant, final double amount,
-                              final Account account);
+    /**
+     * add a payment or amount spent based on the type of commerciant where the payment happened
+     * @param commerciant
+     * @param amount
+     * @param account
+     * @param currency
+     */
+    void addPayment(Commerciant commerciant, double amount, Account account,
+                         String currency);
+
+    /**
+     * get cashback based on the type of commerciant where the payment happened
+     * @param commerciant
+     * @param amount
+     * @param account
+     * @return
+     */
+    double getCashback(Commerciant commerciant, double amount, Account account);
 }

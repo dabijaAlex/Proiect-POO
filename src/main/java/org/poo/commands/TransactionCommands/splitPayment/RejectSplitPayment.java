@@ -1,17 +1,14 @@
-package org.poo.app.splitPayment;
+package org.poo.commands.TransactionCommands.splitPayment;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.app.UserNotFound;
-import org.poo.app.accounts.Account;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 
@@ -21,10 +18,16 @@ public class RejectSplitPayment extends Command {
     private String email;
     private String type;
     private int timestamp;
-
     @JsonIgnore
     private HashMap<String, User> users;
-    public RejectSplitPayment(CommandInput input, HashMap<String, User> users) {
+
+    /**
+     * Constructor
+     * @param input
+     * @param users
+     */
+    public RejectSplitPayment(final CommandInput input,
+                              final HashMap<String, User> users) {
         this.email = input.getEmail();
         this.type = input.getSplitPaymentType();
         this.timestamp = input.getTimestamp();
@@ -33,19 +36,17 @@ public class RejectSplitPayment extends Command {
         this.timestampTheSecond = timestamp;
     }
 
-    public void execute(ArrayNode output) {
-        if(timestamp == 204) {
-            System.out.println(2);
-        }
-        User user = null;
-        try {
-            user = getUserReference(users, email);
-            if(!user.getEmail().equals(email)) {
-                throw new UserNotFound();
-            }
-        } catch (NotFoundException e) {
+    /**
+     * check it is valid email
+     * get user based on email
+     * remove first split payment from user queue and start rejected payment mechanism
+     * @param output
+     */
+    public void execute(final ArrayNode output) throws UserNotFound {
+        if (!email.contains("@")) {
             throw new UserNotFound();
         }
+        User user = getUserReference(users, email);
 
         SingleSplitPayment splitPayment;
         try {
@@ -55,7 +56,4 @@ public class RejectSplitPayment extends Command {
         }
         splitPayment.rejected();
     }
-
-
-
 }

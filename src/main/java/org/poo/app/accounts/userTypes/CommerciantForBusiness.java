@@ -5,6 +5,10 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 
+/**
+ * this class is used to store which business associate made a payment
+ *      to a commerciant and the amount that they payed
+ */
 @Getter @Setter
 public class CommerciantForBusiness {
     private String name;
@@ -12,24 +16,51 @@ public class CommerciantForBusiness {
     private ArrayList<String> employees = new ArrayList<>();
     private double totalReceived = 0;
 
-    public CommerciantForBusiness(String name) {
+    /**
+     * constructor
+     * @param name
+     */
+    public CommerciantForBusiness(final String name) {
         this.name = name;
     }
 
-    public void addManager(String manager){
+    /**
+     * it s first time manager pays here so add him to list
+     * @param manager
+     */
+    public void addManager(final String manager) {
         managers.add(manager);
     }
-    public void addEmployee(String employee){
+
+    /**
+     * it s first time employee pays here so add him to list
+     * @param employee
+     */
+    public void addEmployee(final String employee) {
         employees.add(employee);
     }
-    public void addAmount(double amount){
+
+    /**
+     * add amount spent in the latest transaction
+     * @param amount
+     */
+    public void addAmount(final double amount) {
         totalReceived += amount;
     }
 
-    public ArrayList<String> getManagersCopy(){
+    /**
+     * make deep copy of list for printing in business report
+     * @return
+     */
+    public ArrayList<String> getManagersCopy() {
         return new ArrayList<>(managers);
     }
-    public ArrayList<String> getEmployeesCopy(){
+
+    /**
+     * make deep copy for printing in business report
+     * @return
+     */
+    public ArrayList<String> getEmployeesCopy() {
         return new ArrayList<>(employees);
     }
 }

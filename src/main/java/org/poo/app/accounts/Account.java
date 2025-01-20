@@ -3,9 +3,7 @@ package org.poo.app.accounts;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Card;
@@ -14,7 +12,6 @@ import org.poo.app.User;
 import org.poo.app.accounts.userTypes.BAccUser;
 import org.poo.app.accounts.userTypes.CommerciantForBusiness;
 import org.poo.app.commerciants.Commerciant;
-import org.poo.app.plans.ServicePlan;
 import org.poo.commands.otherCommands.AddInterest;
 import org.poo.commands.otherCommands.ChangeInterestRate;
 import org.poo.transactions.Transaction;
@@ -53,16 +50,27 @@ public class Account {
     protected int techDiscounts = 0;
 
 
+    /**
+     * you can only get one discount per account
+     */
     public void addFoodDiscount() {
         if (foodDiscounts == 0) {
             foodDiscounts++;
         }
     }
+
+    /**
+     * you can only get one discount per account
+     */
     public void addClothesDiscount() {
         if (clothesDiscounts == 0) {
             clothesDiscounts++;
         }
     }
+
+    /**
+     * you can only get one discount per account
+     */
     public void addTechDiscount() {
         if (techDiscounts == 0) {
             techDiscounts++;
@@ -99,6 +107,11 @@ public class Account {
         this.cards.add(card);
     }
 
+    /**
+     * create card and add it to card list
+     * @param emailCreator
+     * @return
+     */
     public String createCard(final String emailCreator) {
         String card = Utils.generateCardNumber();
         this.addCard(new Card(card, "active", emailCreator));
@@ -106,12 +119,32 @@ public class Account {
     }
 
 
+    /**
+     * make a payment
+     * this method is usefull for other types of accounts that opperate differently:
+     *      - for business account we need to authorize the transaction
+     *          based on role and spending limits
+     * @param amount
+     * @param commission
+     * @param queryingPersonEmail
+     * @param timestamp
+     * @param commerciant
+     */
     public void makePayment(final double amount, final double commission,
                             final String queryingPersonEmail, final int timestamp,
                             final Commerciant commerciant) {
         balance = balance - (commission + amount);
     }
 
+    /**
+     * add funds
+     * this method is usefull for other types of accounts that operate differently:
+     *      - for business account we need to authorize the
+     *          deposit based on role and spending limits
+     * @param amount
+     * @param queryingPersonEmail
+     * @param timestamp
+     */
     public void addFunds(final double amount, final String queryingPersonEmail,
                          final int timestamp) {
         balance = balance + amount;
@@ -129,16 +162,36 @@ public class Account {
         this.cards.remove(getCard(cardNumber));
     }
 
+    /**
+     * used after making a payment with a onetime card in order to
+     *      delete this one and gen another card
+     * @param cardNumber
+     * @param queryingPersonEmail
+     */
     public void deleteCardOneTime(final String cardNumber, final String queryingPersonEmail) {
         this.cards.remove(getCard(cardNumber));
     }
+
+    /**
+     * this method is usefull for other types of accounts that operate differently:
+     *       - for business account we need to authorize the action based on roles
+     * @param newAlias
+     * @param queryingPersonEmail
+     */
     public void setAliasCommand(final String newAlias, final String queryingPersonEmail) {
         this.alias = newAlias;
     }
 
+    /**
+     * this method is usefull for other types of accounts that operate differently:
+     *     - for business account we need to authorize the action based on roles
+     * @param newMinBalance
+     * @param queryingPersonEmail
+     */
     public void setMinBalanceCommand(final double newMinBalance, final String queryingPersonEmail) {
         this.minBalance = newMinBalance;
     }
+
     /**
      * copy account so the reference from output is different
      * @param other
@@ -155,7 +208,11 @@ public class Account {
     }
 
 
-
+    /**
+     * in other types of accounts this method throws exception
+     * @param givenCurrency
+     * @return
+     */
     public Account getClassicAccount(final String givenCurrency) {
         if (this.currency.equals(givenCurrency)) {
             return this;
@@ -164,6 +221,12 @@ public class Account {
     }
 
 
+    /**
+     * method valid only for savings account
+     * @param targetAccount
+     * @param amount
+     * @throws NotASavingsAccount
+     */
     public void makeWithdrawal(final Account targetAccount,
                                final double amount) throws NotASavingsAccount {
         throw new NotASavingsAccount();
@@ -202,9 +265,7 @@ public class Account {
      * @param command
      */
     public void addInterest(final ArrayNode output, final AddInterest command) {
-        this.interestError("This is not a savings account",
-                output, command.getCmdName(), command.getTimestamp());
-
+        throw new NotASavingsAccount();
     }
 
 
@@ -216,83 +277,129 @@ public class Account {
      */
     public void setInterestRate(final double newInterestRate, final ArrayNode output,
                                 final ChangeInterestRate command) {
-        this.interestError("This is not a savings account",
-                output, command.getCmdName(), command.getTimestamp());
+        throw new NotASavingsAccount();
     }
+
 
     /**
-     * this method is called by both earlier methods
-     * @param description
-     * @param output
-     * @param cmdName
-     * @param timestamp
+     * method valid only for business
+     * @param spendingLimit
      */
-    private void interestError(final String description, final ArrayNode output,
-                               final String cmdName, final int timestamp) {
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode objectNode = mapper.createObjectNode();
-        objectNode.put("command", cmdName);
-
-
-        ObjectNode outputNode = mapper.createObjectNode();
-        outputNode.put("timestamp", timestamp);
-        outputNode.put("description", description);
-
-        objectNode.set("output", outputNode);
-        objectNode.put("timestamp", timestamp);
-
-        output.add(objectNode);
-    }
-
     public void setSpendingLimit(final double spendingLimit) {
 
     }
 
+    /**
+     * method valid only for business
+     * @param depositLimit
+     */
     public void setDepositLimit(final double depositLimit) {
 
     }
 
+    /**
+     * get the spending limit (valid for business)
+     * @return
+     */
     @JsonIgnore
     public double getSpendingLimit() {
         return 0;
     }
 
+    /**
+     * get the deposit limit (valid for business)
+     * @return
+     */
     @JsonIgnore
     public double getDepositLimit() {
         return 0;
     }
 
+    /**
+     * valid for business only
+     * @param role
+     * @param queryingPersonEmail
+     * @param username
+     */
     public void addBusinessAssociate(final String role, final String queryingPersonEmail,
                                      final String username) {
 
     }
 
+    /**
+     * valid for business
+     * this is not business so it throws
+     * @param amount
+     * @param queryingPersonEmail
+     * @throws NotABusinessAccountException
+     */
     public void changeSpendingLimit(final double amount,
                                     final String queryingPersonEmail)
                                     throws NotABusinessAccountException {
         throw new NotABusinessAccountException();
     }
 
+    /**
+     * valid for business only
+     * this is not business and it throws
+     * @param amount
+     * @param queryingPersonEmail
+     * @throws NotABusinessAccountException
+     */
     public void changeDepositLimit(final double amount,
                                    final String queryingPersonEmail)
                                     throws NotABusinessAccountException {
         throw new NotABusinessAccountException();
     }
 
+    /**
+     *  used to be overwritten in business account and return business associates list.
+     *  idk why i can t name it any other way. this is the only name that java will recognize
+     *      in both classes
+     * @return
+     */
     public ArrayList<BAccUser> abc() {
         return null;
     }
 
+    /**
+     * valid for business accounts
+     * @return
+     */
     @JsonIgnore
     public ArrayList<CommerciantForBusiness> getCommerciantsForBusiness() {
         return null;
     }
 
+    /**
+     * valid for business account
+     * @param queryingPersonEmail
+     * @return
+     */
     @JsonIgnore
     public BAccUser getCurrentAssociate(final String queryingPersonEmail) {
         return new BAccUser("", "");
     }
 
+    /**
+     * useful for auto upcasting
+     * not a business account so this returns null
+     * @return
+     */
+    @JsonIgnore
+    public ArrayList<BAccUser> getManagers() {
+       return null;
+    }
+
+    /**
+     * useful for auto upcasting
+     * not a business account so this returns null
+     * @return
+     */
+    @JsonIgnore
+    public ArrayList<BAccUser> getEmployees() {
+        return null;
+    }
 
 
 

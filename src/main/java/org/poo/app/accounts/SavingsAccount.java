@@ -30,22 +30,31 @@ public class SavingsAccount extends Account {
     }
 
 
+    /**
+     * not a classic account so this returns null
+     * @param currency
+     * @return
+     */
     @Override
     public Account getClassicAccount(final String currency) {
         return null;
     }
 
+    /**
+     * make a withdrawal of x amount
+     * if not enough money throw exception
+     * @param targetAccount
+     * @param amount
+     * @throws InsufficientFundsException
+     */
     @Override
     public void makeWithdrawal(final Account targetAccount,
                                final double amount) throws InsufficientFundsException {
-        double convRate = ExchangeRateGraph.convertRate(targetAccount.getCurrency(),
-                this.getCurrency());
-        double amountToTakeFromAccount = convRate * amount;
-        if (amountToTakeFromAccount > this.getBalance()) {
+        if (amount > this.getBalance()) {
             throw new InsufficientFundsException();
         }
-        this.balance -= amountToTakeFromAccount;
-        targetAccount.setBalance(targetAccount.getBalance() + convRate * amount);
+        this.balance -= amount;
+        targetAccount.setBalance(targetAccount.getBalance() + amount);
     }
 
 

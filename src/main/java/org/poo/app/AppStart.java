@@ -47,8 +47,7 @@ public final class AppStart {
         }
 
 
-        exchangeRateList = new ExchangeRateGraph(input.getExchangeRates());
-
+        exchangeRateList = ExchangeRateGraph.getInstance(input.getExchangeRates());
 
         Invoker invoker = new Invoker(output);
         ArrayList<Command> commands = new ArrayList<>();
@@ -58,29 +57,11 @@ public final class AppStart {
         for (CommandInput commandInput: input.getCommands()) {
             commands.add(factory.createCommand(commandInput, userHashMap));
         }
-
-
-        HashMap<String, Commerciant> commerciants = new HashMap<>();
-        CommerciantMap.setCommerciantsMap(commerciants);
-        for (CommerciantInput commerciantInput: input.getCommerciants()) {
-            String commerciantIban = commerciantInput.getAccount();
-            if (commerciantInput.getType().equals("Food")) {
-                commerciants.put(commerciantIban, new FoodCommerciant(commerciantInput));
-            }
-            if (commerciantInput.getType().equals("Clothes")) {
-                commerciants.put(commerciantIban, new ClothesCommerciant(commerciantInput));
-            }
-            if (commerciantInput.getType().equals("Tech")) {
-                commerciants.put(commerciantIban, new TechCommerciant(commerciantInput));
-            }
-
-            //  put the name of the commerciant also
-            commerciants.put(commerciantInput.getCommerciant(), commerciants.get(commerciantIban));
-            Integer idInt = new Integer(commerciantInput.getId());
-            commerciants.put(idInt.toString(), commerciants.get(commerciantIban));
-        }
-
+        //  add commerciants to commerciant map
+        new CommerciantMap(input);
         invoker.setCmds(commands);
         invoker.solve();
+
+        ExchangeRateGraph.resetInstance();
     }
 }

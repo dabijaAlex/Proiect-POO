@@ -18,8 +18,13 @@ public class addNewBusinessAssociate extends Command {
     private String email;
     private int timestamp;
 
-
-    public addNewBusinessAssociate(CommandInput input, HashMap<String, User> users) {
+    /**
+     * Constructor
+     * @param input
+     * @param users
+     */
+    public addNewBusinessAssociate(final CommandInput input,
+                                   final HashMap<String, User> users) {
         this.cmdName = input.getCommand();
         this.users = users;
         this.accountIban = input.getAccount();
@@ -28,7 +33,11 @@ public class addNewBusinessAssociate extends Command {
         this.timestamp = input.getTimestamp();
     }
 
-    public void execute(ArrayNode output) {
+    /**
+     * works for business account only. the rest throw exception
+     * @param output
+     */
+    public void execute(final ArrayNode output) {
         Account account = getAccountReference(users, accountIban);
         User user = getUserReference(users, email);
         account.addBusinessAssociate(role, email, user.getLastName() + " " +  user.getFirstName());

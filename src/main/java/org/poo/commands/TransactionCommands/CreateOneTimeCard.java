@@ -52,7 +52,8 @@ public final class CreateOneTimeCard extends Command {
      * @param users
      */
     public CreateOneTimeCard(final int timestamp, final String cardHolder,
-                             final String account, final HashMap<String, User> users, final String email) {
+                             final String account, final HashMap<String, User> users,
+                             final String email) {
         this.timestamp = timestamp;
         this.cardHolder = cardHolder;
         this.account = account;

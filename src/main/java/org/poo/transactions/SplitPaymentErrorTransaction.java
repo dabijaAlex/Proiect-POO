@@ -4,14 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
-import java.util.Objects;
 
 @Getter @Setter
 public final class SplitPaymentErrorTransaction extends Transaction {
     private String description;
     private List<String> involvedAccounts;
     private String currency;
-    private String SplitPaymentType;
+    private String splitPaymentType;
     private List<Double> amountForUsers;
     private String error;
 
@@ -25,13 +24,14 @@ public final class SplitPaymentErrorTransaction extends Transaction {
      */
     public SplitPaymentErrorTransaction(final int timestamp, final String description,
                                              final List<String> involvedAccounts,
-                                             final String currency, final String error, final String type, final List<Double> amountEach) {
+                                             final String currency, final String error,
+                                        final String type, final List<Double> amountEach) {
         super(true);
 
         this.timestamp = timestamp;
         this.description = description;
         this.involvedAccounts = involvedAccounts;
-        this.SplitPaymentType = type;
+        this.splitPaymentType = type;
         this.amountForUsers = amountEach;
 
         this.currency = currency;

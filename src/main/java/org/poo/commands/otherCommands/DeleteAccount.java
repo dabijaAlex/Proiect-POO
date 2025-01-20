@@ -60,7 +60,7 @@ public final class DeleteAccount extends Command {
             user = getUserReference(users, email);
 
             cont = getAccountReference(users, iban);
-            if(user.getEmail().equals(cont.getEmail()) == false) {
+            if (!user.getEmail().equals(cont.getEmail())) {
                 throw new NotAuthorizedException();
             }
         } catch (NotFoundException e) {

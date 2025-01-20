@@ -44,7 +44,7 @@ public class OneTimeCard extends Card {
         User user = command.getUserReference(users, account.getIban());
 
         account.addTransaction(new PayOnlineTransaction(command.getTimestamp(),
-                command.getDescription(), amount, command.getCommerciant()));
+                command.getDescription(), amount, command.getCommerciantIdentifier()));
 
 
         DeleteCard del = new DeleteCard(command.getTimestamp(), command.getCardNumber(),

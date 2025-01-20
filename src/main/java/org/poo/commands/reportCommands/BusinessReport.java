@@ -5,17 +5,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.NotFoundException;
 import org.poo.app.User;
 import org.poo.app.accounts.Account;
-import org.poo.app.accounts.BusinessAccount;
 import org.poo.app.accounts.userTypes.BAccUser;
 import org.poo.app.accounts.userTypes.CommerciantForBusiness;
-import org.poo.app.accounts.userTypes.Employee;
-import org.poo.app.accounts.userTypes.Manager;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
-import org.poo.transactions.Transaction;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,12 +25,18 @@ public class BusinessReport extends Command {
     private int timestamp;
     private String accountIban;
     private String type;
-    ArrayList<BAccUser> employees = new ArrayList<>();
-    ArrayList<BAccUser> managers = new ArrayList<>();
+    private ArrayList<BAccUser> employees = new ArrayList<>();
+    private ArrayList<BAccUser> managers = new ArrayList<>();
 
     private HashMap<String, User> users;
 
-    public BusinessReport(CommandInput commandInput, HashMap<String, User> users) {
+    /**
+     * constructor
+     * @param commandInput
+     * @param users
+     */
+    public BusinessReport(final CommandInput commandInput,
+                          final HashMap<String, User> users) {
         this.startTimestamp = commandInput.getStartTimestamp();
         this.endTimestamp = commandInput.getEndTimestamp();
         this.timestamp = commandInput.getTimestamp();
@@ -44,15 +45,17 @@ public class BusinessReport extends Command {
         this.users = users;
     }
 
-    public void execute(ArrayNode output) {
+    /**
+     * check wich type of statistic is wanted and output accordingly
+     * @param output
+     */
+    public void execute(final ArrayNode output) {
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode objectNode = mapper.createObjectNode();
         objectNode.put("command", "businessReport");
 
         Account account = getAccountReference(users, accountIban);
-
-
 
         ObjectNode outputNode = mapper.createObjectNode();
         outputNode.put("IBAN", accountIban);
@@ -61,7 +64,7 @@ public class BusinessReport extends Command {
         outputNode.put("spending limit", account.getSpendingLimit());
         outputNode.put("deposit limit", account.getDepositLimit());
         outputNode.put("statistics type", type);
-        if(type.equals("transaction")) {
+        if (type.equals("transaction")) {
             transactionSide(account, outputNode);
         } else {
             commerciantSide(account, mapper, outputNode);
@@ -74,15 +77,24 @@ public class BusinessReport extends Command {
 
     }
 
-    private void commerciantSide(Account account, ObjectMapper mapper, ObjectNode outputNode) {
+    /**
+     * commerciants report type
+     * add all commerciants where managers and employees made payments
+     * add the managers and employees and the amounts they spent
+     * @param account
+     * @param mapper
+     * @param outputNode
+     */
+    private void commerciantSide(final Account account, final ObjectMapper mapper,
+                                 final ObjectNode outputNode) {
         ArrayNode commercaints = mapper.createArrayNode();
-        Collections.sort(account.getCommerciantsForBusiness(), new Comparator<CommerciantForBusiness>() {
-
+        Collections.sort(account.getCommerciantsForBusiness(),
+                new Comparator<CommerciantForBusiness>() {
             public int compare(final CommerciantForBusiness c1, final CommerciantForBusiness c2) {
                 return c1.getName().compareTo(c2.getName());
             }
         });
-        for(CommerciantForBusiness c: account.getCommerciantsForBusiness()) {
+        for (CommerciantForBusiness c: account.getCommerciantsForBusiness()) {
             ObjectNode singleCommerciant = mapper.createObjectNode();
             singleCommerciant.put("commerciant", c.getName());
             singleCommerciant.put("total received", c.getTotalReceived());
@@ -94,30 +106,32 @@ public class BusinessReport extends Command {
     }
 
 
-    private void transactionSide(Account account, ObjectNode outputNode) {
-        ArrayList<BAccUser> businessAssociates = account.abc();
-
-
-        for(BAccUser businessAssociate : businessAssociates) {
-            if(businessAssociate instanceof Employee) {
-                employees.add(new BAccUser(businessAssociate));
-            }
-            else if(businessAssociate instanceof Manager) {
-                managers.add(new BAccUser(businessAssociate));
-            }
-        }
+    /**
+     * transaction report type
+     * add all the employees and managers that made payments or deposits
+     * the refferences that we get are deep copies
+     * @param account
+     * @param outputNode
+     */
+    private void transactionSide(final Account account, final ObjectNode outputNode) {
+        managers = account.getManagers();
+        employees = account.getEmployees();
 
         double totalSpent = 0;
         double totalDeposited = 0;
-        for(BAccUser employee : employees) {
-            totalDeposited = totalDeposited + employee.getDepositedInTimestamps(startTimestamp, endTimestamp);
-            totalSpent = totalSpent + employee.getSpentInTimestamps(startTimestamp, endTimestamp);
+        for (BAccUser employee : employees) {
+            totalDeposited = totalDeposited
+                    + employee.getDepositedInTimestamps(startTimestamp, endTimestamp);
+            totalSpent = totalSpent
+                    + employee.getSpentInTimestamps(startTimestamp, endTimestamp);
 
         }
 
-        for(BAccUser manager : managers) {
-            totalDeposited = totalDeposited + manager.getDepositedInTimestamps(startTimestamp, endTimestamp);
-            totalSpent = totalSpent + manager.getSpentInTimestamps(startTimestamp, endTimestamp);
+        for (BAccUser manager : managers) {
+            totalDeposited = totalDeposited
+                    + manager.getDepositedInTimestamps(startTimestamp, endTimestamp);
+            totalSpent = totalSpent
+                    + manager.getSpentInTimestamps(startTimestamp, endTimestamp);
 
         }
 

@@ -1,28 +1,36 @@
-package org.poo.app.splitPayment;
+package org.poo.commands.TransactionCommands.splitPayment;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.ExchangeRateGraph;
 import org.poo.app.User;
 import org.poo.app.accounts.Account;
-import org.poo.commands.Command;
 import org.poo.transactions.RejectedSplitPaymentTransaction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
+
+/**
+ * class that keeps how much a single account has to pay and also if it
+ * accepted the payment
+ */
 @Getter @Setter
 class Pair {
     private Account account;
     private boolean status;
     private double amountToPay;
-    public Pair(Account account, boolean status, double amountToPay) {
+
+    /**
+     * constructor
+     * @param account
+     * @param status
+     * @param amountToPay
+     */
+    Pair(final Account account, final boolean status, final double amountToPay) {
         this.account = account;
         this.status = status;
         this.amountToPay = amountToPay;
     }
-
 }
 
 
@@ -39,8 +47,24 @@ public class SingleSplitPayment {
     private double amount;
     private String description;
     private List<Double> amountEachOriginal;
-    public SingleSplitPayment(List<Account> accounts, List<Double> amountEach, String currency, String type, int timestamp, double amount,
-                              String description, List<String> involvedAccounts, List<Double> amountEachOriginal) {
+
+    /**
+     * constructor
+     * @param accounts
+     * @param amountEach
+     * @param currency
+     * @param type
+     * @param timestamp
+     * @param amount
+     * @param description
+     * @param involvedAccounts
+     * @param amountEachOriginal
+     */
+    public SingleSplitPayment(final List<Account> accounts, final List<Double> amountEach,
+                              final String currency, final String type, final int timestamp,
+                              final double amount, final String description,
+                              final List<String> involvedAccounts,
+                              final List<Double> amountEachOriginal) {
         this.type = type;
         this.currency = currency;
         this.amount = amount;
@@ -50,51 +74,54 @@ public class SingleSplitPayment {
         this.involvedAccounts = involvedAccounts;
         this.amountEachOriginal = amountEachOriginal;
 
-        for(int i = 0; i < accounts.size(); i++){
+        for (int i = 0; i < accounts.size(); i++) {
             Pair pair = new Pair(accounts.get(i), false, amountEach.get(i));
             eachAccountAndPayment.add(pair);
             remainingAccounts.add(accounts.get(i));
         }
     }
 
-    public Pair findAccount(Account account) {
-        for(Pair pair : eachAccountAndPayment){
-            if(pair.getAccount().equals(account)){
-                remainingAccounts.remove(pair.getAccount());
-                return pair;
-            }
-        }
-        return null;
-    }
-
-    public void setAcceptedPayment(User user) {
-        for(Pair pair : eachAccountAndPayment){
-            if(pair.getAccount().getUserRef().equals(user)){
+    /**
+     * search for an account in the list of pairs and set it as accepted
+     * @param user
+     */
+    public void setAcceptedPayment(final User user) {
+        for (Pair pair : eachAccountAndPayment) {
+            if (pair.getAccount().getUserRef().equals(user)) {
                 remainingAccounts.remove(pair.getAccount());
                 pair.setStatus(true);
             }
         }
     }
 
+    /**
+     * add to all accounts a transaction that the split payment was rejected and remove
+     *      the instance from user s pending list
+     */
     public void rejected() {
-        for(Pair pair : eachAccountAndPayment){
+        for (Pair pair : eachAccountAndPayment) {
             Account account = pair.getAccount();
             account.addTransaction(new RejectedSplitPaymentTransaction(timestamp,
-                    "Split payment of " + String.format("%.2f", amount) + " " + currency,
+                    "Split payment of " + String.format("%.2f", amount)
+                            + " " + currency,
                     type, currency, amountEachOriginal, involvedAccounts));
         }
-        for(Account account : remainingAccounts){
+        for (Account account : remainingAccounts) {
             account.getUserRef().getSplitPayments().remove(this);
         }
 
     }
 
+    /**
+     * check if all accounts accepted for an  instance of split payment
+     * @return
+     */
     public boolean checkAllAccepted() {
-        for(Pair pair : eachAccountAndPayment) {
-            if(pair.isStatus() == false)
+        for (Pair pair : eachAccountAndPayment) {
+            if (pair.isStatus() == false) {
                 return false;
+            }
         }
         return true;
     }
-    //need to add reference in account
 }

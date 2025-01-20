@@ -7,22 +7,45 @@ import java.util.ArrayList;
 
 public final class Employee extends BAccUser {
 
+    /**
+     * constructor that calls superclass
+     * @param email
+     * @param username
+     */
     public Employee(final String email, final String username) {
         super(email, username);
     }
 
 
-
+    /**
+     * action not allowed so it throws
+     * @param account
+     * @param limit
+     * @throws ChangeSpendingLimitException
+     */
     public void changeSpendingLimit(final Account account,
                                     final double limit) throws ChangeSpendingLimitException {
         throw new ChangeSpendingLimitException();
     }
 
+    /**
+     * action not allowed so this throws
+     * @param account
+     * @param limit
+     * @throws ChangeDepositLimitException
+     */
     public void changeDepositLimit(final Account account,
                                    final double limit) throws ChangeDepositLimitException {
         throw new ChangeDepositLimitException();
     }
 
+    /**
+     * check if card was made by this employee.
+     *      if true delete else throw not authorised exception
+     * @param cardNumber
+     * @param account
+     * @throws NotAuthorizedException
+     */
     public void deleteCard(final String cardNumber,
                            final Account account) throws NotAuthorizedException {
         Card card = account.getCard(cardNumber);
@@ -32,12 +55,28 @@ public final class Employee extends BAccUser {
         account.getCards().remove(card);
     }
 
+    /**
+     * action not allowed so this throws
+     * @param account
+     * @param minBalance
+     * @throws NotAuthorizedException
+     */
     public void setMinBalance(final Account account,
                               final double minBalance) throws NotAuthorizedException {
         throw new NotAuthorizedException();
     }
 
 
+    /**
+     * take amount from account
+     * add this payment to the list of payments made by this user
+     * add this payment to the commerciant where it took place
+     * @param account
+     * @param amount
+     * @param commision
+     * @param timestamp
+     * @param commerciant
+     */
     public void makePayment(final Account account, final double amount, final double commision,
                             final int timestamp, final Commerciant commerciant)
                             throws NotAuthorizedException {
@@ -63,6 +102,16 @@ public final class Employee extends BAccUser {
 
 
     }
+
+    /**
+     * check if bellow deposit limit
+     *      if true add funds and add to this account the amount he deposited
+     *          else throw not authorised exception
+     * @param account
+     * @param funds
+     * @param timestamp
+     * @throws NotAuthorizedException
+     */
     public void addFunds(final Account account, final double funds,
                          final int timestamp) throws NotAuthorizedException {
         if (account.getDepositLimit() < funds && account.getDepositLimit() != -1) {
@@ -74,8 +123,21 @@ public final class Employee extends BAccUser {
     }
 
 
-
+    /**
+     * action not allowed so this throws
+     * @param account
+     * @param alias
+     * @throws NotAuthorizedException
+     */
     public void setAlias(final Account account, final String alias) throws NotAuthorizedException {
         throw new NotAuthorizedException();
+    }
+
+    /**
+     * add employee to given list
+     * @param list
+     */
+    public void addEmployeeToList(ArrayList<BAccUser> list) {
+        list.add(new BAccUser(this));
     }
 }

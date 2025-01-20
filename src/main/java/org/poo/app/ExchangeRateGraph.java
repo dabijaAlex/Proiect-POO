@@ -4,9 +4,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.fileio.ExchangeInput;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -15,7 +16,7 @@ import java.util.*;
  */
 @Getter @Setter
 class DirectedWeightedGraph {
-    private Map<String, List<Edge>> adjacencyList;
+    private Map<String, List<Edge>> adjacencyList = new HashMap<>();
 
     class Edge {
         private String to;
@@ -26,18 +27,12 @@ class DirectedWeightedGraph {
          * @param to
          * @param rate
          */
-        public Edge(String to, double rate) {
+        Edge(final String to, final double rate) {
             this.to = to;
             this.rate = rate;
         }
     }
 
-    /**
-     * Constructor
-     */
-    public DirectedWeightedGraph() {
-        this.adjacencyList = new HashMap<>();
-    }
 
     /**
      * adds a path from a currency to another with the associated conv rate
@@ -93,14 +88,16 @@ class DirectedWeightedGraph {
 
 @Getter @Setter
 public class ExchangeRateGraph {
-    static DirectedWeightedGraph graph;
+    private static DirectedWeightedGraph graph;
+    private static ExchangeRateGraph instance;
+
 
     /**
      * constructor that builds the graph based on input.
      * if there s From -> To (conv rate) there will be To -> From (1 / conv rate)
      * @param input
      */
-    public ExchangeRateGraph(final ExchangeInput[] input) {
+    private ExchangeRateGraph(final ExchangeInput[] input) {
         graph = new DirectedWeightedGraph();
 
         for (ExchangeInput exchangeInput : input) {
@@ -111,6 +108,19 @@ public class ExchangeRateGraph {
         }
     }
 
+    /**
+     * get th instance of class
+     * prevents creation of multiple useless instances as they are useless
+     * @param input
+     * @return
+     */
+    public static ExchangeRateGraph getInstance(final ExchangeInput[] input) {
+        if (instance == null) {
+            instance = new ExchangeRateGraph(input);
+        }
+        return instance;
+    }
+
 
     /**
      * call dfs to get the conv rate From a currency to another
@@ -118,18 +128,31 @@ public class ExchangeRateGraph {
      * @param to
      * @return
      */
-    public static double convertRate(final String from, final String to) {
+    private static double convertRate(final String from, final String to) {
         ArrayList<String> visited = new ArrayList<>();
         double z = graph.dfs(graph, from, to, visited, 1);
         return z;
 
     }
 
+    /**
+     * make direct conversion from one currency to another
+     * @param from
+     * @param to
+     * @param amount
+     * @return
+     */
     public static double makeConversion(final String from, final String to, final double amount) {
         double convRate = 1;
         convRate = convertRate(from, to);
         return amount * convRate;
     }
 
+    /**
+     * reset instance for following tests
+     */
+    public static void resetInstance() {
+        instance = null;
+    }
 
 }
