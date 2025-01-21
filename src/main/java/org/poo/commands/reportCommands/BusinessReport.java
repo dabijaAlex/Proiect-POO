@@ -7,8 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.User;
 import org.poo.app.accounts.Account;
-import org.poo.app.accounts.userTypes.BAccUser;
-import org.poo.app.accounts.userTypes.CommerciantForBusiness;
+import org.poo.app.accounts.businessAccount.userTypes.BAccUser;
+import org.poo.app.accounts.businessAccount.userTypes.CommerciantForBusiness;
 import org.poo.commands.Command;
 import org.poo.fileio.CommandInput;
 

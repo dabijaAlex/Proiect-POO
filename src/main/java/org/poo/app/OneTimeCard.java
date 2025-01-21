@@ -2,9 +2,9 @@ package org.poo.app;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.poo.app.accounts.Account;
-import org.poo.commands.TransactionCommands.CreateOneTimeCard;
-import org.poo.commands.TransactionCommands.DeleteCard;
-import org.poo.commands.TransactionCommands.PayOnline;
+import org.poo.commands.transactionCommands.CreateOneTimeCard;
+import org.poo.commands.transactionCommands.DeleteCard;
+import org.poo.commands.transactionCommands.PayOnline;
 import org.poo.transactions.PayOnlineTransaction;
 
 import java.util.HashMap;

@@ -10,7 +10,7 @@ import org.poo.app.plans.Standard;
 import org.poo.app.plans.Student;
 import org.poo.app.plans.CannotDowngradePlanException;
 
-import org.poo.commands.TransactionCommands.splitPayment.SingleSplitPayment;
+import org.poo.commands.transactionCommands.splitPayment.SingleSplitPayment;
 import org.poo.fileio.UserInput;
 
 import java.util.ArrayList;

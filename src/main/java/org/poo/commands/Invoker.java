@@ -8,9 +8,10 @@ import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.*;
 import org.poo.app.accounts.NotABusinessAccountException;
-import org.poo.app.accounts.userTypes.ChangeDepositLimitException;
-import org.poo.app.accounts.userTypes.ChangeSpendingLimitException;
-import org.poo.app.accounts.userTypes.NotAuthorizedException;
+import org.poo.app.accounts.businessAccount.userTypes.ChangeDepositLimitException;
+import org.poo.app.accounts.businessAccount.userTypes.ChangeSpendingLimitException;
+import org.poo.app.accounts.businessAccount.userTypes.NotAuthorizedException;
+import org.poo.app.notFoundExceptions.*;
 
 import java.util.ArrayList;
 
@@ -39,13 +40,13 @@ public final class Invoker {
                     command.execute(output);
                 } catch (NotFoundException | InsufficientFundsException
                          | NotAuthorizedException ignore) {
-                } catch (UserNotFound e) {
+                } catch (UserNotFoundException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "User not found");
-                } catch (CardNotFound e) {
+                } catch (CardNotFoundException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "Card not found");
-                } catch (AccountNotFound e) {
+                } catch (AccountNotFoundException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "Account not found");
                 } catch (ChangeSpendingLimitException e) {
@@ -57,7 +58,7 @@ public final class Invoker {
                 } catch (NotABusinessAccountException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "This is not a business account");
-                } catch (NotASavingsAccount e) {
+                } catch (NotASavingsAccountException e) {
                     printError(command.timestampTheSecond, command.getCmdName(),
                             "This is not a savings account");
                 }

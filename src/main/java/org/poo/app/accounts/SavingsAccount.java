@@ -3,12 +3,10 @@ package org.poo.app.accounts;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
-import org.poo.app.ExchangeRateGraph;
 import org.poo.app.InsufficientFundsException;
 import org.poo.app.User;
-import org.poo.app.plans.ServicePlan;
-import org.poo.commands.otherCommands.AddInterest;
-import org.poo.commands.otherCommands.ChangeInterestRate;
+import org.poo.commands.accountAdministrationCommands.AddInterest;
+import org.poo.commands.accountAdministrationCommands.ChangeInterestRate;
 import org.poo.transactions.AddInterestTransaction;
 import org.poo.transactions.ChangeInterestRateTransaction;
 

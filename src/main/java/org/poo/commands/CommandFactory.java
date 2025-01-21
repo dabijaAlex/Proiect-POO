@@ -2,12 +2,16 @@ package org.poo.commands;
 
 
 import org.poo.app.User;
-import org.poo.commands.TransactionCommands.splitPayment.AcceptSplitPayment;
-import org.poo.commands.TransactionCommands.splitPayment.RejectSplitPayment;
-import org.poo.commands.TransactionCommands.*;
+import org.poo.commands.transactionCommands.splitPayment.AcceptSplitPayment;
+import org.poo.commands.transactionCommands.splitPayment.RejectSplitPayment;
+import org.poo.commands.transactionCommands.*;
+import org.poo.commands.transactionCommands.splitPayment.SplitPayment;
+import org.poo.commands.businessCommands.ChangeDepositLimit;
+import org.poo.commands.businessCommands.ChangeSpendingLimit;
+import org.poo.commands.businessCommands.addNewBusinessAssociate;
 import org.poo.commands.debugCommands.PrintTransactions;
 import org.poo.commands.debugCommands.PrintUsers;
-import org.poo.commands.otherCommands.*;
+import org.poo.commands.accountAdministrationCommands.*;
 import org.poo.commands.reportCommands.BusinessReport;
 import org.poo.commands.reportCommands.Report;
 import org.poo.commands.reportCommands.SpendingReport;

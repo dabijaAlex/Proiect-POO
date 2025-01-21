@@ -1,12 +1,8 @@
 package org.poo.app;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.poo.app.commerciants.ClothesCommerciant;
-import org.poo.app.commerciants.Commerciant;
-import org.poo.app.commerciants.FoodCommerciant;
-import org.poo.app.commerciants.TechCommerciant;
+import org.poo.app.commerciants.*;
 import org.poo.commands.Invoker;
 import org.poo.fileio.CommandInput;
-import org.poo.fileio.CommerciantInput;
 import org.poo.fileio.ObjectInput;
 import  org.poo.fileio.UserInput;
 

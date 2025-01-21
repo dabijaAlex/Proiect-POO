@@ -2,10 +2,10 @@ package org.poo.commands;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.poo.app.AccountNotFound;
-import org.poo.app.UserNotFound;
+import org.poo.app.notFoundExceptions.AccountNotFoundException;
+import org.poo.app.notFoundExceptions.UserNotFoundException;
 import org.poo.app.accounts.Account;
-import org.poo.app.NotFoundException;
+import org.poo.app.notFoundExceptions.NotFoundException;
 import org.poo.app.User;
 
 import java.util.HashMap;
@@ -39,10 +39,10 @@ public class Command {
         User user = users.get(key);
         if (user == null) {
             if (key.contains("@")) {
-                throw new UserNotFound();
+                throw new UserNotFoundException();
             }
             if (key.contains("RO")) {
-                throw new AccountNotFound();
+                throw new AccountNotFoundException();
             }
             throw new NotFoundException();
         }

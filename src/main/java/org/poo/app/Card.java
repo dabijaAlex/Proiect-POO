@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.accounts.Account;
-import org.poo.commands.TransactionCommands.PayOnline;
+import org.poo.commands.transactionCommands.PayOnline;
 import org.poo.transactions.PayOnlineTransaction;
 
 import java.util.HashMap;

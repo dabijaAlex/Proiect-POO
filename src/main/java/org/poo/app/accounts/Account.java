@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.poo.app.Card;
-import org.poo.app.NotASavingsAccount;
+import org.poo.app.notFoundExceptions.NotASavingsAccountException;
 import org.poo.app.User;
-import org.poo.app.accounts.userTypes.BAccUser;
-import org.poo.app.accounts.userTypes.CommerciantForBusiness;
-import org.poo.app.commerciants.Commerciant;
-import org.poo.commands.otherCommands.AddInterest;
-import org.poo.commands.otherCommands.ChangeInterestRate;
+import org.poo.app.accounts.businessAccount.userTypes.BAccUser;
+import org.poo.app.accounts.businessAccount.userTypes.CommerciantForBusiness;
+import org.poo.app.commerciants.commerciatnTypes.Commerciant;
+import org.poo.commands.accountAdministrationCommands.AddInterest;
+import org.poo.commands.accountAdministrationCommands.ChangeInterestRate;
 import org.poo.transactions.Transaction;
 import org.poo.utils.Utils;
 import java.util.ArrayList;
@@ -225,11 +225,11 @@ public class Account {
      * method valid only for savings account
      * @param targetAccount
      * @param amount
-     * @throws NotASavingsAccount
+     * @throws NotASavingsAccountException
      */
     public void makeWithdrawal(final Account targetAccount,
-                               final double amount) throws NotASavingsAccount {
-        throw new NotASavingsAccount();
+                               final double amount) throws NotASavingsAccountException {
+        throw new NotASavingsAccountException();
     }
 
 
@@ -265,7 +265,7 @@ public class Account {
      * @param command
      */
     public void addInterest(final ArrayNode output, final AddInterest command) {
-        throw new NotASavingsAccount();
+        throw new NotASavingsAccountException();
     }
 
 
@@ -277,7 +277,7 @@ public class Account {
      */
     public void setInterestRate(final double newInterestRate, final ArrayNode output,
                                 final ChangeInterestRate command) {
-        throw new NotASavingsAccount();
+        throw new NotASavingsAccountException();
     }
 
 
